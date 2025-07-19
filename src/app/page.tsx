@@ -54,7 +54,7 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-          <div className="relative aspect-video">
+          <div className="relative w-full h-full min-h-[400px]">
              <Image
               src="https://placehold.co/600x400.png"
               alt="Hero image showing a modern house with a digital lock"
