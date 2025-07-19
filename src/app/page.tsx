@@ -31,7 +31,7 @@ export default function LandingPage() {
             </p>
             <div className="w-full max-w-md space-y-4">
               <p className="font-semibold">Get started now:</p>
-              <form className="grid gap-2">
+              <div className="grid gap-2">
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
@@ -41,11 +41,13 @@ export default function LandingPage() {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full">
-                  Create My Digital Address
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </form>
+                <Link href="/dashboard">
+                  <Button className="w-full">
+                    Create My Digital Address
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
                <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{' '}
                 <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
