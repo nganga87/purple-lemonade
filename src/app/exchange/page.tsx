@@ -69,6 +69,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const marketplaceListings = [
   { 
@@ -278,9 +285,37 @@ export default function ExchangePage() {
                 <Card className="shadow-lg">
                     <CardHeader>
                         <CardTitle className="font-headline">Address NFT Marketplace</CardTitle>
-                        <CardDescription>Browse and acquire verified digital addresses.</CardDescription>
+                        <CardDescription>Browse and acquire verified digital addresses from around the world.</CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <div className="mb-6 p-4 border rounded-lg bg-secondary/50">
+                            <h4 className="font-semibold mb-2">Filter Listings</h4>
+                            <div className="grid md:grid-cols-3 gap-4">
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-muted-foreground">Country</label>
+                                    <Select>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a country" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="usa">United States</SelectItem>
+                                            <SelectItem value="canada">Canada</SelectItem>
+                                            <SelectItem value="uk">United Kingdom</SelectItem>
+                                            <SelectItem value="germany">Germany</SelectItem>
+                                            <SelectItem value="japan">Japan</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-muted-foreground">State/Province</label>
+                                    <Input placeholder="e.g., California" disabled />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-sm font-medium text-muted-foreground">City</label>
+                                    <Input placeholder="e.g., San Francisco" disabled />
+                                </div>
+                            </div>
+                        </div>
                         <Table>
                             <TableHeader>
                                 <TableRow>
