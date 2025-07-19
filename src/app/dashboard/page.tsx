@@ -135,7 +135,7 @@ export default function DashboardPage() {
                 <Link href="/exchange">
                     <SidebarMenuButton>
                     <CandlestickChart />
-                    Exchange
+                    Address Marketplace
                     </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>

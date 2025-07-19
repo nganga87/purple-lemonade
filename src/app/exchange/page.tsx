@@ -27,14 +27,12 @@ import {
   LogOut,
   Wallet,
   ArrowRight,
-  ArrowLeftRight,
   Users,
   CandlestickChart,
-  TrendingUp,
-  TrendingDown,
   MoreHorizontal,
+  Home,
+  Building,
 } from 'lucide-react';
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -63,46 +61,58 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { cn } from '@/lib/utils';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--primary))",
+const marketplaceListings = [
+  { 
+    name: 'Downtown Commercial Space', 
+    address: '789 Business Rd, Metropolis, USA', 
+    price: '15.5 ETH', 
+    type: 'Office',
+    nftId: '0xABC123DEF456...',
+    listedBy: 'Metropolis Properties',
+    avatar: 'https://placehold.co/32x32/orange/white.png?text=M'
   },
-}
-
-const marketData = [
-  { name: 'Bitcoin', symbol: 'BTC', price: 68432.11, change: 1.25, marketCap: '1.35T', icon: 'https://placehold.co/32x32/orange/white.png?text=B' },
-  { name: 'Ethereum', symbol: 'ETH', price: 3567.89, change: -0.52, marketCap: '428.6B', icon: 'https://placehold.co/32x32/royalblue/white.png?text=E' },
-  { name: 'AddressCoin', symbol: 'AC', price: 1.23, change: 5.78, marketCap: '12.3M', icon: 'https://placehold.co/32x32/green/white.png?text=A' },
-  { name: 'Solana', symbol: 'SOL', price: 172.45, change: 2.18, marketCap: '79.1B', icon: 'https://placehold.co/32x32/purple/white.png?text=S' },
-  { name: 'Ripple', symbol: 'XRP', price: 0.52, change: -1.13, marketCap: '28.9B', icon: 'https://placehold.co/32x32/grey/white.png?text=X' },
+  { 
+    name: 'Lakeside Family Home', 
+    address: '101 Lake View, Tranquil Town, USA', 
+    price: '8.2 ETH', 
+    type: 'House',
+    nftId: '0xGHI789JKL012...',
+    listedBy: 'Alice Johnson',
+    avatar: 'https://placehold.co/32x32/royalblue/white.png?text=A'
+  },
+  { 
+    name: 'Modern Warehouse Unit', 
+    address: '21 Industrial Way, Port City, USA', 
+    price: '12.0 ETH', 
+    type: 'Warehouse',
+    nftId: '0xMNO345PQR678...',
+    listedBy: 'Port Logistics Inc.',
+    avatar: 'https://placehold.co/32x32/green/white.png?text=P'
+  },
+  { 
+    name: 'Cozy Mountain Cabin', 
+    address: '333 Pine Ridge, Summit, USA', 
+    price: '4.8 ETH', 
+    type: 'Vacation',
+    nftId: '0xSTU901VWX234...',
+    listedBy: 'Bob Williams',
+    avatar: 'https://placehold.co/32x32/purple/white.png?text=B'
+  },
 ];
 
-const transactionData = [
-    { type: 'Buy', asset: 'BTC', amount: '0.05 BTC', value: '$3,421.60', date: '2024-08-15' },
-    { type: 'Sell', asset: 'ETH', amount: '1.5 ETH', value: '$5,351.83', date: '2024-08-14' },
-    { type: 'Deposit', asset: 'USD', amount: '$5,000.00', value: '', date: '2024-08-12' },
-    { type: 'Buy', asset: 'AC', amount: '10,000 AC', value: '$12,300.00', date: '2024-08-11' },
-]
+const mySaleListings = [
+    { name: 'Work', address: '456 Oak Avenue, Springfield, USA 67890', price: '9.5 ETH', status: 'Listed', views: 124 },
+    { name: 'Vacation House', address: '789 Pine Lane, Lakeside, USA 54321', price: '6.2 ETH', status: 'Listed', views: 88 },
+];
 
 export default function ExchangePage() {
   return (
@@ -154,7 +164,7 @@ export default function ExchangePage() {
                 <Link href="/exchange">
                     <SidebarMenuButton isActive>
                     <CandlestickChart />
-                    Exchange
+                    Address Marketplace
                     </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
@@ -176,7 +186,7 @@ export default function ExchangePage() {
           <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="md:hidden" />
-              <h1 className="text-2xl font-headline font-semibold">Exchange</h1>
+              <h1 className="text-2xl font-headline font-semibold">Address Marketplace</h1>
             </div>
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -227,190 +237,132 @@ export default function ExchangePage() {
           </header>
 
           <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
-            <div className="grid gap-8 md:grid-cols-3">
-                <Card className="md:col-span-2 shadow-lg">
-                    <CardHeader>
-                        <CardTitle className="font-headline">Portfolio Overview</CardTitle>
-                        <CardDescription>Your total crypto asset balance.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <p className="text-sm text-muted-foreground">Total Balance</p>
-                                <p className="text-4xl font-bold font-headline">$154,231.87</p>
-                                <p className="text-sm text-green-500 flex items-center gap-1">
-                                    <TrendingUp className="h-4 w-4"/>
-                                    <span>+ $1,234.56 (2.1%) in last 24h</span>
-                                </p>
-                            </div>
-                            <div className="flex gap-2">
-                                <Button>Deposit</Button>
-                                <Button variant="outline">Withdraw</Button>
-                            </div>
-                        </div>
-                         <div className="h-[200px] w-full mt-8">
-                            <ChartContainer config={chartConfig} className="h-full w-full">
-                                <AreaChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
-                                    <CartesianGrid vertical={false} />
-                                    <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)}/>
-                                    <YAxis tickLine={false} axisLine={false} tickMargin={8} />
-                                    <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-                                    <defs>
-                                        <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="var(--color-desktop)" stopOpacity={0.8}/>
-                                            <stop offset="95%" stopColor="var(--color-desktop)" stopOpacity={0.1}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <Area dataKey="desktop" type="natural" fill="url(#fillDesktop)" stroke="var(--color-desktop)" stackId="a" />
-                                </AreaChart>
-                            </ChartContainer>
-                        </div>
-                    </CardContent>
-                </Card>
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="font-headline">List an Address for Sale</CardTitle>
+                    <CardDescription>Put one of your verified Address NFTs on the marketplace.</CardDescription>
+                </CardHeader>
+                <CardContent className='flex flex-col md:flex-row gap-4 items-end'>
+                    <div className='flex-1 w-full'>
+                        <label className='text-sm font-medium'>Your Address NFT</label>
+                        <Input placeholder="Search for an address or NFT ID to list..." />
+                    </div>
+                    <div className='w-full md:w-auto'>
+                        <label className='text-sm font-medium'>Asking Price (ETH)</label>
+                        <Input type="number" placeholder="e.g., 10.5" />
+                    </div>
+                    <Button>List for Sale</Button>
+                </CardContent>
+            </Card>
+
+            <Tabs defaultValue="marketplace">
+              <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
+                <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
+                <TabsTrigger value="my-listings">My Listings</TabsTrigger>
+              </TabsList>
+              <TabsContent value="marketplace">
                 <Card className="shadow-lg">
                     <CardHeader>
-                        <CardTitle className="font-headline">Quick Trade</CardTitle>
-                        <CardDescription>Instantly buy or sell crypto.</CardDescription>
+                        <CardTitle className="font-headline">Address NFT Marketplace</CardTitle>
+                        <CardDescription>Browse and acquire verified digital addresses.</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="space-y-2">
-                            <label>You sell</label>
-                            <div className="flex gap-2">
-                                <Input type="number" placeholder="1,000" />
-                                <Select defaultValue="usd">
-                                    <SelectTrigger className="w-[120px]">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="usd">USD</SelectItem>
-                                        <SelectItem value="btc">BTC</SelectItem>
-                                        <SelectItem value="eth">ETH</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <div className="flex justify-center">
-                            <Button variant="ghost" size="icon" className="rounded-full bg-secondary">
-                                <ArrowLeftRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                         <div className="space-y-2">
-                            <label>You buy</label>
-                            <div className="flex gap-2">
-                                <Input type="number" placeholder="0.0146" />
-                                 <Select defaultValue="btc">
-                                    <SelectTrigger className="w-[120px]">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="btc">BTC</SelectItem>
-                                        <SelectItem value="usd">USD</SelectItem>
-                                        <SelectItem value="eth">ETH</SelectItem>
-                                         <SelectItem value="ac">AC</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <Button className="w-full">
-                            <ArrowLeftRight className="mr-2 h-4 w-4"/>
-                            Exchange
-                        </Button>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead>Listing</TableHead>
+                                <TableHead>Address</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead>Price</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {marketplaceListings.map((listing) => (
+                                <TableRow key={listing.nftId}>
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <Image src={`https://placehold.co/100x75.png`} alt={listing.name} width={60} height={45} className="rounded-md" data-ai-hint="building exterior"/>
+                                            <div>
+                                                <p className="font-medium">{listing.name}</p>
+                                                <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                                                     <Avatar className='h-5 w-5'>
+                                                        <AvatarImage src={listing.avatar} alt={listing.listedBy} data-ai-hint="person avatar"/>
+                                                        <AvatarFallback>{listing.listedBy.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                    {listing.listedBy}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>{listing.address}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="secondary" className="capitalize">
+                                             {listing.type === 'Office' && <Building className="mr-1 h-3 w-3"/>}
+                                             {listing.type !== 'Office' && <Home className="mr-1 h-3 w-3"/>}
+                                            {listing.type}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="font-mono">{listing.price}</TableCell>
+                                    <TableCell className="text-right">
+                                        <Button size="sm">Buy Now</Button>
+                                    </TableCell>
+                                </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </CardContent>
                 </Card>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                    <Card className="shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="font-headline">Market Overview</CardTitle>
-                             <CardDescription>Browse and trade top cryptocurrencies.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                             <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                    <TableHead>Asset</TableHead>
-                                    <TableHead>Price</TableHead>
-                                    <TableHead>24h Change</TableHead>
-                                    <TableHead>Market Cap</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {marketData.map((coin) => (
-                                    <TableRow key={coin.symbol}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <Image src={coin.icon} alt={coin.name} width={32} height={32} data-ai-hint="crypto currency"/>
-                                                <div>
-                                                    <p className="font-medium">{coin.name}</p>
-                                                    <p className="text-sm text-muted-foreground">{coin.symbol}</p>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>${coin.price.toLocaleString()}</TableCell>
-                                        <TableCell className={cn(coin.change > 0 ? "text-green-500" : "text-red-500", "flex items-center gap-1")}>
-                                            {coin.change > 0 ? <TrendingUp className="h-4 w-4"/> : <TrendingDown className="h-4 w-4"/>}
-                                            {coin.change.toFixed(2)}%
-                                        </TableCell>
-                                        <TableCell>${coin.marketCap}</TableCell>
-                                        <TableCell className="text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>Buy</DropdownMenuItem>
-                                                    <DropdownMenuItem>Sell</DropdownMenuItem>
-                                                    <DropdownMenuItem>View Chart</DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </div>
-                 <div>
-                    <Card className="shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="font-headline">Recent Transactions</CardTitle>
-                             <CardDescription>Your latest account activity.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-4">
-                                {transactionData.map((tx, index) => (
-                                    <div key={index} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn("flex h-8 w-8 items-center justify-center rounded-full", tx.type === 'Buy' ? 'bg-green-100' : tx.type === 'Sell' ? 'bg-red-100' : 'bg-blue-100')}>
-                                                {tx.type === 'Buy' && <TrendingUp className="h-4 w-4 text-green-600"/>}
-                                                {tx.type === 'Sell' && <TrendingDown className="h-4 w-4 text-red-600"/>}
-                                                {tx.type === 'Deposit' && <ArrowRight className="h-4 w-4 text-blue-600"/>}
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">{tx.type} {tx.asset}</p>
-                                                <p className="text-sm text-muted-foreground">{tx.date}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className={cn("font-medium", tx.type === 'Buy' && 'text-green-600', tx.type === 'Sell' && 'text-red-600')}>
-                                                {tx.type === 'Buy' ? '+' : tx.type === 'Sell' ? '-' : ''} {tx.amount}
-                                            </p>
-                                            {tx.value && <p className="text-sm text-muted-foreground">{tx.value}</p>}
-                                        </div>
-                                    </div>
+              </TabsContent>
+              <TabsContent value="my-listings">
+                <Card className="shadow-lg">
+                    <CardHeader>
+                        <CardTitle className="font-headline">Your Active Listings</CardTitle>
+                        <CardDescription>Manage the addresses you have listed for sale.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                         <Table>
+                            <TableHeader>
+                                <TableRow>
+                                <TableHead>Address Name</TableHead>
+                                <TableHead>Full Address</TableHead>
+                                <TableHead>Asking Price</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Views</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {mySaleListings.map((listing) => (
+                                <TableRow key={listing.address}>
+                                    <TableCell className="font-medium">{listing.name}</TableCell>
+                                    <TableCell>{listing.address}</TableCell>
+                                    <TableCell className="font-mono">{listing.price}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className='text-green-600 border-green-300'>{listing.status}</Badge>
+                                    </TableCell>
+                                    <TableCell>{listing.views}</TableCell>
+                                    <TableCell className="text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" size="icon">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem>Edit Listing</DropdownMenuItem>
+                                                <DropdownMenuItem className="text-destructive">Delist</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
+                                </TableRow>
                                 ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </main>
         </SidebarInset>
       </div>

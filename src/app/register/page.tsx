@@ -121,7 +121,7 @@ export default function RegisterPage() {
                 <Link href="/exchange">
                     <SidebarMenuButton>
                     <CandlestickChart />
-                    Exchange
+                    Address Marketplace
                     </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>

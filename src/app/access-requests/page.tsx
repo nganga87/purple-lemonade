@@ -219,7 +219,7 @@ export default function AccessRequestsPage() {
                 <Link href="/exchange">
                     <SidebarMenuButton>
                     <CandlestickChart />
-                    Exchange
+                    Address Marketplace
                     </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>

@@ -230,7 +230,7 @@ export default function MyAddressesPage() {
                 <Link href="/exchange">
                     <SidebarMenuButton>
                     <CandlestickChart />
-                    Exchange
+                    Address Marketplace
                     </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
