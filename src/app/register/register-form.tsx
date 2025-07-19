@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -27,12 +27,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const formSchema = z.object({
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
+  physicalAddress: z.string().min(1, 'Physical address is required.'),
   doorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const drawSignatureOnImage = (imageSrc: string, address: string): Promise<File> => {
+const drawSignatureOnImage = (imageSrc: string, cryptoAddress: string, physicalAddress: string): Promise<File> => {
   return new Promise((resolve, reject) => {
     const img = document.createElement('img');
     img.crossOrigin = 'anonymous';
@@ -49,15 +50,20 @@ const drawSignatureOnImage = (imageSrc: string, address: string): Promise<File> 
       ctx.drawImage(img, 0, 0);
 
       const timestamp = new Date().toISOString();
-      const signatureText = `${address} | ${timestamp}`;
+      const signatureLine1 = physicalAddress;
+      const signatureLine2 = `${cryptoAddress} | ${timestamp}`;
       
       ctx.font = '16px Arial';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-      const textWidth = ctx.measureText(signatureText).width;
-      ctx.fillRect(10, canvas.height - 40, textWidth + 20, 30);
+      const textWidth1 = ctx.measureText(signatureLine1).width;
+      const textWidth2 = ctx.measureText(signatureLine2).width;
+      const maxWidth = Math.max(textWidth1, textWidth2);
+
+      ctx.fillRect(10, canvas.height - 60, maxWidth + 20, 50);
       
       ctx.fillStyle = 'black';
-      ctx.fillText(signatureText, 20, canvas.height - 20);
+      ctx.fillText(signatureLine1, 20, canvas.height - 40);
+      ctx.fillText(signatureLine2, 20, canvas.height - 20);
 
       canvas.toBlob((blob) => {
         if (blob) {
@@ -108,11 +114,13 @@ export function RegisterForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       gpsCoordinates: '',
+      physicalAddress: '',
     },
   });
 
   const { watch, setValue } = form;
   const gpsCoordinates = watch('gpsCoordinates');
+  const physicalAddress = watch('physicalAddress');
   const doorPhoto = watch('doorPhoto');
 
   useEffect(() => {
@@ -157,14 +165,23 @@ export function RegisterForm() {
     if (!generatedAddress) {
       toast({
         variant: 'destructive',
-        title: 'GPS Coordinates Required',
+        title: 'Complete Previous Steps',
         description: 'You must provide GPS coordinates before adding a photo.',
       });
       return null;
     }
 
+    if (!physicalAddress) {
+        toast({
+            variant: 'destructive',
+            title: 'Physical Address Required',
+            description: 'You must provide a physical address before adding a photo.',
+        });
+        return null;
+    }
+
     try {
-      const signedFile = await drawSignatureOnImage(imageSrc, generatedAddress);
+      const signedFile = await drawSignatureOnImage(imageSrc, generatedAddress, physicalAddress);
       const signedImageSrc = URL.createObjectURL(signedFile);
       
       if (source === 'upload') {
@@ -182,7 +199,7 @@ export function RegisterForm() {
       });
       return null;
     }
-  }, [setValue, toast, generatedAddress]);
+  }, [setValue, toast, generatedAddress, physicalAddress]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -322,7 +339,7 @@ export function RegisterForm() {
     }
   };
 
-  const isDataReadyForReview = gpsCoordinates && generatedAddress && doorPhoto;
+  const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -330,7 +347,7 @@ export function RegisterForm() {
         <CardHeader>
           <CardTitle className="font-headline text-2xl">AI-Powered Address Verification</CardTitle>
           <CardDescription>
-            Submit your door photo and location for validation. This ensures the authenticity of new address registrations.
+            Follow the steps to submit your address and location for validation.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -353,19 +370,40 @@ export function RegisterForm() {
                               </FormControl>
                               <Button type="button" variant="outline" onClick={handleGetLocation} disabled={isLoading}>
                                   <LocateFixed className="mr-2 h-4 w-4"/>
-                                  Use My Location
+                                  My Location
                               </Button>
                           </div>
                           <FormDescription>
-                            Provide the latitude and longitude for the property. A wallet address will be generated from this.
+                            Provide latitude and longitude to generate a crypto wallet address.
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="physicalAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>2. Physical Address</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                              <Input placeholder="e.g., 123 Main St, Anytown, USA" {...field} className="pl-10" />
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            This will be included in the digital signature on your photo.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                      {generatedAddress && (
                         <FormItem>
-                          <FormLabel>2. Generated Crypto Wallet Address</FormLabel>
+                          <FormLabel>3. Generated Crypto Wallet Address</FormLabel>
                            <FormControl>
                             <div className="relative flex-grow bg-secondary p-2 rounded-md">
                               <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -373,7 +411,7 @@ export function RegisterForm() {
                             </div>
                           </FormControl>
                           <FormDescription>
-                            This address will be embedded in your photo as a digital signature.
+                            This address is generated from your GPS coordinates.
                           </FormDescription>
                         </FormItem>
                     )}
@@ -383,7 +421,7 @@ export function RegisterForm() {
                   name="doorPhoto"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>3. Door Photo</FormLabel>
+                      <FormLabel>4. Door Photo</FormLabel>
                       <Tabs defaultValue="camera" className="w-full">
                         <TabsList className="grid w-full grid-cols-2">
                           <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
@@ -481,7 +519,7 @@ export function RegisterForm() {
                         </TabsContent>
                       </Tabs>
                       <FormDescription>
-                        A clear photo of the main entrance, signed with your wallet address.
+                        A clear photo of the main entrance, signed with your address details.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -496,6 +534,10 @@ export function RegisterForm() {
                         <div>
                             <span className="font-semibold text-muted-foreground">GPS Coordinates:</span>
                             <p className="font-mono">{gpsCoordinates}</p>
+                        </div>
+                        <div>
+                            <span className="font-semibold text-muted-foreground">Physical Address:</span>
+                            <p>{physicalAddress}</p>
                         </div>
                         <div>
                             <span className="font-semibold text-muted-foreground">Crypto Wallet Address:</span>
