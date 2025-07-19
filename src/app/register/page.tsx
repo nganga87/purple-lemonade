@@ -60,10 +60,12 @@ export default function RegisterPage() {
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <MapPin />
-                  My Addresses
-                </SidebarMenuButton>
+                <Link href="/my-addresses">
+                  <SidebarMenuButton>
+                    <MapPin />
+                    My Addresses
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton href="/register" isActive>

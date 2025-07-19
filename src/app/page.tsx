@@ -102,10 +102,12 @@ export default function DashboardPage() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <MapPin />
-                  My Addresses
-                </SidebarMenuButton>
+                <Link href="/my-addresses">
+                  <SidebarMenuButton>
+                    <MapPin />
+                    My Addresses
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Link href="/register">
