@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, Image as ImageIcon, LocateFixed } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -55,8 +55,14 @@ export function RegisterForm() {
   useEffect(() => {
     const getCameraPermission = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          setHasCameraPermission(false);
-          return;
+        console.error('Camera not supported by this browser.');
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Not Supported',
+          description: 'Your browser does not support camera access.',
+        });
+        return;
       }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({video: true});
@@ -68,11 +74,23 @@ export function RegisterForm() {
       } catch (error) {
         console.error('Error accessing camera:', error);
         setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings to use this feature.',
+        });
       }
     };
 
     getCameraPermission();
-  }, []);
+    
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    }
+  }, [toast]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'doorPhoto' , setPreview: (url: string | null) => void) => {
     const file = e.target.files?.[0];
@@ -197,41 +215,6 @@ export function RegisterForm() {
   };
 
 
-  const FileUploadArea = ({ field, previewUrl, onFileRef, fieldName, setPreview, label }: { field: any, previewUrl: string | null, onFileRef: React.RefObject<HTMLInputElement>, fieldName: "doorPhoto", setPreview: (url: string | null) => void, label: string }) => (
-    <div className="space-y-2">
-      <FormLabel>{label}</FormLabel>
-      <FormControl>
-        <label
-          onDragOver={onDragOver}
-          onDrop={(e) => onDrop(e, fieldName, setPreview)}
-          className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${field.value ? 'border-primary' : ''}`}
-        >
-          {previewUrl ? (
-            <Image src={previewUrl} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" />
-          ) : (
-            <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-              <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
-              <p className="mb-2 text-sm text-muted-foreground">
-                <span className="font-semibold">Click to upload</span> or drag and drop
-              </p>
-              <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
-            </div>
-          )}
-          <input
-            {...form.register(fieldName)}
-            ref={onFileRef}
-            type="file"
-            className="hidden"
-            accept="image/png, image/jpeg, image/webp"
-            onChange={(e) => handleFileChange(e, fieldName, setPreview)}
-          />
-        </label>
-      </FormControl>
-      <FormMessage />
-    </div>
-  );
-
-
   return (
     <div className="max-w-4xl mx-auto">
       <Card className="shadow-lg">
@@ -292,9 +275,9 @@ export function RegisterForm() {
                           { hasCameraPermission === false && (
                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
                                <Alert variant="destructive" className="w-auto">
-                                  <AlertTitle>Camera Access Denied</AlertTitle>
+                                  <AlertTitle>Camera Access Required</AlertTitle>
                                   <AlertDescription>
-                                    Please enable camera permissions.
+                                    Please allow camera access to use this feature.
                                   </AlertDescription>
                               </Alert>
                             </div>
@@ -307,7 +290,7 @@ export function RegisterForm() {
                       </TabsContent>
                     </Tabs>
                     <FormDescription>
-                      Provide a clear photo of the main entrance or front door that is publicly visible.
+                      Provide a clear photo of the main entrance or front door that is publicly visible. It should not be any other door not visible to the public.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
