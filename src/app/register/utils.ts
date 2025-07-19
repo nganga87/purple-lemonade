@@ -2,7 +2,7 @@
 'use server';
 
 // Mock function to generate a sub-address ID
-export const generateSubAddress = (primaryNftId: string, apartmentNumber: string): string => {
+export const generateSubAddress = async (primaryNftId: string, apartmentNumber: string): Promise<string> => {
     const primaryPart = primaryNftId.slice(2, 10);
     
     let aptHash = 0;
