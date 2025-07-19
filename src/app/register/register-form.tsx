@@ -306,7 +306,10 @@ export function RegisterForm() {
                         </Button>
                       </TabsContent>
                     </Tabs>
-                     <FormMessage />
+                    <FormDescription>
+                      Provide a clear photo of the main entrance or front door that is publicly visible.
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
