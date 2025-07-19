@@ -60,58 +60,50 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-const marketplaceListings = [
-  { 
-    name: 'Downtown Commercial Space', 
-    address: '789 Business Rd, Metropolis, USA', 
-    price: '15.5 ETH', 
-    type: 'Office',
-    nftId: '0xABC123DEF456...',
-    listedBy: 'Metropolis Properties',
-    avatar: 'https://placehold.co/32x32.png',
-    status: 'Verified',
-  },
-  { 
-    name: 'Lakeside Family Home', 
-    address: '101 Lake View, Tranquil Town, USA', 
-    price: '8.2 ETH', 
-    type: 'House',
-    nftId: '0xGHI789JKL012...',
-    listedBy: 'Alice Johnson',
-    avatar: 'https://placehold.co/32x32.png',
-    status: 'Verified',
-  },
-  { 
-    name: 'Modern Warehouse Unit', 
-    address: '21 Industrial Way, Port City, USA', 
-    price: '12.0 ETH', 
-    type: 'Warehouse',
-    nftId: '0xMNO345PQR678...',
-    listedBy: 'Port Logistics Inc.',
-    avatar: 'https://placehold.co/32x32.png',
-    status: 'Verified',
-  },
-  { 
-    name: 'Cozy Mountain Cabin', 
-    address: '333 Pine Ridge, Summit, USA', 
-    price: '4.8 ETH', 
-    type: 'Vacation',
-    nftId: '0xSTU901VWX234...',
-    listedBy: 'Bob Williams',
-    avatar: 'https://placehold.co/32x32.png',
-    status: 'Verified',
-  },
-   { 
-    name: 'Suburban Office Building', 
-    address: '555 Commerce Drive, Suburbia, USA', 
-    price: '25.0 ETH', 
-    type: 'Office',
-    nftId: '0xZYX987WVU654...',
-    listedBy: 'Suburbia Real Estate',
-    avatar: 'https://placehold.co/32x32.png',
-    status: 'Pending',
-  },
-];
+const generateListings = (count: number) => {
+  const listings = [];
+  const propertyTypes = ['Office', 'House', 'Warehouse', 'Vacation'];
+  const statuses = ['Verified', 'Pending'];
+  const names = [
+    'Downtown Commercial Space', 'Lakeside Family Home', 'Modern Warehouse Unit', 'Cozy Mountain Cabin', 'Suburban Office Building',
+    'Urban Loft Apartment', 'Industrial Park Bay', 'Beachfront Villa', 'Rural Farmstead', 'City Center Penthouse',
+    'Tech Startup Garage', 'Retail Storefront', 'Historic District Home', 'Waterfront Condo', 'Ski Chalet Retreat'
+  ];
+  const cities = ['Metropolis', 'Tranquil Town', 'Port City', 'Summit', 'Suburbia', 'Rivertown', 'Gleamwood', 'Starfall City', 'Oakhaven', 'Silver Creek'];
+  const listedBySuffix = ['Properties', 'Realty', 'Ventures', 'Holdings', 'Group'];
+  const firstNames = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Heidi'];
+  const lastNames = ['Johnson', 'Williams', 'Brown', 'Smith', 'Davis', 'Miller', 'Wilson', 'Moore'];
+
+  for (let i = 0; i < count; i++) {
+    const type = propertyTypes[i % propertyTypes.length];
+    const city = cities[i % cities.length];
+    const streetNum = Math.floor(Math.random() * 2000) + 1;
+    const streetName = ['Business Rd', 'Lake View', 'Industrial Way', 'Pine Ridge', 'Commerce Drive', 'Main St', 'Oak Ave', 'Elm St'][i % 8];
+    const price = (Math.random() * 30 + 1).toFixed(1);
+    const listedByFirstName = firstNames[i % firstNames.length];
+    const listedByLastName = lastNames[i % lastNames.length];
+    let listedBy;
+    if (i % 3 === 0) {
+      listedBy = `${city} ${listedBySuffix[i % listedBySuffix.length]}`;
+    } else {
+      listedBy = `${listedByFirstName} ${listedByLastName}`;
+    }
+
+    listings.push({
+      name: `${names[i % names.length]} #${i + 1}`,
+      address: `${streetNum} ${streetName}, ${city}, USA`,
+      price: `${price} ETH`,
+      type: type,
+      nftId: `0x${[...Array(12)].map(() => Math.floor(Math.random() * 16).toString(16)).join('').toUpperCase()}...`,
+      listedBy: listedBy,
+      avatar: `https://placehold.co/32x32.png?text=${listedBy.charAt(0)}`,
+      status: statuses[i % statuses.length],
+    });
+  }
+  return listings;
+};
+
+const marketplaceListings = generateListings(200);
 
 const mySaleListings = [
     { name: 'Work', address: '456 Oak Avenue, Springfield, USA 67890', price: '9.5 ETH', status: 'Listed', views: 124 },
