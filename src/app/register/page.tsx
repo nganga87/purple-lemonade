@@ -3,6 +3,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   Sidebar,
   SidebarProvider,
@@ -39,7 +40,17 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Logo } from '@/components/icons';
-import { RegisterForm } from './register-form';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const RegisterForm = dynamic(() => import('./register-form').then(mod => mod.RegisterForm), {
+  ssr: false,
+  loading: () => (
+    <div className="max-w-4xl mx-auto space-y-4">
+      <Skeleton className="h-64 w-full" />
+      <Skeleton className="h-10 w-48" />
+    </div>
+  ),
+});
 
 export default function RegisterPage() {
   return (
