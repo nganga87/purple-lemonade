@@ -41,7 +41,7 @@ export default function LandingPage() {
                     required
                   />
                 </div>
-                <Link href="/dashboard">
+                <Link href="/register">
                   <Button className="w-full">
                     Create My Digital Address
                     <ArrowRight className="ml-2 h-4 w-4" />
