@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -98,6 +98,12 @@ export function RegisterForm() {
       gpsCoordinates: '',
     },
   });
+
+  const { watch } = form;
+  const gpsCoordinates = watch('gpsCoordinates');
+  const cryptoAddress = watch('cryptoAddress');
+  const doorPhoto = watch('doorPhoto');
+
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -295,6 +301,7 @@ export function RegisterForm() {
     }
   };
 
+  const isDataReadyForReview = gpsCoordinates && cryptoAddress && doorPhoto;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -308,171 +315,194 @@ export function RegisterForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-6">
-               <FormField
-                control={form.control}
-                name="gpsCoordinates"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GPS Coordinates</FormLabel>
-                    <div className="flex gap-2">
-                        <FormControl>
-                          <div className="relative flex-grow">
-                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input placeholder="e.g., 34.0522,-118.2437" {...field} className="pl-10" />
-                          </div>
-                        </FormControl>
-                        <Button type="button" variant="outline" onClick={handleGetLocation} disabled={isLoading}>
-                            <LocateFixed className="mr-2 h-4 w-4"/>
-                            Use My Location
-                        </Button>
-                    </div>
-                    <FormDescription>
-                      Provide the latitude and longitude for the property, or use your current location.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="doorPhoto"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Door Photo</FormLabel>
-                    <Tabs defaultValue="camera">
-                      <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
-                        <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="upload">
-                        <div className="space-y-4">
-                          <Alert variant="default" className="border-yellow-500/50 text-yellow-700 dark:border-yellow-500/50 dark:text-yellow-400 [&>svg]:text-yellow-500">
-                             <AlertTriangle className="h-4 w-4" />
-                             <AlertTitle>Location Mismatch Warning</AlertTitle>
-                             <AlertDescription>
-                               If your photo contains location data (EXIF) that does not match the GPS coordinates provided, validation may fail. For best results, use the "Use Camera" option to take a fresh photo.
-                             </AlertDescription>
-                           </Alert>
-                          <FormControl>
-                            <label
-                              onDragOver={onDragOver}
-                              onDrop={onDrop}
-                              className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
-                            >
-                              {doorPhotoPreview ? (
-                                <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" />
-                              ) : (
-                                <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                                  <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
-                                  <p className="mb-2 text-sm text-muted-foreground">
-                                    <span className="font-semibold">Click to upload</span> or drag and drop
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                   <FormField
+                      control={form.control}
+                      name="gpsCoordinates"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>1. GPS Coordinates</FormLabel>
+                          <div className="flex gap-2">
+                              <FormControl>
+                                <div className="relative flex-grow">
+                                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                  <Input placeholder="e.g., 34.0522,-118.2437" {...field} className="pl-10" />
                                 </div>
-                              )}
-                              <input
-                                ref={doorPhotoRef}
-                                type="file"
-                                className="hidden"
-                                accept="image/png, image/jpeg, image/webp"
-                                onChange={handleFileChange}
-                              />
-                            </label>
-                          </FormControl>
-                        </div>
-                      </TabsContent>
-                      <TabsContent value="camera">
-                        <div className="relative overflow-hidden rounded-md">
-                          {capturedImage ? (
-                            <Image src={capturedImage.src} alt="Captured preview" width={1920} height={1080} className="w-full aspect-video" />
-                          ) : (
-                            <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
-                          )}
-                          <canvas ref={canvasRef} className="hidden"></canvas>
-                          {!capturedImage && (
-                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <div className="w-[calc(100%-4rem)] h-[calc(100%-4rem)] border-4 border-white/50 border-dashed rounded-lg shadow-2xl" />
-                            </div>
-                          )}
-                          {cameraStatus !== 'allowed' && !capturedImage && (
-                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
-                               {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
-                               {cameraStatus === 'denied' && (
-                                 <Alert variant="destructive" className="w-auto">
-                                    <AlertTitle>Camera Access Denied</AlertTitle>
-                                    <AlertDescription>
-                                      Please enable camera permissions to use this feature.
-                                    </AlertDescription>
-                                </Alert>
-                               )}
-                               {cameraStatus === 'notsupported' && (
-                                 <Alert variant="destructive" className="w-auto">
-                                    <AlertTitle>Camera Not Supported</AlertTitle>
-                                    <AlertDescription>
-                                      Your browser does not support camera access.
-                                    </AlertDescription>
-                                </Alert>
-                               )}
-                            </div>
-                          )}
-                        </div>
-                        {capturedImage ? (
-                           <div className="flex gap-2 w-full mt-2">
-                            <Button type="button" onClick={handleRetake} variant="outline" className="w-full">
-                              <RefreshCw className="mr-2" />
-                              Retake Photo
-                            </Button>
-                            <Button type="button" onClick={handleConfirmCapture} className="w-full">
-                              <CheckCircle className="mr-2" />
-                              Confirm & Proceed
-                            </Button>
+                              </FormControl>
+                              <Button type="button" variant="outline" onClick={handleGetLocation} disabled={isLoading}>
+                                  <LocateFixed className="mr-2 h-4 w-4"/>
+                                  Use My Location
+                              </Button>
                           </div>
-                        ) : (
-                          <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed' || isCapturing} className="w-full mt-2">
-                            {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
-                            {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
-                          </Button>
-                        )}
-                      </TabsContent>
-                    </Tabs>
-                    <FormDescription>
-                      Provide a clear photo of the main entrance or front door that is publicly visible. It should not be any other door not visible to the public.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-               <FormField
-                control={form.control}
-                name="cryptoAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Crypto Wallet Address</FormLabel>
-                     <FormControl>
-                      <div className="relative flex-grow">
-                        <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input placeholder="e.g., 0x..." {...field} className="pl-10" />
-                      </div>
-                    </FormControl>
-                    <FormDescription>
-                      This address will be embedded in your photo as a digital signature.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          <FormDescription>
+                            Provide the latitude and longitude for the property.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="cryptoAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>2. Crypto Wallet Address</FormLabel>
+                           <FormControl>
+                            <div className="relative flex-grow">
+                              <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                              <Input placeholder="e.g., 0x..." {...field} className="pl-10" />
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            This address will be embedded in your photo as a digital signature.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="doorPhoto"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>3. Door Photo</FormLabel>
+                      <Tabs defaultValue="camera" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                          <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                          <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="upload">
+                          <div className="space-y-4">
+                            <Alert variant="default" className="border-yellow-500/50 text-yellow-700 dark:border-yellow-500/50 dark:text-yellow-400 [&>svg]:text-yellow-500">
+                               <AlertTriangle className="h-4 w-4" />
+                               <AlertTitle>Location Mismatch Warning</AlertTitle>
+                               <AlertDescription>
+                                 If your photo contains location data (EXIF) that does not match the GPS coordinates provided, validation may fail. For best results, use the "Use Camera" option to take a fresh photo.
+                               </AlertDescription>
+                             </Alert>
+                            <FormControl>
+                              <label
+                                onDragOver={onDragOver}
+                                onDrop={onDrop}
+                                className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
+                              >
+                                {doorPhotoPreview ? (
+                                  <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" />
+                                ) : (
+                                  <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                    <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
+                                    <p className="mb-2 text-sm text-muted-foreground">
+                                      <span className="font-semibold">Click to upload</span> or drag and drop
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
+                                  </div>
+                                )}
+                                <input
+                                  ref={doorPhotoRef}
+                                  type="file"
+                                  className="hidden"
+                                  accept="image/png, image/jpeg, image/webp"
+                                  onChange={handleFileChange}
+                                />
+                              </label>
+                            </FormControl>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="camera">
+                          <div className="relative overflow-hidden rounded-md">
+                            {capturedImage ? (
+                              <Image src={capturedImage.src} alt="Captured preview" width={1920} height={1080} className="w-full aspect-video" />
+                            ) : (
+                              <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
+                            )}
+                            <canvas ref={canvasRef} className="hidden"></canvas>
+                            {!capturedImage && (
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                  <div className="w-[calc(100%-4rem)] h-[calc(100%-4rem)] border-4 border-white/50 border-dashed rounded-lg shadow-2xl" />
+                              </div>
+                            )}
+                            {cameraStatus !== 'allowed' && !capturedImage && (
+                               <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+                                 {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
+                                 {cameraStatus === 'denied' && (
+                                   <Alert variant="destructive" className="w-auto">
+                                      <AlertTitle>Camera Access Denied</AlertTitle>
+                                      <AlertDescription>
+                                        Please enable camera permissions to use this feature.
+                                      </AlertDescription>
+                                  </Alert>
+                                 )}
+                                 {cameraStatus === 'notsupported' && (
+                                   <Alert variant="destructive" className="w-auto">
+                                      <AlertTitle>Camera Not Supported</AlertTitle>
+                                      <AlertDescription>
+                                        Your browser does not support camera access.
+                                      </AlertDescription>
+                                  </Alert>
+                                 )}
+                              </div>
+                            )}
+                          </div>
+                          {capturedImage ? (
+                             <div className="flex gap-2 w-full mt-2">
+                              <Button type="button" onClick={handleRetake} variant="outline" className="w-full">
+                                <RefreshCw className="mr-2" />
+                                Retake Photo
+                              </Button>
+                              <Button type="button" onClick={handleConfirmCapture} className="w-full">
+                                <CheckCircle className="mr-2" />
+                                Confirm & Proceed
+                              </Button>
+                            </div>
+                          ) : (
+                            <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed' || isCapturing} className="w-full mt-2">
+                              {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
+                              {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
+                            </Button>
+                          )}
+                        </TabsContent>
+                      </Tabs>
+                      <FormDescription>
+                        A clear photo of the main entrance, signed with your wallet address.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {isDataReadyForReview && (
+                <div className="border-t pt-6 space-y-4">
+                    <h3 className="text-lg font-medium flex items-center gap-2"><Eye className="h-5 w-5"/> Review Your Data</h3>
+                    <div className="p-4 rounded-lg bg-secondary space-y-3 text-sm">
+                        <div>
+                            <span className="font-semibold text-muted-foreground">GPS Coordinates:</span>
+                            <p className="font-mono">{gpsCoordinates}</p>
+                        </div>
+                        <div>
+                            <span className="font-semibold text-muted-foreground">Crypto Wallet Address:</span>
+                            <p className="font-mono truncate">{cryptoAddress}</p>
+                        </div>
+                         <div>
+                            <span className="font-semibold text-muted-foreground">Signed Door Photo:</span>
+                            {doorPhotoPreview && <Image src={doorPhotoPreview} alt="Door photo preview" width={150} height={150} className="mt-2 rounded-md border" />}
+                        </div>
+                    </div>
+                </div>
+              )}
             </CardContent>
             <CardFooter>
-              <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
+              <Button type="submit" disabled={isLoading || !isDataReadyForReview} className="w-full md:w-auto">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Validating...
                   </>
                 ) : (
-                  'Validate Address'
+                  'Validate & Register Address'
                 )}
               </Button>
             </CardFooter>
