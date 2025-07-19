@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -57,6 +57,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Skeleton } from '@/components/ui/skeleton';
 
 const generateListings = (count: number) => {
   const listings = [];
@@ -115,7 +116,11 @@ function NavLink({ href, children }: { href: string, children: React.ReactNode }
 }
 
 export default function ExchangePage() {
-  const [marketplaceListings] = useState(() => generateListings(200));
+  const [marketplaceListings, setMarketplaceListings] = useState<any[]>([]);
+
+  useEffect(() => {
+    setMarketplaceListings(generateListings(200));
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -273,44 +278,57 @@ export default function ExchangePage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {marketplaceListings.map((listing) => (
-                        <TableRow key={listing.nftId}>
-                            <TableCell>
-                                <div className="flex items-center gap-3">
-                                    <Image src={`https://placehold.co/100x75.png`} alt={listing.name} width={60} height={45} className="rounded-md" data-ai-hint="building exterior"/>
-                                    <div>
-                                        <p className="font-medium">{listing.name}</p>
-                                        <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                                             <Avatar className='h-5 w-5'>
-                                                <AvatarImage src={listing.avatar} alt={listing.listedBy} data-ai-hint="person avatar"/>
-                                                <AvatarFallback>{listing.listedBy.charAt(0)}</AvatarFallback>
-                                            </Avatar>
-                                            {listing.listedBy}
-                                        </p>
-                                    </div>
-                                </div>
-                            </TableCell>
-                            <TableCell>{listing.address}</TableCell>
-                            <TableCell>
-                                <Badge variant="outline" className="capitalize flex items-center gap-1">
-                                     {listing.type === 'Office' && <Building className="h-3 w-3"/>}
-                                     {listing.type === 'Warehouse' && <Building className="h-3 w-3"/>}
-                                     {listing.type === 'House' && <Home className="h-3 w-3"/>}
-                                     {listing.type === 'Vacation' && <Home className="h-3 w-3"/>}
-                                    {listing.type}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant={listing.status === 'Verified' ? 'default' : 'secondary'} className={listing.status === 'Verified' ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
-                                    {listing.status}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="font-mono">{listing.price}</TableCell>
-                            <TableCell className="text-right">
-                                <Button size="sm">Buy Now</Button>
-                            </TableCell>
-                        </TableRow>
-                        ))}
+                        {marketplaceListings.length === 0 ? (
+                           Array.from({ length: 5 }).map((_, index) => (
+                             <TableRow key={index}>
+                               <TableCell><Skeleton className="h-10 w-full" /></TableCell>
+                               <TableCell><Skeleton className="h-10 w-full" /></TableCell>
+                               <TableCell><Skeleton className="h-10 w-full" /></TableCell>
+                               <TableCell><Skeleton className="h-10 w-full" /></TableCell>
+                               <TableCell><Skeleton className="h-10 w-full" /></TableCell>
+                               <TableCell><Skeleton className="h-10 w-full" /></TableCell>
+                             </TableRow>
+                           ))
+                        ) : (
+                          marketplaceListings.map((listing) => (
+                          <TableRow key={listing.nftId}>
+                              <TableCell>
+                                  <div className="flex items-center gap-3">
+                                      <Image src={`https://placehold.co/100x75.png`} alt={listing.name} width={60} height={45} className="rounded-md" data-ai-hint="building exterior"/>
+                                      <div>
+                                          <p className="font-medium">{listing.name}</p>
+                                          <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                                               <Avatar className='h-5 w-5'>
+                                                  <AvatarImage src={listing.avatar} alt={listing.listedBy} data-ai-hint="person avatar"/>
+                                                  <AvatarFallback>{listing.listedBy.charAt(0)}</AvatarFallback>
+                                              </Avatar>
+                                              {listing.listedBy}
+                                          </p>
+                                      </div>
+                                  </div>
+                              </TableCell>
+                              <TableCell>{listing.address}</TableCell>
+                              <TableCell>
+                                  <Badge variant="outline" className="capitalize flex items-center gap-1">
+                                       {listing.type === 'Office' && <Building className="h-3 w-3"/>}
+                                       {listing.type === 'Warehouse' && <Building className="h-3 w-3"/>}
+                                       {listing.type === 'House' && <Home className="h-3 w-3"/>}
+                                       {listing.type === 'Vacation' && <Home className="h-3 w-3"/>}
+                                      {listing.type}
+                                  </Badge>
+                              </TableCell>
+                              <TableCell>
+                                  <Badge variant={listing.status === 'Verified' ? 'default' : 'secondary'} className={listing.status === 'Verified' ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
+                                      {listing.status}
+                                  </Badge>
+                              </TableCell>
+                              <TableCell className="font-mono">{listing.price}</TableCell>
+                              <TableCell className="text-right">
+                                  <Button size="sm">Buy Now</Button>
+                              </TableCell>
+                          </TableRow>
+                          ))
+                        )}
                     </TableBody>
                 </Table>
             </CardContent>
