@@ -1,0 +1,378 @@
+
+'use client';
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { handleValidation } from './actions';
+import type { CompareValidationPhotosOutput } from '@/ai/flows/compare-validation-photos';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle } from 'lucide-react';
+import Image from 'next/image';
+import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Link from 'next/link';
+import { Logo } from '@/components/icons';
+
+const formSchema = z.object({
+  validatorGpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
+  validatorDoorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
+});
+
+type FormValues = z.infer<typeof formSchema>;
+
+// Mock data for the request - in a real app, this would be fetched based on `requestId`
+const mockRequest = {
+  requestId: 'REQ-12345',
+  addressToVerify: '123 Main Street, Anytown, USA 12345',
+  originalUserPhoto: 'https://placehold.co/600x400.png',
+};
+
+export default function ValidateRequestPage({ params }: { params: { requestId: string } }) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<CompareValidationPhotosOutput | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [doorPhotoPreview, setDoorPhotoPreview] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [cameraStatus, setCameraStatus] = useState<'loading' | 'allowed' | 'denied' | 'notsupported'>('loading');
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      validatorGpsCoordinates: '',
+    },
+  });
+
+  const { setValue } = form;
+
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+    const getCameraPermission = async () => {
+      if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          setCameraStatus('allowed');
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setCameraStatus('denied');
+        }
+      } else {
+        setCameraStatus('notsupported');
+      }
+    };
+
+    getCameraPermission();
+
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const processAndSetImage = useCallback((imageSrc: string, source: 'upload' | 'camera') => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      // In a real app, you might convert blob to file here
+    };
+
+    if (source === 'upload') {
+      // This is a simplified version. A full implementation would convert the data URI back to a File object.
+      // For now, we'll fetch it to create a blob and then a file.
+      fetch(imageSrc)
+        .then(res => res.blob())
+        .then(blob => {
+          const file = new File([blob], "validator-photo.jpg", { type: "image/jpeg" });
+          setValue('validatorDoorPhoto', file, { shouldValidate: true });
+          setDoorPhotoPreview(imageSrc);
+        });
+    } else { // camera
+        const file = new File([imageSrc], "validator-photo.jpg", { type: "image/jpeg" });
+        setValue('validatorDoorPhoto', file, { shouldValidate: true });
+        setDoorPhotoPreview(URL.createObjectURL(file));
+    }
+  }, [setValue]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        processAndSetImage(reader.result as string, 'upload');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCapture = useCallback(() => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      
+      canvas.toBlob((blob) => {
+        if (blob) {
+            processAndSetImage(blob as any, 'camera');
+            toast({ title: "Photo Captured", description: "Ready for submission."});
+        }
+      }, 'image/jpeg');
+    }
+  }, [processAndSetImage, toast]);
+
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      setIsLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const coords = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
+          setValue('validatorGpsCoordinates', coords, { shouldValidate: true });
+          setIsLoading(false);
+          toast({
+            title: "Location Fetched",
+            description: "Your GPS coordinates have been set.",
+          });
+        },
+        (error) => {
+          setIsLoading(false);
+          toast({
+            variant: 'destructive',
+            title: 'Location Error',
+            description: 'Could not retrieve your location. Please enter it manually.',
+          });
+        }
+      );
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Geolocation not supported',
+        description: 'Your browser does not support geolocation.',
+      });
+    }
+  };
+
+  const onSubmit = async (values: FormValues) => {
+    setIsLoading(true);
+    setResult(null);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('requestId', params.requestId);
+    formData.append('validatorGpsCoordinates', values.validatorGpsCoordinates);
+    formData.append('validatorDoorPhoto', values.validatorDoorPhoto);
+
+    try {
+      const response = await handleValidation(formData);
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      setResult(response);
+      toast({
+        title: "Validation Submitted",
+        description: "Your validation has been recorded.",
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Submission Error",
+        description: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const isFormReadOnly = result?.isMatch === true;
+
+  return (
+    <div className="flex min-h-screen flex-col items-center bg-background font-body p-4">
+        <header className="w-full max-w-4xl mx-auto mb-4">
+            <Link href="/" className="mr-6 flex items-center space-x-2">
+                <Logo className="h-6 w-6 text-primary" />
+                <span className="font-headline font-bold">AddressChain Validator</span>
+            </Link>
+        </header>
+        <div className="w-full max-w-4xl mx-auto">
+        <Card className="shadow-lg">
+            <CardHeader>
+            <CardTitle className="font-headline text-2xl">Third-Party Validation</CardTitle>
+            <CardDescription>
+                You have been selected to validate a new address registration. Please capture a photo of the door and your current location to confirm.
+            </CardDescription>
+            </CardHeader>
+             <CardContent>
+                <div className="p-4 rounded-lg bg-secondary space-y-3 text-sm border">
+                    <h3 className="font-semibold text-lg">Request Details</h3>
+                    <div>
+                        <span className="font-semibold text-muted-foreground">Request ID:</span>
+                        <p className="font-mono">{params.requestId}</p>
+                    </div>
+                    <div>
+                        <span className="font-semibold text-muted-foreground">Address to Verify:</span>
+                        <p>{mockRequest.addressToVerify}</p>
+                    </div>
+                     <div>
+                        <span className="font-semibold text-muted-foreground">Original User's Photo:</span>
+                        <Image src={mockRequest.originalUserPhoto} alt="Original user's door photo" width={200} height={150} className="mt-2 rounded-md border" data-ai-hint="front door"/>
+                    </div>
+                </div>
+            </CardContent>
+
+            <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+                <fieldset disabled={isFormReadOnly}>
+                <CardContent className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="validatorGpsCoordinates"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>1. Your Current GPS Coordinates</FormLabel>
+                                    <div className="flex gap-2">
+                                        <FormControl>
+                                        <div className="relative flex-grow">
+                                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                            <Input placeholder="e.g., 34.0522,-118.2437" {...field} className="pl-10" />
+                                        </div>
+                                        </FormControl>
+                                        <Button type="button" variant="outline" onClick={handleGetLocation} disabled={isLoading}>
+                                            <LocateFixed className="mr-2 h-4 w-4"/>
+                                            Get Location
+                                        </Button>
+                                    </div>
+                                    <FormDescription>
+                                    Capture your location while at the property.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                        </div>
+
+                        <FormField
+                            control={form.control}
+                            name="validatorDoorPhoto"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>2. Capture Door Photo</FormLabel>
+                                <Tabs defaultValue="camera" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                                    <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="upload">
+                                    <FormControl>
+                                        <label className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}>
+                                        {doorPhotoPreview ? (
+                                            <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" />
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                            <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
+                                            <p className="mb-2 text-sm text-muted-foreground">
+                                                <span className="font-semibold">Click to upload</span> or drag and drop
+                                            </p>
+                                            </div>
+                                        )}
+                                        <input
+                                            type="file"
+                                            className="hidden"
+                                            accept="image/png, image/jpeg, image/webp"
+                                            onChange={handleFileChange}
+                                        />
+                                        </label>
+                                    </FormControl>
+                                </TabsContent>
+                                <TabsContent value="camera">
+                                    <div className="relative overflow-hidden rounded-md">
+                                        <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
+                                        <canvas ref={canvasRef} className="hidden"></canvas>
+                                    </div>
+                                    <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed'} className="w-full mt-2">
+                                        <Camera className="mr-2" /> Capture Photo
+                                    </Button>
+                                </TabsContent>
+                                </Tabs>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </div>
+                </CardContent>
+                {!isFormReadOnly && (
+                    <CardFooter>
+                    <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
+                        {isLoading ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Submitting...
+                        </>
+                        ) : (
+                        'Submit Validation'
+                        )}
+                    </Button>
+                    </CardFooter>
+                )}
+                </fieldset>
+            </form>
+            </Form>
+        </Card>
+        
+        {result && (
+            <Card className={`mt-8 shadow-lg ${result.isMatch ? 'border-green-500' : 'border-red-500'}`}>
+            <CardHeader className="flex flex-row items-center gap-4">
+                {result.isMatch ? <CheckCircle className="h-8 w-8 text-green-500" /> : <XCircle className="h-8 w-8 text-red-500" />}
+                <div>
+                <CardTitle className="font-headline text-xl">Comparison Result</CardTitle>
+                <CardDescription>{result.isMatch ? "The photos appear to match." : "The photos do not appear to match."}</CardDescription>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <p className="font-medium">AI Analysis:</p>
+                <p className="text-muted-foreground p-3 bg-secondary rounded-md mt-2">{result.reasoning}</p>
+            </CardContent>
+            </Card>
+        )}
+
+        {error && !result &&(
+            <Card className="mt-8 shadow-lg border-destructive">
+            <CardHeader className="flex flex-row items-center gap-4">
+                <XCircle className="h-8 w-8 text-destructive" />
+                <div>
+                <CardTitle className="font-headline text-xl">Submission Failed</CardTitle>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <p className="text-destructive p-3 bg-destructive/10 rounded-md">{error}</p>
+            </CardContent>
+            </Card>
+        )}
+        </div>
+    </div>
+  );
+}
