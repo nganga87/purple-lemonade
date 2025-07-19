@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -101,8 +101,6 @@ const generateListings = (count: number) => {
   return listings;
 };
 
-const marketplaceListings = generateListings(200);
-
 const mySaleListings = [
     { name: 'Work', address: '456 Oak Avenue, Springfield, USA 67890', price: '9.5 ETH', status: 'Listed', views: 124 },
     { name: 'Vacation House', address: '789 Pine Lane, Lakeside, USA 54321', price: '6.2 ETH', status: 'Listed', views: 88 },
@@ -117,6 +115,8 @@ function NavLink({ href, children }: { href: string, children: React.ReactNode }
 }
 
 export default function ExchangePage() {
+  const [marketplaceListings] = useState(() => generateListings(200));
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
