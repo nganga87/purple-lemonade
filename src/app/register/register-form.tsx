@@ -68,7 +68,7 @@ const drawSignatureOnImage = (imageSrc: string, address: string): Promise<File> 
         }
       }, 'image/jpeg', 0.95);
     };
-    img.onerror = (err) => {
+    img.onerror = () => {
       reject(new Error('Failed to load image for signing.'));
     }
   });
@@ -127,20 +127,20 @@ export function RegisterForm() {
   useEffect(() => {
     let stream: MediaStream | null = null;
     const getCameraPermission = async () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({video: true});
+          setCameraStatus('allowed');
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setCameraStatus('denied');
+        }
+      } else {
         console.error('Camera not supported by this browser.');
         setCameraStatus('notsupported');
-        return;
-      }
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({video: true});
-        setCameraStatus('allowed');
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setCameraStatus('denied');
       }
     };
 
@@ -558,5 +558,3 @@ export function RegisterForm() {
     </div>
   );
 }
-
-    
