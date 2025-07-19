@@ -129,7 +129,12 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
                       <SelectContent>
                         {userProperties.map(prop => (
                           <SelectItem key={prop.nftId} value={prop.nftId}>
-                            {prop.address}
+                            <div className="flex flex-col">
+                              <span>{prop.address}</span>
+                              <span className="text-xs text-muted-foreground font-mono">
+                                (...{prop.nftId.slice(-8)})
+                              </span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
