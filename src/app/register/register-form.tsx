@@ -19,13 +19,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft, Building } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const formSchema = z.object({
+  addressName: z.string().min(1, 'An address name is required (e.g., Home, Office).'),
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   physicalAddress: z.string().min(1, 'Physical address is required.'),
   doorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
@@ -117,6 +118,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      addressName: '',
       gpsCoordinates: '',
       physicalAddress: '',
     },
@@ -126,6 +128,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const gpsCoordinates = watch('gpsCoordinates');
   const physicalAddress = watch('physicalAddress');
   const doorPhoto = watch('doorPhoto');
+  const addressName = watch('addressName');
 
   useEffect(() => {
     if (gpsCoordinates) {
@@ -343,7 +346,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     }
   };
 
-  const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto;
+  const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto && addressName;
   const isFormReadOnly = result?.isValid === true;
 
   return (
@@ -365,12 +368,31 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
               <CardContent className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="addressName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>1. Address Name</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                              <Input placeholder="e.g., Home, Office, Warehouse" {...field} className="pl-10" />
+                            </div>
+                          </FormControl>
+                          <FormDescription>
+                            A friendly name for this address.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                      <FormField
                         control={form.control}
                         name="gpsCoordinates"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>1. GPS Coordinates</FormLabel>
+                            <FormLabel>2. GPS Coordinates</FormLabel>
                             <div className="flex gap-2">
                                 <FormControl>
                                   <div className="relative flex-grow">
@@ -396,7 +418,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                         name="physicalAddress"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>2. Physical Address</FormLabel>
+                            <FormLabel>3. Physical Address</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -413,7 +435,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
 
                        {generatedAddress && (
                           <FormItem>
-                            <FormLabel>3. Generated Crypto Wallet Address</FormLabel>
+                            <FormLabel>4. Generated Crypto Wallet Address</FormLabel>
                              <FormControl>
                               <div className="relative flex-grow bg-secondary p-2 rounded-md">
                                 <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -431,7 +453,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                     name="doorPhoto"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>4. Door Photo</FormLabel>
+                        <FormLabel>5. Door Photo</FormLabel>
                         <Tabs defaultValue="camera" className="w-full">
                           <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
@@ -541,6 +563,10 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                   <div className="border-t pt-6 space-y-4">
                       <h3 className="text-lg font-medium flex items-center gap-2"><Eye className="h-5 w-5"/> Review Your Data</h3>
                       <div className="p-4 rounded-lg bg-secondary space-y-3 text-sm">
+                          <div>
+                              <span className="font-semibold text-muted-foreground">Address Name:</span>
+                              <p>{addressName}</p>
+                          </div>
                           <div>
                               <span className="font-semibold text-muted-foreground">GPS Coordinates:</span>
                               <p className="font-mono">{gpsCoordinates}</p>
