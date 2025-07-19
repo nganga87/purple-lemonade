@@ -153,11 +153,13 @@ export default function MyAddressesPage() {
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <CheckCircle2 />
-                  Verification Requests
-                  <SidebarMenuBadge>3</SidebarMenuBadge>
-                </SidebarMenuButton>
+                <Link href="/verification-requests">
+                  <SidebarMenuButton>
+                    <CheckCircle2 />
+                    Verification Requests
+                    <SidebarMenuBadge>3</SidebarMenuBadge>
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>

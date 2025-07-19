@@ -14,6 +14,7 @@ import {
   SidebarFooter,
   SidebarInset,
   SidebarTrigger,
+  SidebarMenuBadge,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -76,10 +77,13 @@ export default function RegisterPage() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <CheckCircle2 />
-                  Verification Requests
-                </SidebarMenuButton>
+                <Link href="/verification-requests">
+                    <SidebarMenuButton>
+                    <CheckCircle2 />
+                    Verification Requests
+                    <SidebarMenuBadge>3</SidebarMenuBadge>
+                    </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>

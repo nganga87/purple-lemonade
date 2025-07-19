@@ -120,11 +120,13 @@ export default function DashboardPage() {
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <CheckCircle2 />
-                  Verification Requests
-                  <SidebarMenuBadge>3</SidebarMenuBadge>
-                </SidebarMenuButton>
+                <Link href="/verification-requests">
+                    <SidebarMenuButton>
+                    <CheckCircle2 />
+                    Verification Requests
+                    <SidebarMenuBadge>3</SidebarMenuBadge>
+                    </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
@@ -300,10 +302,12 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                        <p className="text-muted-foreground mb-4">You have 3 pending requests.</p>
-                       <Button variant="outline" className="w-full">
-                          <CheckCircle2 className="mr-2 h-4 w-4" />
-                          View Requests
-                        </Button>
+                       <Link href="/verification-requests">
+                         <Button variant="outline" className="w-full">
+                            <CheckCircle2 className="mr-2 h-4 w-4" />
+                            View Requests
+                          </Button>
+                       </Link>
                     </CardContent>
                   </Card>
                 </div>
