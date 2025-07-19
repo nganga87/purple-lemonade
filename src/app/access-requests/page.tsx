@@ -39,6 +39,7 @@ import {
   Trash2,
   Home,
   Building,
+  CandlestickChart,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -213,6 +214,14 @@ export default function AccessRequestsPage() {
                   Access Requests
                   {pendingCount > 0 && <SidebarMenuBadge>{pendingCount}</SidebarMenuBadge>}
                 </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/exchange">
+                    <SidebarMenuButton>
+                    <CandlestickChart />
+                    Exchange
+                    </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>

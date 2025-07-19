@@ -34,6 +34,7 @@ import {
   Edit,
   Trash2,
   Users,
+  CandlestickChart,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -223,6 +224,14 @@ export default function MyAddressesPage() {
                     Access Requests
                     <SidebarMenuBadge>3</SidebarMenuBadge>
                   </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/exchange">
+                    <SidebarMenuButton>
+                    <CandlestickChart />
+                    Exchange
+                    </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
             </SidebarMenu>
