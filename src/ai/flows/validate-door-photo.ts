@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -58,6 +59,8 @@ const prompt = ai.definePrompt({
 You will receive a door photo, GPS coordinates of the property, and a satellite image of the property. The door photo has a digital signature embedded on it, containing the user's crypto wallet address and a timestamp.
 
 First, verify that the crypto address in the prompt matches the one visible in the door photo's digital signature. If they do not match, the validation must fail.
+
+Second, analyze the door photo for any signs of digital manipulation or editing. If the image appears to have been altered in any way (e.g., edited text, doctored background), the validation must fail.
 
 Then, analyze the door photo and satellite image to determine if the door photo is a valid representation of the property at the given GPS coordinates.
 
