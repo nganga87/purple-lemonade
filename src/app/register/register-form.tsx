@@ -132,7 +132,7 @@ export function RegisterForm() {
     }
   }, [gpsCoordinates]);
 
-  useEffect(() => {
+ useEffect(() => {
     let stream: MediaStream | null = null;
     const getCameraPermission = async () => {
       if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
