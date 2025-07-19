@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -127,7 +128,7 @@ export default function MyAddressesPage() {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                 <Link href="/">
+                 <Link href="/dashboard">
                   <SidebarMenuButton>
                     <LayoutDashboard />
                     Dashboard

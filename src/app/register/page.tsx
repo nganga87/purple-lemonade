@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -52,7 +53,7 @@ export default function RegisterPage() {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <Link href="/">
+                <Link href="/dashboard">
                   <SidebarMenuButton>
                     <LayoutDashboard />
                     Dashboard
