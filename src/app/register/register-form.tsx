@@ -445,7 +445,7 @@ export function RegisterForm() {
                                   className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
                                 >
                                   {doorPhotoPreview ? (
-                                    <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" />
+                                    <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" data-ai-hint="house door"/>
                                   ) : (
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
                                       <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
@@ -469,7 +469,7 @@ export function RegisterForm() {
                           <TabsContent value="camera">
                             <div className="relative overflow-hidden rounded-md">
                               {capturedImage ? (
-                                <Image src={capturedImage.src} alt="Captured preview" width={1920} height={1080} className="w-full aspect-video" />
+                                <Image src={capturedImage.src} alt="Captured preview" width={1920} height={1080} className="w-full aspect-video" data-ai-hint="house door"/>
                               ) : (
                                 <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
                               )}
@@ -547,7 +547,7 @@ export function RegisterForm() {
                           </div>
                            <div>
                               <span className="font-semibold text-muted-foreground">Signed Door Photo:</span>
-                              {doorPhotoPreview && <Image src={doorPhotoPreview} alt="Door photo preview" width={150} height={150} className="mt-2 rounded-md border" />}
+                              {doorPhotoPreview && <Image src={doorPhotoPreview} alt="Door photo preview" width={150} height={150} className="mt-2 rounded-md border" data-ai-hint="house door"/>}
                           </div>
                       </div>
                   </div>
