@@ -18,6 +18,11 @@ import {
   SidebarMenuBadge,
 } from '@/components/ui/sidebar';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
   LayoutDashboard,
   MapPin,
   PlusCircle,
@@ -27,10 +32,13 @@ import {
   LogOut,
   Wallet,
   MoreVertical,
-  Clock,
+  ChevronRight,
   UserCheck,
   UserX,
   Users,
+  Trash2,
+  Home,
+  Building,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -60,6 +68,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 const initialRequests = [
   {
@@ -70,6 +80,8 @@ const initialRequests = [
     date: '2024-08-15',
     status: 'Pending',
     address: '123 Main Street, Anytown, USA 12345',
+    houseNumber: 'Apt 2B',
+    doorPicture: 'https://placehold.co/400x300.png',
   },
   {
     id: 'REQ-002',
@@ -97,6 +109,8 @@ const initialRequests = [
     date: '2024-07-20',
     status: 'Approved',
     address: '123 Main Street, Anytown, USA 12345',
+    houseNumber: 'Apt 3C',
+    doorPicture: 'https://placehold.co/400x300.png',
   },
   {
     id: 'REQ-005',
@@ -109,13 +123,39 @@ const initialRequests = [
   },
 ];
 
-export type AccessRequest = typeof initialRequests[0];
+export type AccessRequest = {
+    id: string;
+    name: string;
+    avatar: string;
+    purpose: string;
+    date: string;
+    status: 'Pending' | 'Approved' | 'Rejected';
+    address: string;
+    houseNumber?: string;
+    doorPicture?: string;
+};
+
 
 export default function AccessRequestsPage() {
   const [requests, setRequests] = useState<AccessRequest[]>(initialRequests);
+  const [openCollapsible, setOpenCollapsible] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const handleRequestAction = (requestId: string, newStatus: 'Approved' | 'Rejected') => {
     setRequests(requests.map(req => req.id === requestId ? { ...req, status: newStatus } : req));
+     toast({
+      title: `Request ${newStatus}`,
+      description: `The access request from has been ${newStatus.toLowerCase()}.`,
+    });
+  };
+
+  const handleDeleteRequest = (requestId: string) => {
+    setRequests(requests.filter(req => req.id !== requestId));
+    toast({
+      variant: "destructive",
+      title: "Request Deleted",
+      description: "The access request has been removed.",
+    });
   };
   
   const pendingCount = requests.filter(req => req.status === 'Pending').length;
@@ -241,6 +281,7 @@ export default function AccessRequestsPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
+                            <TableHead className="w-12"></TableHead>
                             <TableHead className="w-[250px]">Requester</TableHead>
                             <TableHead>Purpose</TableHead>
                             <TableHead>Address</TableHead>
@@ -251,30 +292,40 @@ export default function AccessRequestsPage() {
                         </TableHeader>
                         <TableBody>
                             {requests.map((request) => (
-                            <TableRow key={request.id}>
-                                <TableCell>
-                                    <div className="flex items-center gap-3">
-                                        <Avatar>
-                                            <AvatarImage src={request.avatar} alt={request.name} />
-                                            <AvatarFallback>{request.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                        </Avatar>
-                                        <span className="font-medium">{request.name}</span>
-                                    </div>
-                                </TableCell>
-                                <TableCell>{request.purpose}</TableCell>
-                                <TableCell className="text-muted-foreground">{request.address}</TableCell>
-                                <TableCell className="text-muted-foreground">{request.date}</TableCell>
-                                <TableCell>
-                                    <Badge variant={
-                                        request.status === 'Approved' ? 'default' : request.status === 'Rejected' ? 'destructive' : 'secondary'
-                                    } className={
-                                        request.status === 'Approved' ? 'bg-green-100 text-green-800' : request.status === 'Rejected' ? 'bg-red-100 text-red-800' : ''
-                                    }>
-                                        {request.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                {request.status === 'Pending' ? (
+                            <Collapsible asChild key={request.id} open={openCollapsible === request.id} onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
+                              <>
+                                <TableRow className="hover:bg-muted/50">
+                                    <TableCell>
+                                      {request.purpose === 'Tenant' && (
+                                        <CollapsibleTrigger asChild>
+                                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                                            <ChevronRight className={cn("h-4 w-4 transition-transform", openCollapsible === request.id && "rotate-90")} />
+                                          </Button>
+                                        </CollapsibleTrigger>
+                                      )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-3">
+                                            <Avatar>
+                                                <AvatarImage src={request.avatar} alt={request.name} data-ai-hint="person avatar"/>
+                                                <AvatarFallback>{request.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                            </Avatar>
+                                            <span className="font-medium">{request.name}</span>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>{request.purpose}</TableCell>
+                                    <TableCell className="text-muted-foreground">{request.address}</TableCell>
+                                    <TableCell className="text-muted-foreground">{request.date}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={
+                                            request.status === 'Approved' ? 'default' : request.status === 'Rejected' ? 'destructive' : 'secondary'
+                                        } className={
+                                            request.status === 'Approved' ? 'bg-green-100 text-green-800' : request.status === 'Rejected' ? 'bg-red-100 text-red-800' : ''
+                                        }>
+                                            {request.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="icon">
@@ -282,21 +333,55 @@ export default function AccessRequestsPage() {
                                         </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Approved')}>
-                                                <UserCheck className="mr-2 h-4 w-4" />
-                                                Approve
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Rejected')} className="text-destructive">
-                                                <UserX className="mr-2 h-4 w-4" />
-                                                Reject
+                                            {request.status === 'Pending' && (
+                                              <>
+                                                <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Approved')}>
+                                                    <UserCheck className="mr-2 h-4 w-4" />
+                                                    Approve
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Rejected')} className="text-destructive">
+                                                    <UserX className="mr-2 h-4 w-4" />
+                                                    Reject
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                              </>
+                                            )}
+                                            <DropdownMenuItem onClick={() => handleDeleteRequest(request.id)} className="text-destructive">
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                Delete
                                             </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                ) : (
-                                    <span className="text-xs text-muted-foreground italic">Actioned</span>
+                                    </TableCell>
+                                </TableRow>
+                                {request.purpose === 'Tenant' && (
+                                  <CollapsibleContent asChild>
+                                    <TableRow>
+                                      <TableCell colSpan={7} className="p-0">
+                                        <div className="bg-secondary/50 p-6">
+                                          <h4 className="font-semibold text-lg mb-4">Tenant Details</h4>
+                                          <div className="grid md:grid-cols-2 gap-6">
+                                              <div className="space-y-4">
+                                                <div className="flex items-center gap-2">
+                                                    <Building className="h-5 w-5 text-muted-foreground" />
+                                                    <div>
+                                                        <p className="text-sm text-muted-foreground">House/Apt Number</p>
+                                                        <p className="font-medium">{request.houseNumber}</p>
+                                                    </div>
+                                                </div>
+                                              </div>
+                                              <div>
+                                                <p className="text-sm text-muted-foreground mb-2">Door Picture</p>
+                                                <Image src={request.doorPicture!} alt={`Door for ${request.houseNumber}`} width={200} height={150} className="rounded-lg border shadow-md" data-ai-hint="apartment door"/>
+                                              </div>
+                                          </div>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  </CollapsibleContent>
                                 )}
-                                </TableCell>
-                            </TableRow>
+                              </>
+                            </Collapsible>
                             ))}
                         </TableBody>
                     </Table>
@@ -308,3 +393,5 @@ export default function AccessRequestsPage() {
     </SidebarProvider>
   );
 }
+
+    
