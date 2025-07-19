@@ -16,8 +16,6 @@ import {
   Edit,
   Trash2,
   LayoutDashboard,
-  TrendingUp,
-  ArrowLeftRight,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -61,8 +59,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
 
 const marketplaceListings = [
   { 
@@ -122,23 +118,6 @@ const mySaleListings = [
     { name: 'Vacation House', address: '789 Pine Lane, Lakeside, USA 54321', price: '6.2 ETH', status: 'Listed', views: 88 },
 ];
 
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isActive = pathname === href;
-
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
-        isActive ? "text-primary" : "text-muted-foreground"
-      )}
-    >
-      {children}
-    </Link>
-  );
-}
-
 export default function ExchangePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -149,16 +128,6 @@ export default function ExchangePage() {
               <Logo className="h-6 w-6 text-primary" />
               <span className="font-headline font-bold text-lg">AddressChain</span>
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
-              <NavLink href="/exchange">
-                <ArrowLeftRight />
-                Marketplace
-              </NavLink>
-              <NavLink href="#">
-                 <TrendingUp />
-                Analytics
-              </NavLink>
-            </nav>
           </div>
           <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="rounded-full">
