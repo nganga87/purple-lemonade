@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -92,8 +92,12 @@ const generateMockAddress = (seed: string): string => {
     return `0x${randomHex}${'A'.repeat(40 - 6 - randomHex.length)}${randomHex}`.slice(0, 42);
 };
 
+interface RegisterFormProps {
+  onBack: () => void;
+}
 
-export function RegisterForm() {
+
+export function RegisterForm({ onBack }: RegisterFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ValidateDoorPhotoOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -344,6 +348,10 @@ export function RegisterForm() {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <Button variant="ghost" onClick={onBack} className="mb-4">
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Options
+      </Button>
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">AI-Powered Address Verification</CardTitle>

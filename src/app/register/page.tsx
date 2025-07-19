@@ -48,6 +48,7 @@ const RegisterForm = dynamic(() => import('./register-form').then(mod => mod.Reg
   ssr: false,
   loading: () => (
     <div className="max-w-4xl mx-auto space-y-4">
+      <Skeleton className="h-12 w-48" />
       <Skeleton className="h-64 w-full" />
       <Skeleton className="h-10 w-48" />
     </div>
@@ -64,7 +65,7 @@ export default function RegisterPage() {
   const renderContent = () => {
     switch (choice) {
       case 'new-property':
-        return <RegisterForm />;
+        return <RegisterForm onBack={handleResetChoice} />;
       case 'add-tenant':
         return <AddTenantForm onBack={handleResetChoice} />;
       default:
