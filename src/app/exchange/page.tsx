@@ -26,12 +26,13 @@ import {
   UserCircle,
   LogOut,
   Wallet,
-  ArrowRight,
   Users,
   CandlestickChart,
   MoreHorizontal,
   Home,
   Building,
+  Edit,
+  Trash2,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -62,7 +63,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-import { cn } from '@/lib/utils';
 import {
   Tabs,
   TabsContent,
@@ -78,7 +78,8 @@ const marketplaceListings = [
     type: 'Office',
     nftId: '0xABC123DEF456...',
     listedBy: 'Metropolis Properties',
-    avatar: 'https://placehold.co/32x32/orange/white.png?text=M'
+    avatar: 'https://placehold.co/32x32.png',
+    status: 'Verified',
   },
   { 
     name: 'Lakeside Family Home', 
@@ -87,7 +88,8 @@ const marketplaceListings = [
     type: 'House',
     nftId: '0xGHI789JKL012...',
     listedBy: 'Alice Johnson',
-    avatar: 'https://placehold.co/32x32/royalblue/white.png?text=A'
+    avatar: 'https://placehold.co/32x32.png',
+    status: 'Verified',
   },
   { 
     name: 'Modern Warehouse Unit', 
@@ -96,7 +98,8 @@ const marketplaceListings = [
     type: 'Warehouse',
     nftId: '0xMNO345PQR678...',
     listedBy: 'Port Logistics Inc.',
-    avatar: 'https://placehold.co/32x32/green/white.png?text=P'
+    avatar: 'https://placehold.co/32x32.png',
+    status: 'Verified',
   },
   { 
     name: 'Cozy Mountain Cabin', 
@@ -105,7 +108,18 @@ const marketplaceListings = [
     type: 'Vacation',
     nftId: '0xSTU901VWX234...',
     listedBy: 'Bob Williams',
-    avatar: 'https://placehold.co/32x32/purple/white.png?text=B'
+    avatar: 'https://placehold.co/32x32.png',
+    status: 'Verified',
+  },
+   { 
+    name: 'Suburban Office Building', 
+    address: '555 Commerce Drive, Suburbia, USA', 
+    price: '25.0 ETH', 
+    type: 'Office',
+    nftId: '0xZYX987WVU654...',
+    listedBy: 'Suburbia Real Estate',
+    avatar: 'https://placehold.co/32x32.png',
+    status: 'Pending',
   },
 ];
 
@@ -243,11 +257,11 @@ export default function ExchangePage() {
                     <CardDescription>Put one of your verified Address NFTs on the marketplace.</CardDescription>
                 </CardHeader>
                 <CardContent className='flex flex-col md:flex-row gap-4 items-end'>
-                    <div className='flex-1 w-full'>
+                    <div className='flex-1 w-full space-y-2'>
                         <label className='text-sm font-medium'>Your Address NFT</label>
                         <Input placeholder="Search for an address or NFT ID to list..." />
                     </div>
-                    <div className='w-full md:w-auto'>
+                    <div className='w-full md:w-auto space-y-2'>
                         <label className='text-sm font-medium'>Asking Price (ETH)</label>
                         <Input type="number" placeholder="e.g., 10.5" />
                     </div>
@@ -270,9 +284,10 @@ export default function ExchangePage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                <TableHead>Listing</TableHead>
+                                <TableHead className="w-[300px]">Listing</TableHead>
                                 <TableHead>Address</TableHead>
                                 <TableHead>Type</TableHead>
+                                <TableHead>Verification</TableHead>
                                 <TableHead>Price</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                                 </TableRow>
@@ -297,10 +312,17 @@ export default function ExchangePage() {
                                     </TableCell>
                                     <TableCell>{listing.address}</TableCell>
                                     <TableCell>
-                                        <Badge variant="secondary" className="capitalize">
-                                             {listing.type === 'Office' && <Building className="mr-1 h-3 w-3"/>}
-                                             {listing.type !== 'Office' && <Home className="mr-1 h-3 w-3"/>}
+                                        <Badge variant="outline" className="capitalize flex items-center gap-1">
+                                             {listing.type === 'Office' && <Building className="h-3 w-3"/>}
+                                             {listing.type === 'Warehouse' && <Building className="h-3 w-3"/>}
+                                             {listing.type === 'House' && <Home className="h-3 w-3"/>}
+                                             {listing.type === 'Vacation' && <Home className="h-3 w-3"/>}
                                             {listing.type}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant={listing.status === 'Verified' ? 'default' : 'secondary'} className={listing.status === 'Verified' ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
+                                            {listing.status}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="font-mono">{listing.price}</TableCell>
@@ -350,8 +372,14 @@ export default function ExchangePage() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem>Edit Listing</DropdownMenuItem>
-                                                <DropdownMenuItem className="text-destructive">Delist</DropdownMenuItem>
+                                                <DropdownMenuItem>
+                                                  <Edit className='mr-2 h-4 w-4' />
+                                                  Edit Listing
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem className="text-destructive">
+                                                  <Trash2 className='mr-2 h-4 w-4' />
+                                                  Delist
+                                                </DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>
