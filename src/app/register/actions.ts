@@ -34,12 +34,16 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
   try {
     const doorPhoto = formData.get('doorPhoto') as File | null;
     const gpsCoordinates = formData.get('gpsCoordinates') as string | null;
+    const cryptoAddress = formData.get('cryptoAddress') as string | null;
 
     if (!doorPhoto || doorPhoto.size === 0) {
       return { isValid: false, validationDetails: 'Door photo is missing or empty.', error: 'Door photo is missing or empty.' };
     }
     if (!gpsCoordinates) {
       return { isValid: false, validationDetails: 'GPS coordinates are required.', error: 'GPS coordinates are required.' };
+    }
+    if (!cryptoAddress) {
+        return { isValid: false, validationDetails: 'Crypto wallet address is required.', error: 'Crypto wallet address is required.' };
     }
 
     // Fetch satellite image based on GPS
@@ -51,6 +55,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
       doorPhotoDataUri,
       satelliteImageDataUri,
       gpsCoordinates,
+      cryptoAddress,
     };
 
     const result = await validateDoorPhoto(input);

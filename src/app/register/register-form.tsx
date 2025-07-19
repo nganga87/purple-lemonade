@@ -18,18 +18,61 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 const formSchema = z.object({
+  cryptoAddress: z.string().min(1, 'Crypto wallet address is required.'),
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   doorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+const drawSignatureOnImage = (imageSrc: string, address: string): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement('img');
+    img.crossOrigin = 'anonymous';
+    img.src = imageSrc;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        return reject(new Error('Could not get canvas context.'));
+      }
+      
+      ctx.drawImage(img, 0, 0);
+
+      const timestamp = new Date().toISOString();
+      const signatureText = `${address} | ${timestamp}`;
+      
+      ctx.font = '16px Arial';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      const textWidth = ctx.measureText(signatureText).width;
+      ctx.fillRect(10, canvas.height - 40, textWidth + 20, 30);
+      
+      ctx.fillStyle = 'black';
+      ctx.fillText(signatureText, 20, canvas.height - 20);
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], "signed_door_photo.jpg", { type: "image/jpeg" });
+          resolve(file);
+        } else {
+          reject(new Error('Could not create blob from canvas.'));
+        }
+      }, 'image/jpeg', 0.95);
+    };
+    img.onerror = (err) => {
+      reject(new Error('Failed to load image for signing.'));
+    }
+  });
+};
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +91,7 @@ export function RegisterForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      cryptoAddress: '',
       gpsCoordinates: '',
     },
   });
@@ -92,13 +136,39 @@ export function RegisterForm() {
     }
   }, [toast]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'doorPhoto' , setPreview: (url: string | null) => void) => {
+  const processAndSetImage = async (imageSrc: string) => {
+    const address = form.getValues('cryptoAddress');
+    if (!address) {
+      form.setError('cryptoAddress', { type: 'manual', message: 'Please enter your wallet address before adding a photo.' });
+      toast({
+        variant: 'destructive',
+        title: 'Wallet Address Required',
+        description: 'You must enter a wallet address before selecting a photo.',
+      });
+      return;
+    }
+
+    try {
+      const signedFile = await drawSignatureOnImage(imageSrc, address);
+      form.setValue('doorPhoto', signedFile, { shouldValidate: true });
+      setDoorPhotoPreview(URL.createObjectURL(signedFile));
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      toast({
+        variant: "destructive",
+        title: "Image Signing Failed",
+        description: errorMessage,
+      });
+    }
+  };
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      form.setValue(fieldName, file, { shouldValidate: true });
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result as string);
+        processAndSetImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -108,14 +178,13 @@ export function RegisterForm() {
     e.preventDefault();
   }, []);
 
-  const onDrop = useCallback((e: React.DragEvent<HTMLLabelElement>, fieldName: 'doorPhoto', setPreview: (url: string | null) => void) => {
+  const onDrop = useCallback((e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      form.setValue(fieldName, file, { shouldValidate: true });
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreview(reader.result as string);
+        processAndSetImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -131,18 +200,15 @@ export function RegisterForm() {
       const context = canvas.getContext('2d');
       context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
       
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const file = new File([blob], "door_photo.jpg", { type: "image/jpeg" });
-          form.setValue('doorPhoto', file, { shouldValidate: true });
-          setDoorPhotoPreview(URL.createObjectURL(file));
-          toast({
-            title: "Photo Captured",
-            description: "Your door photo has been captured successfully.",
-          });
-          setIsCapturing(false);
-        }
-      }, 'image/jpeg');
+      const imageDataUrl = canvas.toDataURL('image/jpeg');
+
+      processAndSetImage(imageDataUrl).finally(() => {
+        setIsCapturing(false);
+        toast({
+          title: "Photo Captured & Signed",
+          description: "Your door photo has been captured and signed successfully.",
+        });
+      });
     }
   }, [form, toast]);
 
@@ -153,6 +219,7 @@ export function RegisterForm() {
     setError(null);
 
     const formData = new FormData();
+    formData.append('cryptoAddress', values.cryptoAddress);
     formData.append('gpsCoordinates', values.gpsCoordinates);
     formData.append('doorPhoto', values.doorPhoto);
     
@@ -227,7 +294,26 @@ export function RegisterForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="space-y-6">
-              
+               <FormField
+                control={form.control}
+                name="cryptoAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Crypto Wallet Address</FormLabel>
+                     <FormControl>
+                      <div className="relative flex-grow">
+                        <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input placeholder="e.g., 0x..." {...field} className="pl-10" />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      This address will be embedded in your photo as a digital signature.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="doorPhoto"
@@ -243,7 +329,7 @@ export function RegisterForm() {
                         <FormControl>
                           <label
                             onDragOver={onDragOver}
-                            onDrop={(e) => onDrop(e, 'doorPhoto', setDoorPhotoPreview)}
+                            onDrop={onDrop}
                             className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
                           >
                             {doorPhotoPreview ? (
@@ -258,12 +344,12 @@ export function RegisterForm() {
                               </div>
                             )}
                             <input
-                              {...form.register("doorPhoto")}
+                              // We don't use the form register here directly because we handle the file processing manually
                               ref={doorPhotoRef}
                               type="file"
                               className="hidden"
                               accept="image/png, image/jpeg, image/webp"
-                              onChange={(e) => handleFileChange(e, 'doorPhoto', setDoorPhotoPreview)}
+                              onChange={handleFileChange}
                             />
                           </label>
                         </FormControl>
@@ -285,7 +371,7 @@ export function RegisterForm() {
                         </div>
                         <Button type="button" onClick={handleCapture} disabled={hasCameraPermission !== true || isCapturing} className="w-full mt-2">
                           {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
-                          {isCapturing ? 'Capturing...' : 'Capture Photo'}
+                          {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
                         </Button>
                       </TabsContent>
                     </Tabs>
