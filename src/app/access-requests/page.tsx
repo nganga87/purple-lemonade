@@ -68,6 +68,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 
@@ -290,98 +301,117 @@ export default function AccessRequestsPage() {
                             <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
-                            {requests.map((request) => (
-                            <Collapsible asChild key={request.id} open={openCollapsible === request.id} onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
-                              <TableBody>
-                                <TableRow className="hover:bg-muted/50">
-                                    <TableCell>
-                                      {request.purpose === 'Tenant' && (
-                                        <CollapsibleTrigger asChild>
-                                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                                            <ChevronRight className={cn("h-4 w-4 transition-transform", openCollapsible === request.id && "rotate-90")} />
-                                          </Button>
-                                        </CollapsibleTrigger>
-                                      )}
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-3">
-                                            <Avatar>
-                                                <AvatarImage src={request.avatar} alt={request.name} data-ai-hint="person avatar"/>
-                                                <AvatarFallback>{request.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                                            </Avatar>
-                                            <span className="font-medium">{request.name}</span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>{request.purpose}</TableCell>
-                                    <TableCell className="text-muted-foreground">{request.address}</TableCell>
-                                    <TableCell className="text-muted-foreground">{request.date}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={
-                                            request.status === 'Approved' ? 'default' : request.status === 'Rejected' ? 'destructive' : 'secondary'
-                                        } className={
-                                            request.status === 'Approved' ? 'bg-green-100 text-green-800' : request.status === 'Rejected' ? 'bg-red-100 text-red-800' : ''
-                                        }>
-                                            {request.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon">
-                                            <MoreVertical className="h-4 w-4" />
-                                        </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            {request.status === 'Pending' && (
-                                              <>
-                                                <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Approved')}>
-                                                    <UserCheck className="mr-2 h-4 w-4" />
-                                                    Approve
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Rejected')} className="text-destructive">
-                                                    <UserX className="mr-2 h-4 w-4" />
-                                                    Reject
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                              </>
-                                            )}
-                                            <DropdownMenuItem onClick={() => handleDeleteRequest(request.id)} className="text-destructive">
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                    </TableCell>
-                                </TableRow>
-                                {request.purpose === 'Tenant' && (
-                                  <CollapsibleContent asChild>
-                                    <TableRow>
-                                      <TableCell colSpan={7} className="p-0">
-                                        <div className="bg-secondary/50 p-6">
-                                          <h4 className="font-semibold text-lg mb-4">Tenant Details</h4>
-                                          <div className="grid md:grid-cols-2 gap-6">
-                                              <div className="space-y-4">
-                                                <div className="flex items-center gap-2">
-                                                    <Building className="h-5 w-5 text-muted-foreground" />
-                                                    <div>
-                                                        <p className="text-sm text-muted-foreground">House/Apt Number</p>
-                                                        <p className="font-medium">{request.houseNumber}</p>
-                                                    </div>
-                                                </div>
-                                              </div>
-                                              <div>
-                                                <p className="text-sm text-muted-foreground mb-2">Door Picture</p>
-                                                <Image src={request.doorPicture!} alt={`Door for ${request.houseNumber}`} width={200} height={150} className="rounded-lg border shadow-md" data-ai-hint="apartment door"/>
-                                              </div>
-                                          </div>
-                                        </div>
-                                      </TableCell>
+                            <AlertDialog>
+                                {requests.map((request) => (
+                                <Collapsible asChild key={request.id} open={openCollapsible === request.id} onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
+                                  <TableBody>
+                                    <TableRow className="hover:bg-muted/50">
+                                        <TableCell>
+                                          {request.purpose === 'Tenant' && (
+                                            <CollapsibleTrigger asChild>
+                                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                <ChevronRight className={cn("h-4 w-4 transition-transform", openCollapsible === request.id && "rotate-90")} />
+                                              </Button>
+                                            </CollapsibleTrigger>
+                                          )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-3">
+                                                <Avatar>
+                                                    <AvatarImage src={request.avatar} alt={request.name} data-ai-hint="person avatar"/>
+                                                    <AvatarFallback>{request.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                                </Avatar>
+                                                <span className="font-medium">{request.name}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>{request.purpose}</TableCell>
+                                        <TableCell className="text-muted-foreground">{request.address}</TableCell>
+                                        <TableCell className="text-muted-foreground">{request.date}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={
+                                                request.status === 'Approved' ? 'default' : request.status === 'Rejected' ? 'destructive' : 'secondary'
+                                            } className={
+                                                request.status === 'Approved' ? 'bg-green-100 text-green-800' : request.status === 'Rejected' ? 'bg-red-100 text-red-800' : ''
+                                            }>
+                                                {request.status}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon">
+                                                <MoreVertical className="h-4 w-4" />
+                                            </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                {request.status === 'Pending' && (
+                                                  <>
+                                                    <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Approved')}>
+                                                        <UserCheck className="mr-2 h-4 w-4" />
+                                                        Approve
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleRequestAction(request.id, 'Rejected')} className="text-destructive">
+                                                        <UserX className="mr-2 h-4 w-4" />
+                                                        Reject
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                  </>
+                                                )}
+                                                <AlertDialogTrigger asChild>
+                                                    <DropdownMenuItem className="text-destructive">
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </AlertDialogTrigger>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        </TableCell>
                                     </TableRow>
-                                  </CollapsibleContent>
-                                )}
-                              </TableBody>
-                            </Collapsible>
-                            ))}
+                                    {request.purpose === 'Tenant' && (
+                                      <CollapsibleContent asChild>
+                                        <TableRow>
+                                          <TableCell colSpan={7} className="p-0">
+                                            <div className="bg-secondary/50 p-6">
+                                              <h4 className="font-semibold text-lg mb-4">Tenant Details</h4>
+                                              <div className="grid md:grid-cols-2 gap-6">
+                                                  <div className="space-y-4">
+                                                    <div className="flex items-center gap-2">
+                                                        <Building className="h-5 w-5 text-muted-foreground" />
+                                                        <div>
+                                                            <p className="text-sm text-muted-foreground">House/Apt Number</p>
+                                                            <p className="font-medium">{request.houseNumber}</p>
+                                                        </div>
+                                                    </div>
+                                                  </div>
+                                                  <div>
+                                                    <p className="text-sm text-muted-foreground mb-2">Door Picture</p>
+                                                    <Image src={request.doorPicture!} alt={`Door for ${request.houseNumber}`} width={200} height={150} className="rounded-lg border shadow-md" data-ai-hint="apartment door"/>
+                                                  </div>
+                                              </div>
+                                            </div>
+                                          </TableCell>
+                                        </TableRow>
+                                      </CollapsibleContent>
+                                    )}
+                                  </TableBody>
+                                </Collapsible>
+                                ))}
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete the access request.
+                                    </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    {/* This assumes we have a request to delete. In a real app, you'd manage this state better. */}
+                                    <AlertDialogAction onClick={() => requests.length > 0 && handleDeleteRequest(requests[0].id)}>
+                                        Continue
+                                    </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                     </Table>
                 </CardContent>
             </Card>
@@ -391,7 +421,3 @@ export default function AccessRequestsPage() {
     </SidebarProvider>
   );
 }
-
-    
-
-    
