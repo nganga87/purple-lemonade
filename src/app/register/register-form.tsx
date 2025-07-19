@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -87,6 +87,8 @@ export function RegisterForm() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cameraStatus, setCameraStatus] = useState<'loading' | 'allowed' | 'denied' | 'notsupported'>('loading');
   const [isCapturing, setIsCapturing] = useState(false);
+  
+  const [capturedImage, setCapturedImage] = useState<{ src: string, file: File } | null>(null);
 
 
   const form = useForm<FormValues>({
@@ -126,7 +128,7 @@ export function RegisterForm() {
     }
   }, []);
 
-  const processAndSetImage = async (imageSrc: string) => {
+  const processAndSetImage = useCallback(async (imageSrc: string, source: 'upload' | 'camera') => {
     const address = form.getValues('cryptoAddress');
     if (!address) {
       form.setError('cryptoAddress', { type: 'manual', message: 'Please enter your wallet address before adding a photo.' });
@@ -135,13 +137,19 @@ export function RegisterForm() {
         title: 'Wallet Address Required',
         description: 'You must enter a wallet address before selecting a photo.',
       });
-      return;
+      return null;
     }
 
     try {
       const signedFile = await drawSignatureOnImage(imageSrc, address);
-      form.setValue('doorPhoto', signedFile, { shouldValidate: true });
-      setDoorPhotoPreview(URL.createObjectURL(signedFile));
+      const signedImageSrc = URL.createObjectURL(signedFile);
+      
+      if (source === 'upload') {
+        form.setValue('doorPhoto', signedFile, { shouldValidate: true });
+        setDoorPhotoPreview(signedImageSrc);
+      }
+      
+      return { src: signedImageSrc, file: signedFile };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       toast({
@@ -149,16 +157,17 @@ export function RegisterForm() {
         title: "Image Signing Failed",
         description: errorMessage,
       });
+      return null;
     }
-  };
+  }, [form, toast]);
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        processAndSetImage(reader.result as string);
+      reader.onloadend = async () => {
+        await processAndSetImage(reader.result as string, 'upload');
       };
       reader.readAsDataURL(file);
     }
@@ -173,14 +182,14 @@ export function RegisterForm() {
     const file = e.dataTransfer.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        processAndSetImage(reader.result as string);
+      reader.onloadend = async () => {
+        await processAndSetImage(reader.result as string, 'upload');
       };
       reader.readAsDataURL(file);
     }
   }, [processAndSetImage]);
   
-  const handleCapture = useCallback(() => {
+  const handleCapture = useCallback(async () => {
     if (videoRef.current && canvasRef.current) {
       setIsCapturing(true);
       const video = videoRef.current;
@@ -192,15 +201,30 @@ export function RegisterForm() {
       
       const imageDataUrl = canvas.toDataURL('image/jpeg');
 
-      processAndSetImage(imageDataUrl).finally(() => {
-        setIsCapturing(false);
-        toast({
-          title: "Photo Captured & Signed",
-          description: "Your door photo has been captured and signed successfully.",
-        });
-      });
+      const signedImage = await processAndSetImage(imageDataUrl, 'camera');
+      if (signedImage) {
+        setCapturedImage(signedImage);
+      }
+      
+      setIsCapturing(false);
     }
-  }, [processAndSetImage, toast]);
+  }, [processAndSetImage]);
+
+  const handleRetake = () => {
+    setCapturedImage(null);
+  };
+
+  const handleConfirmCapture = () => {
+    if (capturedImage) {
+      form.setValue('doorPhoto', capturedImage.file, { shouldValidate: true });
+      setDoorPhotoPreview(capturedImage.src);
+      toast({
+        title: "Photo Confirmed",
+        description: "Your door photo has been set and is ready for submission.",
+      });
+      setCapturedImage(null); // Clear the captured image to hide the confirm/retake buttons
+    }
+  };
 
 
   const onSubmit = async (values: FormValues) => {
@@ -360,12 +384,18 @@ export function RegisterForm() {
                       </TabsContent>
                       <TabsContent value="camera">
                         <div className="relative overflow-hidden rounded-md">
-                          <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
+                          {capturedImage ? (
+                            <Image src={capturedImage.src} alt="Captured preview" width={1920} height={1080} className="w-full aspect-video" />
+                          ) : (
+                            <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
+                          )}
                           <canvas ref={canvasRef} className="hidden"></canvas>
-                          <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="w-[calc(100%-4rem)] h-[calc(100%-4rem)] border-4 border-white/50 border-dashed rounded-lg shadow-2xl" />
-                          </div>
-                          {cameraStatus !== 'allowed' && (
+                          {!capturedImage && (
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div className="w-[calc(100%-4rem)] h-[calc(100%-4rem)] border-4 border-white/50 border-dashed rounded-lg shadow-2xl" />
+                            </div>
+                          )}
+                          {cameraStatus !== 'allowed' && !capturedImage && (
                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
                                {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
                                {cameraStatus === 'denied' && (
@@ -387,10 +417,23 @@ export function RegisterForm() {
                             </div>
                           )}
                         </div>
-                        <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed' || isCapturing} className="w-full mt-2">
-                          {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
-                          {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
-                        </Button>
+                        {capturedImage ? (
+                           <div className="flex gap-2 w-full mt-2">
+                            <Button type="button" onClick={handleRetake} variant="outline" className="w-full">
+                              <RefreshCw className="mr-2" />
+                              Retake Photo
+                            </Button>
+                            <Button type="button" onClick={handleConfirmCapture} className="w-full">
+                              <CheckCircle className="mr-2" />
+                              Confirm & Proceed
+                            </Button>
+                          </div>
+                        ) : (
+                          <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed' || isCapturing} className="w-full mt-2">
+                            {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
+                            {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
+                          </Button>
+                        )}
                       </TabsContent>
                     </Tabs>
                     <FormDescription>
