@@ -290,10 +290,9 @@ export default function AccessRequestsPage() {
                             <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
                             {requests.map((request) => (
                             <Collapsible asChild key={request.id} open={openCollapsible === request.id} onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
-                              <>
+                              <TableBody>
                                 <TableRow className="hover:bg-muted/50">
                                     <TableCell>
                                       {request.purpose === 'Tenant' && (
@@ -380,10 +379,9 @@ export default function AccessRequestsPage() {
                                     </TableRow>
                                   </CollapsibleContent>
                                 )}
-                              </>
+                              </TableBody>
                             </Collapsible>
                             ))}
-                        </TableBody>
                     </Table>
                 </CardContent>
             </Card>
@@ -393,5 +391,7 @@ export default function AccessRequestsPage() {
     </SidebarProvider>
   );
 }
+
+    
 
     
