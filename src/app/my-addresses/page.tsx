@@ -33,6 +33,7 @@ import {
   ChevronDown,
   Edit,
   Trash2,
+  Users,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -216,10 +217,10 @@ export default function MyAddressesPage() {
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/verification-requests">
+                <Link href="/access-requests">
                   <SidebarMenuButton>
-                    <CheckCircle2 />
-                    Verification Requests
+                    <Users />
+                    Access Requests
                     <SidebarMenuBadge>3</SidebarMenuBadge>
                   </SidebarMenuButton>
                 </Link>

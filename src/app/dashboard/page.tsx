@@ -30,6 +30,7 @@ import {
   Activity,
   QrCode,
   Copy,
+  Users,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -120,10 +121,10 @@ export default function DashboardPage() {
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/verification-requests">
+                <Link href="/access-requests">
                     <SidebarMenuButton>
-                    <CheckCircle2 />
-                    Verification Requests
+                    <Users />
+                    Access Requests
                     <SidebarMenuBadge>3</SidebarMenuBadge>
                     </SidebarMenuButton>
                 </Link>
@@ -297,14 +298,14 @@ export default function DashboardPage() {
                   </Card>
                    <Card className="shadow-lg">
                     <CardHeader>
-                      <CardTitle className="font-headline">Pending Verifications</CardTitle>
-                      <CardDescription>Help secure the network by verifying new addresses near you.</CardDescription>
+                      <CardTitle className="font-headline">Pending Access Requests</CardTitle>
+                      <CardDescription>Manage requests from others to use your address.</CardDescription>
                     </CardHeader>
                     <CardContent>
                        <p className="text-muted-foreground mb-4">You have 3 pending requests.</p>
-                       <Link href="/verification-requests">
+                       <Link href="/access-requests">
                          <Button variant="outline" className="w-full">
-                            <CheckCircle2 className="mr-2 h-4 w-4" />
+                            <Users className="mr-2 h-4 w-4" />
                             View Requests
                           </Button>
                        </Link>
