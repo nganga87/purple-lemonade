@@ -54,13 +54,12 @@ export default function LandingPage() {
               </p>
             </div>
           </div>
-          <div className="relative">
+          <div className="relative aspect-video">
              <Image
               src="https://placehold.co/600x400.png"
               alt="Hero image showing a modern house with a digital lock"
-              width={600}
-              height={400}
-              className="rounded-xl shadow-2xl"
+              fill
+              className="rounded-xl shadow-2xl object-cover"
               data-ai-hint="modern house digital"
             />
             <div className="absolute -bottom-8 -right-8 w-48 rounded-lg bg-card p-4 shadow-lg border">
