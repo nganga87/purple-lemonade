@@ -24,9 +24,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud, CheckCircle, QrCode } from 'lucide-react';
 import Image from 'next/image';
+import { generateSubAddress } from './utils';
 
 const formSchema = z.object({
   property: z.string().min(1, 'Please select a property.'),
@@ -54,9 +64,15 @@ interface AddTenantFormProps {
   onBack: () => void;
 }
 
+type SubAddressResult = {
+  subAddressId: string;
+  tenantName: string;
+}
+
 export function AddTenantForm({ onBack }: AddTenantFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [result, setResult] = useState<SubAddressResult | null>(null);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -87,16 +103,23 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
 
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const subAddressId = generateSubAddress(values.property, values.apartmentNumber);
 
     toast({
       title: "Tenant Invitation Sent",
       description: `${values.tenantName} has been invited to use your address.`,
     });
-
+    
+    setResult({ subAddressId, tenantName: values.tenantName });
     setIsLoading(false);
+  };
+  
+  const handleDialogClose = () => {
+    setResult(null);
     form.reset();
     setPhotoPreview(null);
-  };
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -244,6 +267,42 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
           </form>
         </Form>
       </Card>
+      
+      {result && (
+        <AlertDialog open={!!result} onOpenChange={() => handleDialogClose()}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <div className="flex justify-center">
+                 <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
+              </div>
+              <AlertDialogTitle className="text-center font-headline text-2xl">Sub-Address Created!</AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                A new sub-digital address has been generated for {result.tenantName}.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="py-4 space-y-4">
+                <div className="p-4 rounded-lg bg-secondary text-center space-y-2">
+                    <p className="text-sm text-muted-foreground">Tenant's Sub-Digital Address</p>
+                    <p className="font-mono text-sm break-all">{result.subAddressId}</p>
+                </div>
+                <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
+                    <div className="p-2 bg-white rounded-lg shadow-md">
+                      <Image src="https://placehold.co/160x160.png" alt="QR Code" width={160} height={160} data-ai-hint="qr code"/>
+                    </div>
+                    <p className="mt-2 text-sm text-muted-foreground">Scan QR code for verification</p>
+                </div>
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogAction onClick={handleDialogClose} className="w-full">
+                Done
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
     </div>
   );
 }
+
+    
