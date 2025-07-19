@@ -30,6 +30,7 @@ import {
   Copy,
   MoreVertical,
   ChevronDown,
+  Edit,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -55,10 +56,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Badge } from '@/components/ui/badge';
 import { Logo } from '@/components/icons';
+import { EditAddressForm } from './edit-address-form';
 
-const addresses = [
+const initialAddresses = [
   {
     isPrimary: true,
     name: 'Home',
@@ -85,14 +95,23 @@ const addresses = [
   },
 ];
 
-type Address = typeof addresses[0];
+export type Address = typeof initialAddresses[0];
 
 export default function MyAddressesPage() {
+  const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses[0] || null);
-  
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
   const handleAddressSelect = (addressId: string) => {
     const address = addresses.find(addr => addr.nftId === addressId);
     setSelectedAddress(address || null);
+  };
+  
+  const handleAddressUpdate = (updatedAddress: Address) => {
+    const newAddresses = addresses.map(addr => addr.nftId === updatedAddress.nftId ? updatedAddress : addr);
+    setAddresses(newAddresses);
+    setSelectedAddress(updatedAddress);
+    setIsEditDialogOpen(false);
   };
 
   return (
@@ -152,138 +171,159 @@ export default function MyAddressesPage() {
           </SidebarFooter>
         </Sidebar>
 
-        <SidebarInset className="flex-1 flex flex-col">
-          <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="md:hidden" />
-              <h1 className="text-2xl font-headline font-semibold">My Addresses</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <Bell className="h-5 w-5" />
-                <span className="sr-only">Notifications</span>
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Avatar>
-                      <AvatarImage src="https://placehold.co/100x100.png" alt="User avatar" data-ai-hint="user avatar"/>
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Wallet className="mr-2 h-4 w-4" />
-                    <span>Wallet</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <SidebarInset className="flex-1 flex flex-col">
+            <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
+              <div className="flex items-center gap-4">
+                <SidebarTrigger className="md:hidden" />
+                <h1 className="text-2xl font-headline font-semibold">My Addresses</h1>
+              </div>
+              <div className="flex items-center gap-4">
+                <Button variant="ghost" size="icon" className="rounded-full">
+                  <Bell className="h-5 w-5" />
+                  <span className="sr-only">Notifications</span>
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="rounded-full">
+                      <Avatar>
+                        <AvatarImage src="https://placehold.co/100x100.png" alt="User avatar" data-ai-hint="user avatar"/>
+                        <AvatarFallback>JD</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <UserCircle className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Wallet className="mr-2 h-4 w-4" />
+                      <span>Wallet</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </header>
 
-          <main className="flex-1 p-4 md:p-6 lg:p-8">
-            <div className="grid gap-8">
-                <div className='flex justify-between items-start md:items-center flex-col md:flex-row gap-4'>
-                    <div>
-                        <h2 className="text-2xl font-headline font-semibold">Your Address NFTs</h2>
-                        <p className="text-muted-foreground">Manage your verified digital addresses.</p>
-                    </div>
-                    <Link href="/register">
-                        <Button>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Register New Address
-                        </Button>
-                    </Link>
-                </div>
-              
-              <div className="space-y-8">
-                <Select onValueChange={handleAddressSelect} defaultValue={selectedAddress?.nftId}>
-                  <SelectTrigger className="w-full md:w-[400px]">
-                    <SelectValue placeholder="Select an address" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {addresses.map((address) => (
-                      <SelectItem key={address.nftId} value={address.nftId}>
-                        {address.name} ({address.address})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {selectedAddress && (
-                  <Card className="shadow-lg animate-in fade-in-50 duration-500">
-                    <CardHeader className="flex flex-row items-start justify-between">
+            <main className="flex-1 p-4 md:p-6 lg:p-8">
+              <div className="grid gap-8">
+                  <div className='flex justify-between items-start md:items-center flex-col md:flex-row gap-4'>
                       <div>
-                        <CardTitle className="font-headline">{selectedAddress.address}</CardTitle>
-                        <CardDescription>
-                          {selectedAddress.isPrimary && (
-                            <Badge variant="outline" className="mr-2 border-primary text-primary">Primary</Badge>
-                          )}
-                          GPS: {selectedAddress.gps}
-                        </CardDescription>
+                          <h2 className="text-2xl font-headline font-semibold">Your Address NFTs</h2>
+                          <p className="text-muted-foreground">Manage your verified digital addresses.</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                          <Badge variant={selectedAddress.status === 'Verified' ? 'secondary' : 'default'} className={selectedAddress.status === 'Verified' ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}>
-                          {selectedAddress.status}
-                          </Badge>
-                          <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                  <MoreVertical className="h-4 w-4" />
+                      <Link href="/register">
+                          <Button>
+                          <PlusCircle className="mr-2 h-4 w-4" />
+                          Register New Address
+                          </Button>
+                      </Link>
+                  </div>
+                
+                <div className="space-y-8">
+                  <Select onValueChange={handleAddressSelect} defaultValue={selectedAddress?.nftId}>
+                    <SelectTrigger className="w-full md:w-[400px]">
+                      <SelectValue placeholder="Select an address" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {addresses.map((address) => (
+                        <SelectItem key={address.nftId} value={address.nftId}>
+                          {address.name} ({address.address})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {selectedAddress && (
+                    <Card className="shadow-lg animate-in fade-in-50 duration-500">
+                      <CardHeader className="flex flex-row items-start justify-between">
+                        <div>
+                          <CardTitle className="font-headline">{selectedAddress.address}</CardTitle>
+                          <CardDescription>
+                            {selectedAddress.isPrimary && (
+                              <Badge variant="outline" className="mr-2 border-primary text-primary">Primary</Badge>
+                            )}
+                            GPS: {selectedAddress.gps}
+                          </CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Badge variant={selectedAddress.status === 'Verified' ? 'secondary' : 'default'} className={selectedAddress.status === 'Verified' ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}>
+                            {selectedAddress.status}
+                            </Badge>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <MoreVertical className="h-4 w-4" />
+                                </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                <DialogTrigger asChild>
+                                    <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
+                                        <Edit className="mr-2 h-4 w-4" />
+                                        <span>Edit</span>
+                                    </DropdownMenuItem>
+                                </DialogTrigger>
+                                <DropdownMenuItem>Set as Primary</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">Archive</DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="grid md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 space-y-4">
+                          <div className="space-y-1">
+                            <h3 className="font-semibold">Address NFT ID</h3>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
+                              <p className="truncate">{selectedAddress.nftId}</p>
+                              <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <Copy className="h-4 w-4" />
                               </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
-                              <DropdownMenuItem>Set as Primary</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">Archive</DropdownMenuItem>
-                              </DropdownMenuContent>
-                          </DropdownMenu>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="grid md:grid-cols-3 gap-6">
-                      <div className="md:col-span-2 space-y-4">
-                        <div className="space-y-1">
-                          <h3 className="font-semibold">Address NFT ID</h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
-                            <p className="truncate">{selectedAddress.nftId}</p>
-                            <Button variant="ghost" size="icon" className="h-7 w-7">
-                              <Copy className="h-4 w-4" />
-                            </Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
-                        <div className="p-2 bg-white rounded-lg shadow-md">
-                          <Image src="https://placehold.co/120x120.png" alt="QR Code" width={120} height={120} data-ai-hint="qr code" />
+                        <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
+                          <div className="p-2 bg-white rounded-lg shadow-md">
+                            <Image src="https://placehold.co/120x120.png" alt="QR Code" width={120} height={120} data-ai-hint="qr code" />
+                          </div>
+                           <Button variant="outline" size="sm" className="mt-4">
+                            <QrCode className="mr-2 h-4 w-4" />
+                            Show QR
+                          </Button>
                         </div>
-                         <Button variant="outline" size="sm" className="mt-4">
-                          <QrCode className="mr-2 h-4 w-4" />
-                          Show QR
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
               </div>
-            </div>
-          </main>
-        </SidebarInset>
+            </main>
+             {selectedAddress && (
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Edit Address</DialogTitle>
+                  <DialogDescription>
+                    Update the details for your address. Click save when you're done.
+                  </DialogDescription>
+                </DialogHeader>
+                <EditAddressForm
+                  address={selectedAddress}
+                  onFormSubmit={handleAddressUpdate}
+                />
+              </DialogContent>
+            )}
+          </SidebarInset>
+        </Dialog>
       </div>
     </SidebarProvider>
   );
