@@ -84,7 +84,7 @@ export function RegisterForm() {
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [cameraStatus, setCameraStatus] = useState<'loading' | 'allowed' | 'denied' | 'notsupported'>('loading');
   const [isCapturing, setIsCapturing] = useState(false);
 
 
@@ -97,44 +97,33 @@ export function RegisterForm() {
   });
 
   useEffect(() => {
+    let stream: MediaStream | null = null;
     const getCameraPermission = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         console.error('Camera not supported by this browser.');
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Not Supported',
-          description: 'Your browser does not support camera access.',
-        });
+        setCameraStatus('notsupported');
         return;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({video: true});
-        setHasCameraPermission(true);
-
+        stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setCameraStatus('allowed');
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
       } catch (error) {
         console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this feature.',
-        });
+        setCameraStatus('denied');
       }
     };
 
     getCameraPermission();
     
     return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
+      if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
     }
-  }, [toast]);
+  }, []);
 
   const processAndSetImage = async (imageSrc: string) => {
     const address = form.getValues('cryptoAddress');
@@ -188,7 +177,7 @@ export function RegisterForm() {
       };
       reader.readAsDataURL(file);
     }
-  }, [form]);
+  }, [form, processAndSetImage]);
   
   const handleCapture = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
@@ -210,7 +199,7 @@ export function RegisterForm() {
         });
       });
     }
-  }, [form, toast]);
+  }, [form, toast, processAndSetImage]);
 
 
   const onSubmit = async (values: FormValues) => {
@@ -323,7 +312,7 @@ export function RegisterForm() {
                     <Tabs defaultValue="upload">
                       <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
-                        <TabsTrigger value="camera" disabled={hasCameraPermission === false}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                        <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
                       </TabsList>
                       <TabsContent value="upload">
                         <FormControl>
@@ -344,7 +333,6 @@ export function RegisterForm() {
                               </div>
                             )}
                             <input
-                              // We don't use the form register here directly because we handle the file processing manually
                               ref={doorPhotoRef}
                               type="file"
                               className="hidden"
@@ -358,18 +346,29 @@ export function RegisterForm() {
                         <div className="relative">
                           <video ref={videoRef} className="w-full aspect-video rounded-md bg-black" autoPlay muted playsInline />
                           <canvas ref={canvasRef} className="hidden"></canvas>
-                          { hasCameraPermission === false && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
-                               <Alert variant="destructive" className="w-auto">
-                                  <AlertTitle>Camera Access Required</AlertTitle>
-                                  <AlertDescription>
-                                    Please allow camera access to use this feature.
-                                  </AlertDescription>
-                              </Alert>
+                          {cameraStatus !== 'allowed' && (
+                             <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+                               {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
+                               {cameraStatus === 'denied' && (
+                                 <Alert variant="destructive" className="w-auto">
+                                    <AlertTitle>Camera Access Denied</AlertTitle>
+                                    <AlertDescription>
+                                      Please enable camera permissions to use this feature.
+                                    </AlertDescription>
+                                </Alert>
+                               )}
+                               {cameraStatus === 'notsupported' && (
+                                 <Alert variant="destructive" className="w-auto">
+                                    <AlertTitle>Camera Not Supported</AlertTitle>
+                                    <AlertDescription>
+                                      Your browser does not support camera access.
+                                    </AlertDescription>
+                                </Alert>
+                               )}
                             </div>
                           )}
                         </div>
-                        <Button type="button" onClick={handleCapture} disabled={hasCameraPermission !== true || isCapturing} className="w-full mt-2">
+                        <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed' || isCapturing} className="w-full mt-2">
                           {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
                           {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
                         </Button>
