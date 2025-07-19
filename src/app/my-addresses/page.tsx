@@ -349,8 +349,8 @@ export default function MyAddressesPage() {
                                     </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                    <DialogTrigger asChild disabled={selectedAddress.isPrimary}>
-                                        <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)} disabled={selectedAddress.isPrimary}>
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
                                             <Edit className="mr-2 h-4 w-4" />
                                             <span>Edit Details</span>
                                         </DropdownMenuItem>
