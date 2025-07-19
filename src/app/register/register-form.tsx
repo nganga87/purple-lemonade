@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -178,7 +178,7 @@ export function RegisterForm() {
       };
       reader.readAsDataURL(file);
     }
-  }, [form, processAndSetImage]);
+  }, [processAndSetImage]);
   
   const handleCapture = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
@@ -200,7 +200,7 @@ export function RegisterForm() {
         });
       });
     }
-  }, [form, toast, processAndSetImage]);
+  }, [processAndSetImage, toast]);
 
 
   const onSubmit = async (values: FormValues) => {
@@ -322,32 +322,41 @@ export function RegisterForm() {
                         <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
                       </TabsList>
                       <TabsContent value="upload">
-                        <FormControl>
-                          <label
-                            onDragOver={onDragOver}
-                            onDrop={onDrop}
-                            className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
-                          >
-                            {doorPhotoPreview ? (
-                              <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" />
-                            ) : (
-                              <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                                <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
-                                <p className="mb-2 text-sm text-muted-foreground">
-                                  <span className="font-semibold">Click to upload</span> or drag and drop
-                                </p>
-                                <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
-                              </div>
-                            )}
-                            <input
-                              ref={doorPhotoRef}
-                              type="file"
-                              className="hidden"
-                              accept="image/png, image/jpeg, image/webp"
-                              onChange={handleFileChange}
-                            />
-                          </label>
-                        </FormControl>
+                        <div className="space-y-4">
+                          <Alert variant="default" className="border-yellow-500/50 text-yellow-700 dark:border-yellow-500/50 dark:text-yellow-400 [&>svg]:text-yellow-500">
+                             <AlertTriangle className="h-4 w-4" />
+                             <AlertTitle>Location Mismatch Warning</AlertTitle>
+                             <AlertDescription>
+                               If your photo contains location data (EXIF) that does not match the GPS coordinates provided, validation may fail. For best results, use the "Use Camera" option to take a fresh photo.
+                             </AlertDescription>
+                           </Alert>
+                          <FormControl>
+                            <label
+                              onDragOver={onDragOver}
+                              onDrop={onDrop}
+                              className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
+                            >
+                              {doorPhotoPreview ? (
+                                <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                  <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
+                                  <p className="mb-2 text-sm text-muted-foreground">
+                                    <span className="font-semibold">Click to upload</span> or drag and drop
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
+                                </div>
+                              )}
+                              <input
+                                ref={doorPhotoRef}
+                                type="file"
+                                className="hidden"
+                                accept="image/png, image/jpeg, image/webp"
+                                onChange={handleFileChange}
+                              />
+                            </label>
+                          </FormControl>
+                        </div>
                       </TabsContent>
                       <TabsContent value="camera">
                         <div className="relative">
