@@ -31,6 +31,7 @@ import {
   QrCode,
   Copy,
   Users,
+  Mail,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -207,34 +208,40 @@ export default function DashboardPage() {
                   </div>
                   <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Verified</Badge>
                 </CardHeader>
-                <CardContent className="grid md:grid-cols-3 gap-6">
-                  <div className="md:col-span-2 space-y-4">
-                    <div className="space-y-1">
-                      <h3 className="font-semibold">Address NFT ID</h3>
+                <CardContent className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-sm">Location</h3>
+                      <p className="text-muted-foreground">123 Main Street, Anytown, USA 12345</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-sm">GPS Coordinates</h3>
+                      <p className="text-muted-foreground">34.0522° N, 118.2437° W</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-sm">Address NFT ID</h3>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
-                        <p className="truncate">0x7A1B2c3D4e5F6a7B8c9d0E1f2A3b4C5d6E7f8A9B</p>
+                        <p className="truncate font-mono">0x7A1B2c3D4e5F6a7B8c9d0E1f2A3b4C5d6E7f8A9B</p>
                         <Button variant="ghost" size="icon" className="h-7 w-7">
                           <Copy className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <h3 className="font-semibold">Location</h3>
-                      <p className="text-muted-foreground">123 Main Street, Anytown, USA 12345</p>
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="font-semibold">GPS Coordinates</h3>
-                      <p className="text-muted-foreground">34.0522° N, 118.2437° W</p>
-                    </div>
                   </div>
-                  <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
-                    <div className="p-2 bg-white rounded-lg shadow-md">
-                      <Image src="https://placehold.co/160x160.png" alt="QR Code" width={160} height={160} data-ai-hint="qr code"/>
+                  <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-6">
+                    <div className="p-3 bg-white rounded-lg shadow-md">
+                      <Image src="https://placehold.co/180x180.png" alt="QR Code" width={180} height={180} data-ai-hint="qr code"/>
                     </div>
-                    <Button variant="outline" className="mt-4">
-                      <QrCode className="mr-2 h-4 w-4" />
-                      Show Full QR
-                    </Button>
+                    <div className="flex gap-2 w-full mt-4">
+                        <Button variant="outline" className="w-full">
+                          <QrCode className="mr-2 h-4 w-4" />
+                          Expand QR
+                        </Button>
+                        <Button variant="outline" className="w-full">
+                          <Mail className="mr-2 h-4 w-4" />
+                          Send to Email
+                        </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
