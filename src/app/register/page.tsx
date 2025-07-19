@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import {
@@ -21,7 +21,6 @@ import {
   LayoutDashboard,
   MapPin,
   PlusCircle,
-  CheckCircle2,
   Settings,
   Bell,
   UserCircle,
@@ -42,6 +41,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Logo } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
+import { RegistrationOptions, type RegistrationChoice } from './registration-options';
+import { AddTenantForm } from './add-tenant-form';
 
 const RegisterForm = dynamic(() => import('./register-form').then(mod => mod.RegisterForm), {
   ssr: false,
@@ -54,6 +55,23 @@ const RegisterForm = dynamic(() => import('./register-form').then(mod => mod.Reg
 });
 
 export default function RegisterPage() {
+  const [choice, setChoice] = useState<RegistrationChoice | null>(null);
+
+  const handleResetChoice = () => {
+    setChoice(null);
+  };
+
+  const renderContent = () => {
+    switch (choice) {
+      case 'new-property':
+        return <RegisterForm />;
+      case 'add-tenant':
+        return <AddTenantForm onBack={handleResetChoice} />;
+      default:
+        return <RegistrationOptions onChoice={setChoice} />;
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
@@ -166,7 +184,7 @@ export default function RegisterPage() {
           </header>
           
           <main className="flex-1 p-4 md:p-6 lg:p-8">
-            <RegisterForm />
+            {renderContent()}
           </main>
         </SidebarInset>
       </div>
