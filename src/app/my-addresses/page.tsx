@@ -32,6 +32,7 @@ import {
   MoreVertical,
   ChevronDown,
   Edit,
+  Trash2,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -50,6 +51,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
 import {
   Select,
@@ -66,9 +70,23 @@ import {
   DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Badge } from '@/components/ui/badge';
 import { Logo } from '@/components/icons';
 import { EditAddressForm } from './edit-address-form';
+import { deleteAddress } from './delete-address';
+import { useToast } from '@/hooks/use-toast';
+
 
 const initialAddresses = [
   {
@@ -101,8 +119,9 @@ export type Address = typeof initialAddresses[0];
 
 export default function MyAddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses[0] || null);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses.find(a => a.isPrimary) || addresses[0] || null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleAddressSelect = (addressId: string) => {
     const address = addresses.find(addr => addr.nftId === addressId);
@@ -115,6 +134,50 @@ export default function MyAddressesPage() {
     setSelectedAddress(updatedAddress);
     setIsEditDialogOpen(false);
   };
+  
+  const handleSetPrimary = (nftId: string) => {
+    const newAddresses = addresses.map(addr => ({
+      ...addr,
+      isPrimary: addr.nftId === nftId
+    }));
+    setAddresses(newAddresses);
+    const newSelected = newAddresses.find(addr => addr.nftId === selectedAddress?.nftId);
+    if(newSelected) setSelectedAddress(newSelected);
+    toast({
+      title: "Primary Address Updated",
+      description: "Your primary address has been changed.",
+    });
+  }
+
+  const handleArchiveAddress = async (nftId: string) => {
+    try {
+      const result = await deleteAddress(nftId);
+      if (result.error) {
+        throw new Error(result.error);
+      }
+      
+      const newAddresses = addresses.filter(addr => addr.nftId !== nftId);
+      setAddresses(newAddresses);
+      
+      if (selectedAddress?.nftId === nftId) {
+        setSelectedAddress(newAddresses.find(a => a.isPrimary) || newAddresses[0] || null);
+      }
+      
+      toast({
+        title: "Address Archived",
+        description: "The address has been successfully archived.",
+      });
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      toast({
+        variant: "destructive",
+        title: "Archive Failed",
+        description: errorMessage,
+      });
+    }
+  };
+
 
   return (
     <SidebarProvider>
@@ -246,14 +309,16 @@ export default function MyAddressesPage() {
                   </div>
                 
                 <div className="space-y-8">
-                  <Select onValueChange={handleAddressSelect} defaultValue={selectedAddress?.nftId}>
+                  <Select onValueChange={handleAddressSelect} value={selectedAddress?.nftId || ''}>
                     <SelectTrigger className="w-full md:w-[400px]">
                       <SelectValue placeholder="Select an address" />
                     </SelectTrigger>
                     <SelectContent>
                       {addresses.map((address) => (
                         <SelectItem key={address.nftId} value={address.nftId}>
-                          {address.name} ({address.address})
+                          {address.name}{' '}
+                          <span className="text-muted-foreground">({address.address})</span>
+                          {address.isPrimary && ' - Primary'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -263,35 +328,57 @@ export default function MyAddressesPage() {
                     <Card className="shadow-lg animate-in fade-in-50 duration-500">
                       <CardHeader className="flex flex-row items-start justify-between">
                         <div>
-                          <CardTitle className="font-headline">{selectedAddress.address}</CardTitle>
-                          <CardDescription>
-                            {selectedAddress.isPrimary && (
-                              <Badge variant="outline" className="mr-2 border-primary text-primary">Primary</Badge>
-                            )}
-                            GPS: {selectedAddress.gps}
+                          <CardTitle className="font-headline">{selectedAddress.name}</CardTitle>
+                           <CardDescription>
+                            {selectedAddress.address}
                           </CardDescription>
                         </div>
                         <div className="flex items-center gap-2">
+                           {selectedAddress.isPrimary && (
+                              <Badge variant="outline" className="mr-2 border-primary text-primary">Primary</Badge>
+                            )}
                             <Badge variant={selectedAddress.status === 'Verified' ? 'secondary' : 'default'} className={selectedAddress.status === 'Verified' ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}>
                             {selectedAddress.status}
                             </Badge>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <MoreVertical className="h-4 w-4" />
-                                </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                <DialogTrigger asChild>
-                                    <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
-                                        <Edit className="mr-2 h-4 w-4" />
-                                        <span>Edit</span>
-                                    </DropdownMenuItem>
-                                </DialogTrigger>
-                                <DropdownMenuItem>Set as Primary</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive">Archive</DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                             <AlertDialog>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                    <DialogTrigger asChild>
+                                        <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)}>
+                                            <Edit className="mr-2 h-4 w-4" />
+                                            <span>Edit Details</span>
+                                        </DropdownMenuItem>
+                                    </DialogTrigger>
+                                    <DropdownMenuItem onSelect={() => handleSetPrimary(selectedAddress.nftId)} disabled={selectedAddress.isPrimary}>Set as Primary</DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <AlertDialogTrigger asChild>
+                                        <DropdownMenuItem className="text-destructive" disabled={selectedAddress.isPrimary}>
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            <span>Archive</span>
+                                        </DropdownMenuItem>
+                                    </AlertDialogTrigger>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently archive the address "{selectedAddress.name}".
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleArchiveAddress(selectedAddress.nftId)}>
+                                      Continue
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </div>
                       </CardHeader>
                       <CardContent className="grid md:grid-cols-3 gap-6">
@@ -305,6 +392,10 @@ export default function MyAddressesPage() {
                               </Button>
                             </div>
                           </div>
+                           <div className="space-y-1">
+                                <h3 className="font-semibold">GPS Coordinates</h3>
+                                <p className="text-muted-foreground">{selectedAddress.gps}</p>
+                            </div>
                         </div>
                         <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
                           <div className="p-2 bg-white rounded-lg shadow-md">
