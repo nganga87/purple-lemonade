@@ -16,6 +16,10 @@ import {
   Edit,
   Trash2,
   LayoutDashboard,
+  ChevronDown,
+  ArrowLeftRight,
+  TrendingUp,
+  TrendingDown,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -46,12 +50,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
 import {
   Select,
   SelectContent,
@@ -110,16 +108,50 @@ const mySaleListings = [
     { name: 'Vacation House', address: '789 Pine Lane, Lakeside, USA 54321', price: '6.2 ETH', status: 'Listed', views: 88 },
 ];
 
+function NavLink({ href, children }: { href: string, children: React.ReactNode }) {
+    return (
+        <Link href={href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            {children}
+        </Link>
+    )
+}
+
 export default function ExchangePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="mr-6 flex items-center space-x-2">
+            <Link href="/" className="mr-2 flex items-center space-x-2">
               <Logo className="h-6 w-6 text-primary" />
               <span className="font-headline font-bold text-lg">AddressChain</span>
             </Link>
+             <nav className="hidden md:flex items-center gap-6">
+                <NavLink href="#">Buy</NavLink>
+                <NavLink href="#">Sell</NavLink>
+                <NavLink href="#">Market</NavLink>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="p-0 h-auto text-sm font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:ring-0">
+                      Trade <ChevronDown className="ml-1 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    <DropdownMenuItem>
+                      <ArrowLeftRight className="mr-2 h-4 w-4" />
+                      <span>P2P Exchange</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <TrendingUp className="mr-2 h-4 w-4" />
+                      <span>Derivatives</span>
+                    </DropdownMenuItem>
+                     <DropdownMenuItem>
+                      <TrendingDown className="mr-2 h-4 w-4" />
+                      <span>Margin Trading</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </nav>
           </div>
           <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -195,156 +227,147 @@ export default function ExchangePage() {
             </CardContent>
         </Card>
 
-        <Tabs defaultValue="marketplace">
-          <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
-            <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
-            <TabsTrigger value="my-listings">My Listings</TabsTrigger>
-          </TabsList>
-          <TabsContent value="marketplace">
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="font-headline">Address NFT Marketplace</CardTitle>
-                    <CardDescription>Browse and acquire verified digital addresses from around the world.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="mb-6 p-4 border rounded-lg bg-secondary/50">
-                        <h4 className="font-semibold mb-2">Filter Listings</h4>
-                        <div className="grid md:grid-cols-3 gap-4">
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium text-muted-foreground">Country</label>
-                                <Select>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a country" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="usa">United States</SelectItem>
-                                        <SelectItem value="canada">Canada</SelectItem>
-                                        <SelectItem value="uk">United Kingdom</SelectItem>
-                                        <SelectItem value="germany">Germany</SelectItem>
-                                        <SelectItem value="japan">Japan</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium text-muted-foreground">State/Province</label>
-                                <Input placeholder="e.g., California" disabled />
-                            </div>
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium text-muted-foreground">City</label>
-                                <Input placeholder="e.g., San Francisco" disabled />
-                            </div>
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="font-headline">Address NFT Marketplace</CardTitle>
+                <CardDescription>Browse and acquire verified digital addresses from around the world.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="mb-6 p-4 border rounded-lg bg-secondary/50">
+                    <h4 className="font-semibold mb-2">Filter Listings</h4>
+                    <div className="grid md:grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-muted-foreground">Country</label>
+                            <Select>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a country" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="usa">United States</SelectItem>
+                                    <SelectItem value="canada">Canada</SelectItem>
+                                    <SelectItem value="uk">United Kingdom</SelectItem>
+                                    <SelectItem value="germany">Germany</SelectItem>
+                                    <SelectItem value="japan">Japan</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-muted-foreground">State/Province</label>
+                            <Input placeholder="e.g., California" disabled />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-medium text-muted-foreground">City</label>
+                            <Input placeholder="e.g., San Francisco" disabled />
                         </div>
                     </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                            <TableHead className="w-[300px]">Listing</TableHead>
-                            <TableHead>Address</TableHead>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Verification</TableHead>
-                            <TableHead>Price</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {marketplaceListings.map((listing) => (
-                            <TableRow key={listing.nftId}>
-                                <TableCell>
-                                    <div className="flex items-center gap-3">
-                                        <Image src={`https://placehold.co/100x75.png`} alt={listing.name} width={60} height={45} className="rounded-md" data-ai-hint="building exterior"/>
-                                        <div>
-                                            <p className="font-medium">{listing.name}</p>
-                                            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                                                 <Avatar className='h-5 w-5'>
-                                                    <AvatarImage src={listing.avatar} alt={listing.listedBy} data-ai-hint="person avatar"/>
-                                                    <AvatarFallback>{listing.listedBy.charAt(0)}</AvatarFallback>
-                                                </Avatar>
-                                                {listing.listedBy}
-                                            </p>
-                                        </div>
+                </div>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead className="w-[300px]">Listing</TableHead>
+                        <TableHead>Address</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Verification</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {marketplaceListings.map((listing) => (
+                        <TableRow key={listing.nftId}>
+                            <TableCell>
+                                <div className="flex items-center gap-3">
+                                    <Image src={`https://placehold.co/100x75.png`} alt={listing.name} width={60} height={45} className="rounded-md" data-ai-hint="building exterior"/>
+                                    <div>
+                                        <p className="font-medium">{listing.name}</p>
+                                        <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                                             <Avatar className='h-5 w-5'>
+                                                <AvatarImage src={listing.avatar} alt={listing.listedBy} data-ai-hint="person avatar"/>
+                                                <AvatarFallback>{listing.listedBy.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            {listing.listedBy}
+                                        </p>
                                     </div>
-                                </TableCell>
-                                <TableCell>{listing.address}</TableCell>
-                                <TableCell>
-                                    <Badge variant="outline" className="capitalize flex items-center gap-1">
-                                         {listing.type === 'Office' && <Building className="h-3 w-3"/>}
-                                         {listing.type === 'Warehouse' && <Building className="h-3 w-3"/>}
-                                         {listing.type === 'House' && <Home className="h-3 w-3"/>}
-                                         {listing.type === 'Vacation' && <Home className="h-3 w-3"/>}
-                                        {listing.type}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <Badge variant={listing.status === 'Verified' ? 'default' : 'secondary'} className={listing.status === 'Verified' ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
-                                        {listing.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="font-mono">{listing.price}</TableCell>
-                                <TableCell className="text-right">
-                                    <Button size="sm">Buy Now</Button>
-                                </TableCell>
-                            </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="my-listings">
-            <Card className="shadow-lg">
-                <CardHeader>
-                    <CardTitle className="font-headline">Your Active Listings</CardTitle>
-                    <CardDescription>Manage the addresses you have listed for sale.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <Table>
-                        <TableHeader>
-                            <TableRow>
-                            <TableHead>Address Name</TableHead>
-                            <TableHead>Full Address</TableHead>
-                            <TableHead>Asking Price</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Views</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {mySaleListings.map((listing) => (
-                            <TableRow key={listing.address}>
-                                <TableCell className="font-medium">{listing.name}</TableCell>
-                                <TableCell>{listing.address}</TableCell>
-                                <TableCell className="font-mono">{listing.price}</TableCell>
-                                <TableCell>
-                                    <Badge variant="outline" className='text-green-600 border-green-300'>{listing.status}</Badge>
-                                </TableCell>
-                                <TableCell>{listing.views}</TableCell>
-                                <TableCell className="text-right">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon">
-                                                <MoreHorizontal className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem>
-                                              <Edit className='mr-2 h-4 w-4' />
-                                              Edit Listing
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="text-destructive">
-                                              <Trash2 className='mr-2 h-4 w-4' />
-                                              Delist
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                                </div>
+                            </TableCell>
+                            <TableCell>{listing.address}</TableCell>
+                            <TableCell>
+                                <Badge variant="outline" className="capitalize flex items-center gap-1">
+                                     {listing.type === 'Office' && <Building className="h-3 w-3"/>}
+                                     {listing.type === 'Warehouse' && <Building className="h-3 w-3"/>}
+                                     {listing.type === 'House' && <Home className="h-3 w-3"/>}
+                                     {listing.type === 'Vacation' && <Home className="h-3 w-3"/>}
+                                    {listing.type}
+                                </Badge>
+                            </TableCell>
+                            <TableCell>
+                                <Badge variant={listing.status === 'Verified' ? 'default' : 'secondary'} className={listing.status === 'Verified' ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
+                                    {listing.status}
+                                </Badge>
+                            </TableCell>
+                            <TableCell className="font-mono">{listing.price}</TableCell>
+                            <TableCell className="text-right">
+                                <Button size="sm">Buy Now</Button>
+                            </TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="font-headline">Your Active Listings</CardTitle>
+                <CardDescription>Manage the addresses you have listed for sale.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                        <TableHead>Address Name</TableHead>
+                        <TableHead>Full Address</TableHead>
+                        <TableHead>Asking Price</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Views</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {mySaleListings.map((listing) => (
+                        <TableRow key={listing.address}>
+                            <TableCell className="font-medium">{listing.name}</TableCell>
+                            <TableCell>{listing.address}</TableCell>
+                            <TableCell className="font-mono">{listing.price}</TableCell>
+                            <TableCell>
+                                <Badge variant="outline" className='text-green-600 border-green-300'>{listing.status}</Badge>
+                            </TableCell>
+                            <TableCell>{listing.views}</TableCell>
+                            <TableCell className="text-right">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem>
+                                          <Edit className='mr-2 h-4 w-4' />
+                                          Edit Listing
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive">
+                                          <Trash2 className='mr-2 h-4 w-4' />
+                                          Delist
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
       </main>
     </div>
   );
