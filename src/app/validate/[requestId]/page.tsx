@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleValidation } from './actions';
 import type { CompareValidationPhotosOutput } from '@/ai/flows/compare-validation-photos';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,7 +29,7 @@ import { Logo } from '@/components/icons';
 
 const formSchema = z.object({
   validatorGpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
-  validatorDoorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
+  validatorDoorPhoto: z.instanceof(File, { message: 'A photo of the door is required.' }).refine(file => file.size > 0, 'A photo of the door is required.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -59,7 +59,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
     },
   });
 
-  const { setValue } = form;
+  const { setValue, trigger } = form;
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -89,37 +89,18 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
     };
   }, []);
 
-  const processAndSetImage = useCallback((imageSrc: string, source: 'upload' | 'camera') => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      // In a real app, you might convert blob to file here
-    };
+  const setFileInForm = useCallback((file: File) => {
+      const previewUrl = URL.createObjectURL(file);
+      setDoorPhotoPreview(previewUrl);
+      setValue('validatorDoorPhoto', file, { shouldValidate: true });
+      trigger('validatorDoorPhoto'); // Manually trigger validation
+  }, [setValue, trigger]);
 
-    if (source === 'upload') {
-      // This is a simplified version. A full implementation would convert the data URI back to a File object.
-      // For now, we'll fetch it to create a blob and then a file.
-      fetch(imageSrc)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], "validator-photo.jpg", { type: "image/jpeg" });
-          setValue('validatorDoorPhoto', file, { shouldValidate: true });
-          setDoorPhotoPreview(imageSrc);
-        });
-    } else { // camera
-        const file = new File([imageSrc], "validator-photo.jpg", { type: "image/jpeg" });
-        setValue('validatorDoorPhoto', file, { shouldValidate: true });
-        setDoorPhotoPreview(URL.createObjectURL(file));
-    }
-  }, [setValue]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        processAndSetImage(reader.result as string, 'upload');
-      };
-      reader.readAsDataURL(file);
+      setFileInForm(file);
     }
   };
 
@@ -134,16 +115,22 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
       
       canvas.toBlob((blob) => {
         if (blob) {
-            processAndSetImage(blob as any, 'camera');
-            toast({ title: "Photo Captured", description: "Ready for submission."});
+            const capturedFile = new File([blob], "validator-photo.jpg", { type: "image/jpeg" });
+            setFileInForm(capturedFile);
+            toast({ title: "Photo Captured", description: "The captured image is now ready for submission."});
         }
       }, 'image/jpeg');
     }
-  }, [processAndSetImage, toast]);
+  }, [setFileInForm, toast]);
+  
+  const handleRetake = () => {
+    setDoorPhotoPreview(null);
+    setValue('validatorDoorPhoto', new File([], ''), { shouldValidate: true });
+  }
 
   const handleGetLocation = () => {
+    setIsLoading(true);
     if (navigator.geolocation) {
-      setIsLoading(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
@@ -165,6 +152,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
         }
       );
     } else {
+      setIsLoading(false);
       toast({
         variant: 'destructive',
         title: 'Geolocation not supported',
@@ -309,13 +297,31 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
                                     </FormControl>
                                 </TabsContent>
                                 <TabsContent value="camera">
-                                    <div className="relative overflow-hidden rounded-md">
-                                        <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
-                                        <canvas ref={canvasRef} className="hidden"></canvas>
+                                     <div className="space-y-2">
+                                        <div className="relative overflow-hidden rounded-md">
+                                            <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
+                                            <canvas ref={canvasRef} className="hidden"></canvas>
+                                            {cameraStatus !== 'allowed' && (
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                                                    {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
+                                                    {cameraStatus === 'denied' && <Alert variant="destructive"><AlertTitle>Camera Denied</AlertTitle></Alert>}
+                                                </div>
+                                            )}
+                                        </div>
+                                        {doorPhotoPreview ? (
+                                             <div className="flex gap-2 items-center">
+                                                 <Image src={doorPhotoPreview} alt="Captured preview" width={100} height={75} className="rounded-md border"/>
+                                                 <p className="text-sm text-green-600 flex-1">Photo captured. Ready to submit.</p>
+                                                 <Button type="button" onClick={handleRetake} variant="outline" size="sm">
+                                                    <RefreshCw className="mr-2 h-4 w-4"/> Retake
+                                                 </Button>
+                                             </div>
+                                        ) : (
+                                            <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed'} className="w-full">
+                                                <Camera className="mr-2" /> Capture Photo
+                                            </Button>
+                                        )}
                                     </div>
-                                    <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed'} className="w-full mt-2">
-                                        <Camera className="mr-2" /> Capture Photo
-                                    </Button>
                                 </TabsContent>
                                 </Tabs>
                                 <FormMessage />
@@ -326,7 +332,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
                 </CardContent>
                 {!isFormReadOnly && (
                     <CardFooter>
-                    <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
+                    <Button type="submit" disabled={isLoading || !form.formState.isValid} className="w-full md:w-auto">
                         {isLoading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
