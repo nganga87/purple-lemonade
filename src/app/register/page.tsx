@@ -46,10 +46,10 @@ export default function RegisterPage() {
       <div className="flex min-h-screen bg-background">
         <Sidebar>
           <SidebarHeader>
-            <div className="flex items-center gap-2 p-2">
+            <Link href="/" className="flex items-center gap-2 p-2">
               <Logo className="w-8 h-8 text-primary" />
               <h1 className="text-xl font-headline font-semibold">AddressChain</h1>
-            </div>
+            </Link>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
