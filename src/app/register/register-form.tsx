@@ -359,9 +359,12 @@ export function RegisterForm() {
                         </div>
                       </TabsContent>
                       <TabsContent value="camera">
-                        <div className="relative">
-                          <video ref={videoRef} className="w-full aspect-video rounded-md bg-black" autoPlay muted playsInline />
+                        <div className="relative overflow-hidden rounded-md">
+                          <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
                           <canvas ref={canvasRef} className="hidden"></canvas>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-[calc(100%-4rem)] h-[calc(100%-4rem)] border-4 border-white/50 border-dashed rounded-lg shadow-2xl" />
+                          </div>
                           {cameraStatus !== 'allowed' && (
                              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
                                {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
