@@ -161,7 +161,7 @@ export default function ExchangePage() {
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/exchange">
+                <Link href="/exchange" target="_blank" rel="noopener noreferrer">
                     <SidebarMenuButton isActive>
                     <CandlestickChart />
                     Address Marketplace

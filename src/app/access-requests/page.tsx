@@ -216,7 +216,7 @@ export default function AccessRequestsPage() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/exchange">
+                <Link href="/exchange" target="_blank" rel="noopener noreferrer">
                     <SidebarMenuButton>
                     <CandlestickChart />
                     Address Marketplace
