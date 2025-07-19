@@ -10,11 +10,29 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-background font-body">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 max-w-screen-2xl items-center">
+        <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Logo className="h-6 w-6 text-primary" />
-            <span className="font-headline font-bold">AddressChain</span>
+            <span className="font-headline font-bold text-lg">AddressChain</span>
           </Link>
+          <nav className="hidden items-center gap-6 text-sm md:flex">
+             <Link
+              href="/exchange"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground/60 transition-colors hover:text-foreground/80"
+            >
+              Marketplace
+            </Link>
+          </nav>
+          <div className="flex items-center gap-2">
+            <Link href="/login">
+              <Button variant="ghost">Log In</Button>
+            </Link>
+            <Link href="/register">
+              <Button>Sign Up</Button>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -48,12 +66,6 @@ export default function LandingPage() {
                   </Button>
                 </Link>
               </div>
-               <p className="text-center text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <Link href="/login" className="font-semibold text-primary underline-offset-4 hover:underline">
-                  Log In
-                </Link>
-              </p>
             </div>
           </div>
           <div className="relative w-full h-full min-h-[400px]">
