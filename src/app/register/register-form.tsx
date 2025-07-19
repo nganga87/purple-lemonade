@@ -316,10 +316,10 @@ export function RegisterForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Door Photo</FormLabel>
-                    <Tabs defaultValue="upload">
+                    <Tabs defaultValue="camera">
                       <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
                         <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                        <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
                       </TabsList>
                       <TabsContent value="upload">
                         <div className="space-y-4">
