@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -285,18 +286,24 @@ export function RegisterForm() {
             <CardContent className="space-y-6">
                <FormField
                 control={form.control}
-                name="cryptoAddress"
+                name="gpsCoordinates"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Crypto Wallet Address</FormLabel>
-                     <FormControl>
-                      <div className="relative flex-grow">
-                        <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input placeholder="e.g., 0x..." {...field} className="pl-10" />
-                      </div>
-                    </FormControl>
+                    <FormLabel>GPS Coordinates</FormLabel>
+                    <div className="flex gap-2">
+                        <FormControl>
+                          <div className="relative flex-grow">
+                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input placeholder="e.g., 34.0522,-118.2437" {...field} className="pl-10" />
+                          </div>
+                        </FormControl>
+                        <Button type="button" variant="outline" onClick={handleGetLocation} disabled={isLoading}>
+                            <LocateFixed className="mr-2 h-4 w-4"/>
+                            Use My Location
+                        </Button>
+                    </div>
                     <FormDescription>
-                      This address will be embedded in your photo as a digital signature.
+                      Provide the latitude and longitude for the property, or use your current location.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -382,26 +389,20 @@ export function RegisterForm() {
                 )}
               />
               
-              <FormField
+               <FormField
                 control={form.control}
-                name="gpsCoordinates"
+                name="cryptoAddress"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>GPS Coordinates</FormLabel>
-                    <div className="flex gap-2">
-                        <FormControl>
-                          <div className="relative flex-grow">
-                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input placeholder="e.g., 34.0522,-118.2437" {...field} className="pl-10" />
-                          </div>
-                        </FormControl>
-                        <Button type="button" variant="outline" onClick={handleGetLocation} disabled={isLoading}>
-                            <LocateFixed className="mr-2 h-4 w-4"/>
-                            Use My Location
-                        </Button>
-                    </div>
+                    <FormLabel>Crypto Wallet Address</FormLabel>
+                     <FormControl>
+                      <div className="relative flex-grow">
+                        <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input placeholder="e.g., 0x..." {...field} className="pl-10" />
+                      </div>
+                    </FormControl>
                     <FormDescription>
-                      Provide the latitude and longitude for the property, or use your current location.
+                      This address will be embedded in your photo as a digital signature.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
