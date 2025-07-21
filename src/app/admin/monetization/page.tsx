@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { AdminLayout } from '../admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save } from 'lucide-react';
+import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +41,14 @@ export default function MonetizationPage() {
   const [isMarketplaceActive, setIsMarketplaceActive] = useState(true);
   const [apiFee, setApiFee] = useState(0.001);
   const [isApiActive, setIsApiActive] = useState(true);
+  const [lookupFee, setLookupFee] = useState(0.10);
+  const [isLookupActive, setIsLookupActive] = useState(true);
+  const [handshakeFee, setHandshakeFee] = useState(1.00);
+  const [isHandshakeActive, setIsHandshakeActive] = useState(false);
+  const [transferFee, setTransferFee] = useState(0.1);
+  const [isTransferActive, setIsTransferActive] = useState(true);
+  const [mintingFee, setMintingFee] = useState(5.00);
+  const [isMintingActive, setIsMintingActive] = useState(true);
 
   return (
     <AdminLayout active="monetization">
@@ -103,53 +111,93 @@ export default function MonetizationPage() {
             <CardTitle>Revenue Stream Management</CardTitle>
             <CardDescription>Configure commission rates and activate/deactivate revenue streams.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
-              <div className="flex-1">
-                <Label htmlFor="marketplace-fee" className="font-semibold">Marketplace Fees</Label>
-                <p className="text-sm text-muted-foreground">Set the commission percentage for each sale on the Address NFT Marketplace.</p>
+              <div className="flex items-center gap-4 flex-1">
+                <ShoppingCart className="h-6 w-6 text-muted-foreground"/>
+                <div>
+                    <Label htmlFor="marketplace-fee" className="font-semibold">Marketplace Sale Commission</Label>
+                    <p className="text-sm text-muted-foreground">Percentage fee for each sale on the Address NFT Marketplace.</p>
+                </div>
               </div>
               <div className="flex items-center gap-4 w-full md:w-auto">
                 <div className="relative flex-grow md:flex-grow-0">
                   <Input 
-                    id="marketplace-fee"
-                    type="number"
-                    value={marketplaceFee}
+                    id="marketplace-fee" type="number" value={marketplaceFee}
                     onChange={(e) => setMarketplaceFee(parseFloat(e.target.value))}
                     className="w-full md:w-32 pr-8"
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
                 </div>
-                <Switch 
-                  id="marketplace-switch"
-                  checked={isMarketplaceActive}
-                  onCheckedChange={setIsMarketplaceActive}
-                />
+                <Switch id="marketplace-switch" checked={isMarketplaceActive} onCheckedChange={setIsMarketplaceActive}/>
                 <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
               </div>
             </div>
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
-              <div className="flex-1">
-                <Label htmlFor="api-fee" className="font-semibold">API Usage Fees</Label>
-                <p className="text-sm text-muted-foreground">Set the per-call rate for API usage beyond the subscription plan limits.</p>
+              <div className="flex items-center gap-4 flex-1">
+                 <FileText className="h-6 w-6 text-muted-foreground"/>
+                 <div>
+                    <Label htmlFor="api-fee" className="font-semibold">API Lookup Fee</Label>
+                    <p className="text-sm text-muted-foreground">Flat rate fee for each API address lookup request.</p>
+                 </div>
               </div>
               <div className="flex items-center gap-4 w-full md:w-auto">
                  <div className="relative flex-grow md:flex-grow-0">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                  <Input
-                    id="api-fee"
-                    type="number"
-                    value={apiFee}
-                    onChange={(e) => setApiFee(parseFloat(e.target.value))}
-                    step="0.001"
-                    className="w-full md:w-32 pl-7"
-                  />
+                  <Input id="api-fee" type="number" value={lookupFee} onChange={(e) => setLookupFee(parseFloat(e.target.value))} step="0.01" className="w-full md:w-32 pl-7"/>
                 </div>
-                <Switch
-                  id="api-switch"
-                  checked={isApiActive}
-                  onCheckedChange={setIsApiActive}
-                />
+                <Switch id="api-switch" checked={isLookupActive} onCheckedChange={setIsLookupActive}/>
+                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
+              </div>
+            </div>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
+              <div className="flex items-center gap-4 flex-1">
+                 <ArrowLeftRight className="h-6 w-6 text-muted-foreground"/>
+                 <div>
+                    <Label htmlFor="transfer-fee" className="font-semibold">NFT Transfer Fee</Label>
+                    <p className="text-sm text-muted-foreground">Commission on wallet-to-wallet address NFT transfers.</p>
+                 </div>
+              </div>
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                 <div className="relative flex-grow md:flex-grow-0">
+                  <Input id="transfer-fee" type="number" value={transferFee} onChange={(e) => setTransferFee(parseFloat(e.target.value))} step="0.1" className="w-full md:w-32 pr-8"/>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
+                </div>
+                <Switch id="transfer-switch" checked={isTransferActive} onCheckedChange={setIsTransferActive}/>
+                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
+              </div>
+            </div>
+             <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
+              <div className="flex items-center gap-4 flex-1">
+                 <History className="h-6 w-6 text-muted-foreground"/>
+                 <div>
+                    <Label htmlFor="minting-fee" className="font-semibold">Address Minting Fee</Label>
+                    <p className="text-sm text-muted-foreground">One-time fee charged for creating a new digital address NFT.</p>
+                 </div>
+              </div>
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                 <div className="relative flex-grow md:flex-grow-0">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input id="minting-fee" type="number" value={mintingFee} onChange={(e) => setMintingFee(parseFloat(e.target.value))} step="0.50" className="w-full md:w-32 pl-7"/>
+                </div>
+                <Switch id="minting-switch" checked={isMintingActive} onCheckedChange={setIsMintingActive}/>
+                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
+              </div>
+            </div>
+             <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
+              <div className="flex items-center gap-4 flex-1">
+                 <Users className="h-6 w-6 text-muted-foreground"/>
+                 <div>
+                    <Label htmlFor="handshake-fee" className="font-semibold">Handshake Delivery Fee</Label>
+                    <p className="text-sm text-muted-foreground">Service fee for verified, in-person "handshake" deliveries.</p>
+                 </div>
+              </div>
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                 <div className="relative flex-grow md:flex-grow-0">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input id="handshake-fee" type="number" value={handshakeFee} onChange={(e) => setHandshakeFee(parseFloat(e.target.value))} step="0.50" className="w-full md:w-32 pl-7"/>
+                </div>
+                <Switch id="handshake-switch" checked={isHandshakeActive} onCheckedChange={setIsHandshakeActive}/>
                 <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
               </div>
             </div>
