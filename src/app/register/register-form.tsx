@@ -26,6 +26,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countries, type Country } from '@/lib/countries';
+import Link from 'next/link';
 
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
@@ -107,10 +108,11 @@ interface RegisterFormProps {
   onBack: () => void;
 }
 
+type RegistrationResult = ValidateDoorPhotoOutput & { submitted?: boolean };
 
 export function RegisterForm({ onBack }: RegisterFormProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<ValidateDoorPhotoOutput | null>(null);
+  const [result, setResult] = useState<RegistrationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [doorPhotoPreview, setDoorPhotoPreview] = useState<string | null>(null);
   const [generatedAddress, setGeneratedAddress] = useState<string | null>(null);
@@ -316,15 +318,15 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       }
       setResult(response);
       toast({
-        title: "Validation Complete",
-        description: "AI validation has finished successfully.",
+        title: response.submitted ? "Registration Submitted" : "Validation Complete",
+        description: response.validationDetails,
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
       toast({
         variant: "destructive",
-        title: "Validation Error",
+        title: "Submission Error",
         description: errorMessage,
       });
     } finally {
@@ -366,7 +368,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   };
 
   const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto && addressName && countryCode;
-  const isFormReadOnly = result?.isValid === true;
+  const isFormReadOnly = result?.submitted === true;
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -376,9 +378,9 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       </Button>
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">AI-Powered Address Verification</CardTitle>
+          <CardTitle className="font-headline text-2xl">AI-Powered Address Registration</CardTitle>
           <CardDescription>
-            {isFormReadOnly ? "Your address has been successfully validated and registered." : "Follow the steps to submit your address and location for validation."}
+            {isFormReadOnly ? "Your address has been submitted for validation." : "Follow the steps to submit your address and location for validation."}
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -669,10 +671,10 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Validating...
+                        Submitting...
                       </>
                     ) : (
-                      'Validate & Register Address'
+                      'Submit for Validation'
                     )}
                   </Button>
                 </CardFooter>
@@ -687,13 +689,22 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
           <CardHeader className="flex flex-row items-center gap-4">
             {result.isValid ? <CheckCircle className="h-8 w-8 text-green-500" /> : <XCircle className="h-8 w-8 text-red-500" />}
             <div>
-              <CardTitle className="font-headline text-xl">Validation Result</CardTitle>
-              <CardDescription>{result.isValid ? "This address has been successfully validated." : "This address could not be validated."}</CardDescription>
+              <CardTitle className="font-headline text-xl">
+                {result.submitted ? "Registration Submitted" : "Preliminary Check Failed"}
+              </CardTitle>
+              <CardDescription>{result.isValid ? "Your address is pending third-party validation." : "Your submission could not be processed."}</CardDescription>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="font-medium">Validation Details:</p>
+            <p className="font-medium">Details:</p>
             <p className="text-muted-foreground p-3 bg-secondary rounded-md mt-2">{result.validationDetails}</p>
+             {result.submitted && (
+                <Button asChild className="mt-4">
+                    <Link href="/my-addresses">
+                        Go to My Addresses
+                    </Link>
+                </Button>
+            )}
           </CardContent>
         </Card>
       )}
@@ -703,8 +714,8 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
           <CardHeader className="flex flex-row items-center gap-4">
             <XCircle className="h-8 w-8 text-destructive" />
             <div>
-              <CardTitle className="font-headline text-xl">Validation Failed</CardTitle>
-              <CardDescription>An error occurred during the validation process.</CardDescription>
+              <CardTitle className="font-headline text-xl">Submission Failed</CardTitle>
+              <CardDescription>An error occurred during the submission process.</CardDescription>
             </div>
           </CardHeader>
           <CardContent>

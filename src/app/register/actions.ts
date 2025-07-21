@@ -29,7 +29,7 @@ const getSatelliteImageForGps = async (gpsCoordinates: string): Promise<string> 
 };
 
 
-type ActionResponse = ValidateDoorPhotoOutput & { error?: string };
+type ActionResponse = ValidateDoorPhotoOutput & { error?: string, submitted?: boolean };
 
 export async function handleRegistration(formData: FormData): Promise<ActionResponse> {
   try {
@@ -69,14 +69,33 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
       physicalAddress,
     };
 
-    const result = await validateDoorPhoto(input);
-    return result;
+    // The AI validation here is a preliminary check.
+    const preliminaryValidation = await validateDoorPhoto(input);
+
+    if (!preliminaryValidation.isValid) {
+      return {
+        ...preliminaryValidation,
+        error: `Preliminary validation failed: ${preliminaryValidation.validationDetails}`
+      }
+    }
+    
+    // In a real app, you would now save the registration to the database with a 'pending_validation' status.
+    // A new validation request would be created for third-party validators.
+    console.log('Registration submitted for validation:', input);
+    
+    // For the demo, we'll return a success state indicating it's been submitted.
+    return { 
+      isValid: true,
+      validationDetails: 'Your address has been submitted and is now pending third-party validation. You can track its status on the "My Addresses" page.',
+      submitted: true,
+    };
+
   } catch (e) {
     console.error('[handleRegistration Error]', e);
     const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred during validation.';
     return {
       isValid: false,
-      validationDetails: `Validation failed due to a server error: ${errorMessage}`,
+      validationDetails: `Submission failed due to a server error: ${errorMessage}`,
       error: errorMessage,
     };
   }
