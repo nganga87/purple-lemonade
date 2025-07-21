@@ -34,6 +34,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
+import { pricingPlans } from '../pricing-data';
 
 const clientSchema = z.object({
   id: z.string().optional(),
@@ -193,9 +194,9 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
                             <SelectTrigger><SelectValue placeholder="Select a plan" /></SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Standard">Standard</SelectItem>
-                            <SelectItem value="Pro">Pro</SelectItem>
-                            <SelectItem value="Enterprise">Enterprise</SelectItem>
+                            {pricingPlans.map(plan => (
+                                <SelectItem key={plan.name} value={plan.name}>{plan.name} ({plan.price})</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       <FormMessage />

@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { pricingPlans } from '../pricing-data';
 
 
 const revenueData = [
@@ -28,12 +29,6 @@ const revenueData = [
   { month: 'May', api: 4800, marketplace: 2181 },
   { month: 'Jun', api: 3800, marketplace: 2500 },
   { month: 'Jul', api: 4300, marketplace: 2100 },
-];
-
-const pricingPlans = [
-    { name: 'Standard', price: '$49/mo', apiCalls: '10,000/mo', users: 5 },
-    { name: 'Pro', price: '$99/mo', apiCalls: '50,000/mo', users: 25 },
-    { name: 'Enterprise', price: 'Custom', apiCalls: 'Unlimited', users: 'Unlimited' },
 ];
 
 const initialRevenueStreams = [
@@ -421,4 +416,3 @@ export default function MonetizationPage() {
     </AdminLayout>
   );
 }
-
