@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
               </div>
             </div>
             <Button asChild type="submit" className="w-full mt-2">
-              <Link href="/access-requests">Log In</Link>
+              <Link href="/admin/dashboard">Log In</Link>
             </Button>
           </form>
         </CardContent>

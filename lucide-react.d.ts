@@ -58,4 +58,8 @@ declare module 'lucide-react' {
   export const ShoppingCart: Icon;
   export const ShieldAlert: Icon;
   export const Loader2: Icon;
+  export const Briefcase: Icon;
+  export const ShieldCheck: Icon;
+  export const DollarSign: Icon;
+  export const ArrowUpRight: Icon;
 }
