@@ -14,7 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleValidation } from './actions';
@@ -28,7 +27,6 @@ import Link from 'next/link';
 import { Logo } from '@/components/icons';
 
 const formSchema = z.object({
-  validatorGpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   validatorDoorPhoto: z.instanceof(File, { message: 'A photo of the door is required.' }).refine(file => file.size > 0, 'A photo of the door is required.'),
 });
 
@@ -39,6 +37,7 @@ const mockRequest = {
   requestId: 'REQ-12345',
   addressToVerify: '123 Main Street, Anytown, USA 12345',
   originalUserPhoto: 'https://placehold.co/600x400.png',
+  gpsCoordinates: '34.0522,-118.2437', // Pre-defined GPS for validation
 };
 
 export default function ValidateRequestPage({ params }: { params: { requestId: string } }) {
@@ -46,6 +45,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
   const [result, setResult] = useState<CompareValidationPhotosOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [doorPhotoPreview, setDoorPhotoPreview] = useState<string | null>(null);
+  const [locationVerified, setLocationVerified] = useState(false);
   const { toast } = useToast();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -54,12 +54,10 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      validatorGpsCoordinates: '',
-    },
   });
 
-  const { setValue, trigger } = form;
+  const { setValue, trigger, watch } = form;
+  const photo = watch('validatorDoorPhoto');
 
   const requestCamera = async () => {
     if (cameraStatus !== 'idle' && cameraStatus !== 'denied') return;
@@ -120,37 +118,15 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
     setValue('validatorDoorPhoto', new File([], ''), { shouldValidate: true });
   }
 
-  const handleGetLocation = () => {
-    setIsLoading(true);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const coords = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-          setValue('validatorGpsCoordinates', coords, { shouldValidate: true });
-          setIsLoading(false);
-          toast({
-            title: "Location Fetched",
-            description: "Your GPS coordinates have been set.",
-          });
-        },
-        (error) => {
-          setIsLoading(false);
-          toast({
-            variant: 'destructive',
-            title: 'Location Error',
-            description: 'Could not retrieve your location. Please enter it manually.',
-          });
-        }
-      );
-    } else {
-      setIsLoading(false);
-      toast({
-        variant: 'destructive',
-        title: 'Geolocation not supported',
-        description: 'Your browser does not support geolocation.',
-      });
-    }
+  const handleVerifyLocation = () => {
+    const [lat, lng] = mockRequest.gpsCoordinates.split(',');
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+    window.open(url, '_blank');
+    setLocationVerified(true);
+    toast({
+      title: 'Map Opened',
+      description: 'Please verify the location on the map and return to this tab to submit your photo.',
+    });
   };
 
   const onSubmit = async (values: FormValues) => {
@@ -160,7 +136,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
 
     const formData = new FormData();
     formData.append('requestId', params.requestId);
-    formData.append('validatorGpsCoordinates', values.validatorGpsCoordinates);
+    formData.append('validatorGpsCoordinates', mockRequest.gpsCoordinates);
     formData.append('validatorDoorPhoto', values.validatorDoorPhoto);
 
     try {
@@ -187,6 +163,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
   };
   
   const isFormReadOnly = result?.isMatch === true;
+  const canSubmit = locationVerified && photo && photo.size > 0;
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-background font-body p-4">
@@ -201,7 +178,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
             <CardHeader>
             <CardTitle className="font-headline text-2xl">Third-Party Validation</CardTitle>
             <CardDescription>
-                You have been selected to validate a new address registration. Please capture a photo of the door and your current location to confirm.
+                You have been selected to validate a new address registration. Please confirm the location and capture a photo of the door.
             </CardDescription>
             </CardHeader>
              <CardContent>
@@ -228,31 +205,16 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
                 <CardContent className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">
                         <div className="space-y-4">
-                            <FormField
-                                control={form.control}
-                                name="validatorGpsCoordinates"
-                                render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>1. Your Current GPS Coordinates</FormLabel>
-                                    <div className="flex gap-2">
-                                        <FormControl>
-                                        <div className="relative flex-grow">
-                                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                            <Input placeholder="e.g., 34.0522,-118.2437" {...field} className="pl-10" />
-                                        </div>
-                                        </FormControl>
-                                        <Button type="button" variant="outline" onClick={handleGetLocation} disabled={isLoading}>
-                                            <LocateFixed className="mr-2 h-4 w-4"/>
-                                            Get Location
-                                        </Button>
-                                    </div>
-                                    <FormDescription>
-                                    Capture your location while at the property.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                                )}
-                            />
+                            <FormItem>
+                                <FormLabel>1. Verify Location</FormLabel>
+                                <Button type="button" onClick={handleVerifyLocation} className="w-full" variant={locationVerified ? "secondary" : "default"}>
+                                  {locationVerified ? <CheckCircle className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
+                                  {locationVerified ? "Location Viewed" : "Verify Location on Map"}
+                                </Button>
+                                <FormDescription>
+                                  Click to open Google Maps at the target GPS coordinates. Confirm you are at this location before proceeding.
+                                </FormDescription>
+                            </FormItem>
                         </div>
 
                         <FormField
@@ -324,7 +286,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
                 </CardContent>
                 {!isFormReadOnly && (
                     <CardFooter>
-                    <Button type="submit" disabled={isLoading || !form.formState.isValid} className="w-full md:w-auto">
+                    <Button type="submit" disabled={isLoading || !canSubmit} className="w-full md:w-auto">
                         {isLoading ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
