@@ -145,13 +145,30 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
               </TabsList>
               <div className="py-4 max-h-[50vh] overflow-y-auto px-1">
                 <TabsContent value="company" className="space-y-4">
-                  <FormField control={form.control} name="companyName" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Company Name</FormLabel>
-                      <FormControl><Input placeholder="e.g., Global Logistics Inc." {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                  <FormField
+                    control={form.control}
+                    name="companyName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company Name</FormLabel>
+                         <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a company or type to add..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Global Logistics">Global Logistics</SelectItem>
+                            <SelectItem value="E-Shop Now">E-Shop Now</SelectItem>
+                            <SelectItem value="Quick Couriers">Quick Couriers</SelectItem>
+                            <SelectItem value="Innovate Tech">Innovate Tech</SelectItem>
+                            <SelectItem value="Sunrise Foods">Sunrise Foods</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                    <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="registrationNumber" render={({ field }) => (
                         <FormItem>
