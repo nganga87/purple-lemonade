@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -11,13 +12,13 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const GenerateAddressReportInputSchema = z.object({
+const GenerateAddressReportInputSchema = z.object({
   addressNftId: z.string().describe('The unique NFT identifier for the digital address.'),
   physicalAddress: z.string().describe('The full physical address being investigated.'),
 });
 export type GenerateAddressReportInput = z.infer<typeof GenerateAddressReportInputSchema>;
 
-export const GenerateAddressReportOutputSchema = z.object({
+const GenerateAddressReportOutputSchema = z.object({
   listingSummary: z.string().describe('A summary of where this address NFT is currently or was previously listed for sale or rent.'),
   commercialUsage: z.array(z.string()).describe('A list of known commercial services (e.g., e-commerce, food delivery) associated with this address.'),
   verificationHistory: z.array(z.string()).describe('A timeline of key verification and validation events for this address.'),
