@@ -44,7 +44,7 @@ const initialRevenueStreams = [
     { id: 'handshake', name: 'Handshake Delivery Fee', description: 'Service fee for verified, in-person "handshake" deliveries.', value: 1.00, type: 'flat', isActive: false, icon: Users },
 ];
 
-const taxRules = [
+const initialTaxRules = [
     { id: 'tax-1', jurisdiction: 'California, US', rate: '8.25%', type: 'Sales Tax' },
     { id: 'tax-2', jurisdiction: 'United Kingdom', rate: '20.0%', type: 'VAT' },
     { id: 'tax-3', jurisdiction: 'Quebec, CA', rate: '14.975%', type: 'GST + QST' },
@@ -60,11 +60,25 @@ type RevenueStream = {
     icon: React.ComponentType<any>;
 }
 
+type TaxRule = {
+    id: string;
+    jurisdiction: string;
+    rate: string;
+    type: string;
+}
+
 export default function MonetizationPage() {
   const [revenueStreams, setRevenueStreams] = useState<RevenueStream[]>(initialRevenueStreams);
+  const [taxRules, setTaxRules] = useState<TaxRule[]>(initialTaxRules);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newStream, setNewStream] = useState({ name: '', description: '', type: 'percentage' as 'percentage' | 'flat', value: 0 });
   const { toast } = useToast();
+
+  const [newTaxCountry, setNewTaxCountry] = useState('');
+  const [newTaxState, setNewTaxState] = useState('');
+  const [newTaxRate, setNewTaxRate] = useState('');
+  const [newTaxType, setNewTaxType] = useState('Sales Tax');
+
 
   const handleStreamChange = (id: string, field: 'value' | 'isActive', value: number | boolean) => {
     setRevenueStreams(prevStreams =>
@@ -106,6 +120,47 @@ export default function MonetizationPage() {
     });
     setNewStream({ name: '', description: '', type: 'percentage', value: 0 });
     setIsAddDialogOpen(false);
+  };
+  
+  const handleAddTaxRule = () => {
+    if (!newTaxCountry || !newTaxRate) {
+        toast({
+            variant: "destructive",
+            title: "Validation Error",
+            description: "Country and Tax Rate are required.",
+        });
+        return;
+    }
+    const countryName = countries.find(c => c.code === newTaxCountry)?.name || newTaxCountry;
+    const jurisdiction = newTaxState ? `${newTaxState}, ${countryName}` : countryName;
+
+    const newRule: TaxRule = {
+        id: `tax-${Date.now()}`,
+        jurisdiction,
+        rate: `${parseFloat(newTaxRate).toFixed(2)}%`,
+        type: newTaxType
+    };
+
+    setTaxRules(prev => [...prev, newRule]);
+    toast({
+        title: "Tax Rule Added",
+        description: `Rule for ${jurisdiction} has been added.`,
+    });
+    
+    // Reset form
+    setNewTaxCountry('');
+    setNewTaxState('');
+    setNewTaxRate('');
+    setNewTaxType('Sales Tax');
+  };
+
+  const handleDeleteTaxRule = (id: string) => {
+      setTaxRules(prev => prev.filter(rule => rule.id !== id));
+      toast({
+          variant: 'destructive',
+          title: "Tax Rule Deleted",
+          description: "The selected tax rule has been removed.",
+      });
   };
 
 
@@ -267,7 +322,7 @@ export default function MonetizationPage() {
                         <div className="space-y-1 md:col-span-2">
                             <Label>Jurisdiction</Label>
                             <div className="flex gap-2">
-                                <Select>
+                                <Select onValueChange={setNewTaxCountry} value={newTaxCountry}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select Country" />
                                     </SelectTrigger>
@@ -277,17 +332,17 @@ export default function MonetizationPage() {
                                         ))}
                                     </SelectContent>
                                 </Select>
-                                <Input placeholder="State/Province (Optional)" />
+                                <Input placeholder="State/Province (Optional)" value={newTaxState} onChange={(e) => setNewTaxState(e.target.value)}/>
                             </div>
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="tax-rate">Tax Rate</Label>
                              <div className="relative">
-                                <Input id="tax-rate" type="number" placeholder="e.g., 8.25" />
+                                <Input id="tax-rate" type="number" placeholder="e.g., 8.25" value={newTaxRate} onChange={(e) => setNewTaxRate(e.target.value)} />
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">%</span>
                             </div>
                         </div>
-                        <Button>Add Tax Rule</Button>
+                        <Button onClick={handleAddTaxRule}>Add Tax Rule</Button>
                     </div>
                 </div>
 
@@ -314,7 +369,7 @@ export default function MonetizationPage() {
                                <Button variant="ghost" size="icon">
                                     <Edit className="h-4 w-4" />
                                 </Button>
-                               <Button variant="ghost" size="icon" className="text-destructive">
+                               <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteTaxRule(rule.id)}>
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </TableCell>
@@ -362,3 +417,4 @@ export default function MonetizationPage() {
     </AdminLayout>
   );
 }
+
