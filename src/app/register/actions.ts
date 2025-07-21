@@ -37,6 +37,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     const gpsCoordinates = formData.get('gpsCoordinates') as string | null;
     const cryptoAddress = formData.get('cryptoAddress') as string | null;
     const countryCode = formData.get('countryCode') as string | null;
+    const physicalAddress = formData.get('physicalAddress') as string | null;
 
     if (!doorPhoto || doorPhoto.size === 0) {
       return { isValid: false, validationDetails: 'Door photo is missing or empty.', error: 'Door photo is missing or empty.' };
@@ -50,6 +51,9 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     if (!countryCode) {
         return { isValid: false, validationDetails: 'Country code is required.', error: 'Country code is required.' };
     }
+    if (!physicalAddress) {
+        return { isValid: false, validationDetails: 'Physical address is required.', error: 'Physical address is required.' };
+    }
 
     // Fetch satellite image based on GPS
     const satelliteImageDataUri = await getSatelliteImageForGps(gpsCoordinates);
@@ -62,6 +66,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
       gpsCoordinates,
       cryptoAddress,
       countryCode,
+      physicalAddress,
     };
 
     const result = await validateDoorPhoto(input);

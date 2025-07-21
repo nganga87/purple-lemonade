@@ -32,6 +32,9 @@ const ValidateDoorPhotoInputSchema = z.object({
    countryCode: z
     .string()
     .describe('The two-letter ISO country code for the address (e.g., "US", "NG").'),
+   physicalAddress: z
+    .string()
+    .describe('The full physical address provided by the user.'),
 });
 export type ValidateDoorPhotoInput = z.infer<typeof ValidateDoorPhotoInputSchema>;
 
@@ -60,16 +63,18 @@ const prompt = ai.definePrompt({
   prompt: `You are a Physical-to-Digital Asset Verifier. Your primary function is to establish a trusted link between a digital asset (an address NFT) and a physical location within a specific national jurisdiction. The user's door photo is the critical "ground truth" evidence.
 
 You will receive:
-1.  A door photo with an embedded digital signature (crypto address and timestamp).
+1.  A door photo with an embedded digital signature (crypto address, timestamp, and physical address).
 2.  The property's GPS coordinates.
 3.  A satellite image of the property.
 4.  The user's crypto wallet address.
 5.  The two-letter country code for the address ('{{{countryCode}}}').
+6.  The physical address text provided by the user.
 
 Your validation process must follow these steps strictly:
 
 **Step 1: Signature & Authenticity Check**
--   Verify that the crypto address in the prompt ('{{{cryptoAddress}}}') EXACTLY matches the one visible in the door photo's digital signature. If they do not match, the validation fails instantly.
+-   Verify that the crypto address in the prompt ('{{{cryptoAddress}}}') EXACTLY matches the one visible in the door photo's digital signature.
+-   Verify that the physical address in the prompt ('{{{physicalAddress}}}') is reasonably represented in the signature.
 -   Analyze the door photo for any signs of digital manipulation (e.g., edited text, doctored backgrounds, inconsistent lighting on the signature). If tampering is suspected, the validation fails.
 -   Confirm that the crypto address appears to be correctly formatted and plausibly linked to the provided country code and GPS coordinates.
 
@@ -86,6 +91,7 @@ Door Photo: {{media url=doorPhotoDataUri}}
 GPS Coordinates: {{{gpsCoordinates}}}
 Satellite Image: {{media url=satelliteImageDataUri}}
 User's Crypto Address: {{{cryptoAddress}}}
+User's Physical Address: {{{physicalAddress}}}
 Country Code: {{{countryCode}}}`,
 });
 

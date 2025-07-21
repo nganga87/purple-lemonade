@@ -55,20 +55,26 @@ const drawSignatureOnImage = (imageSrc: string, cryptoAddress: string, physicalA
       ctx.drawImage(img, 0, 0);
 
       const timestamp = new Date().toISOString();
-      const signatureLine1 = physicalAddress;
+      
+      const maxAddressLength = 40;
+      const truncatedAddress = physicalAddress.length > maxAddressLength 
+          ? physicalAddress.substring(0, maxAddressLength) + '...'
+          : physicalAddress;
+
+      const signatureLine1 = truncatedAddress;
       const signatureLine2 = `${cryptoAddress} | ${timestamp}`;
       
-      ctx.font = '16px Arial';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      ctx.font = 'bold 16px Arial';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
       const textWidth1 = ctx.measureText(signatureLine1).width;
       const textWidth2 = ctx.measureText(signatureLine2).width;
       const maxWidth = Math.max(textWidth1, textWidth2);
 
-      ctx.fillRect(10, canvas.height - 60, maxWidth + 20, 50);
+      ctx.fillRect(8, canvas.height - 52, maxWidth + 24, 44);
       
-      ctx.fillStyle = 'black';
-      ctx.fillText(signatureLine1, 20, canvas.height - 40);
-      ctx.fillText(signatureLine2, 20, canvas.height - 20);
+      ctx.fillStyle = 'white';
+      ctx.fillText(signatureLine1, 20, canvas.height - 32);
+      ctx.fillText(signatureLine2, 20, canvas.height - 12);
 
       canvas.toBlob((blob) => {
         if (blob) {
@@ -309,6 +315,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     formData.append('gpsCoordinates', values.gpsCoordinates);
     formData.append('doorPhoto', values.doorPhoto);
     formData.append('countryCode', values.country);
+    formData.append('physicalAddress', values.physicalAddress);
     
     try {
       const response = await handleRegistration(formData);
@@ -442,7 +449,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                              <FormItem>
                               <FormLabel>3. State/Province</FormLabel>
                               {selectedCountry && selectedCountry.states ? (
-                                <Select onValueChange={field.onChange} value={field.value} disabled={!selectedCountry?.states}>
+                                <Select onValueChange={field.onChange} value={field.value || ''} disabled={!selectedCountry?.states}>
                                   <FormControl>
                                     <SelectTrigger>
                                       <SelectValue placeholder="Select..." />
