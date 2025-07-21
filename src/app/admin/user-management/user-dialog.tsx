@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, ShieldCheck, Fingerprint } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, ShieldCheck, Fingerprint, Users } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -50,6 +50,7 @@ const userSchema = z.object({
   jobTitle: z.string().optional(),
   bio: z.string().optional(),
   phone: z.string().optional(),
+  additionalPhone: z.string().optional(),
   homeAddress: z.string().startsWith('0x', { message: 'Must be a valid Digital Address NFT ID.' }).optional().or(z.literal('')),
   workAddress: z.string().startsWith('0x', { message: 'Must be a valid Digital Address NFT ID.' }).optional().or(z.literal('')),
   workCountry: z.string().optional(),
@@ -76,6 +77,7 @@ const defaultValues: Omit<AdminUser, 'id'> = {
   jobTitle: '',
   bio: '',
   phone: '',
+  additionalPhone: '',
   homeAddress: '',
   workAddress: '',
   workCountry: '',
@@ -356,6 +358,23 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                             <Input type="tel" placeholder="+1 (555) 123-4567" {...field} className="pl-10" />
                           </div>
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="additionalPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Additional Phone Number</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input type="tel" placeholder="Spouse or family member..." {...field} className="pl-10" />
+                          </div>
+                        </FormControl>
+                         <FormDescription>An optional secondary contact number.</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
