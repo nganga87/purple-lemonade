@@ -320,7 +320,7 @@ export default function AccessRequestsPage() {
                           <TableBody>
                             {requests.map((request) => (
                             <Collapsible asChild key={request.id} open={openCollapsible === request.id} onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
-                              <React.Fragment>
+                              <>
                                 <TableRow className="hover:bg-muted/50">
                                     <TableCell>
                                       {request.purpose === 'Tenant' && (
@@ -409,7 +409,7 @@ export default function AccessRequestsPage() {
                                     </TableRow>
                                   </CollapsibleContent>
                                 )}
-                              </React.Fragment>
+                              </>
                             </Collapsible>
                             ))}
                           </TableBody>
