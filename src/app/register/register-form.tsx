@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft, Building, Globe } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft, Building, Globe, Save } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -110,6 +110,8 @@ interface RegisterFormProps {
 
 type RegistrationResult = ValidateDoorPhotoOutput & { submitted?: boolean };
 
+const LOCAL_STORAGE_KEY = 'addressChainRegistrationForm';
+
 export function RegisterForm({ onBack }: RegisterFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<RegistrationResult | null>(null);
@@ -139,12 +141,30 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     },
   });
 
-  const { watch, setValue } = form;
+  const { watch, setValue, reset, getValues } = form;
   const countryCode = watch('country');
   const gpsCoordinates = watch('gpsCoordinates');
   const physicalAddress = watch('physicalAddress');
   const doorPhoto = watch('doorPhoto');
   const addressName = watch('addressName');
+
+  useEffect(() => {
+    try {
+      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedData) {
+        const parsedData:Partial<FormValues> = JSON.parse(savedData);
+        // We don't restore the file input, but we restore the text fields
+        const { doorPhoto, ...restOfData } = parsedData;
+        reset(restOfData);
+        toast({
+          title: "Draft Loaded",
+          description: "Your previously saved registration data has been loaded.",
+        })
+      }
+    } catch (e) {
+      console.error("Failed to load saved form data:", e);
+    }
+  }, [reset, toast]);
 
   useEffect(() => {
     if (countryCode) {
@@ -321,6 +341,8 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
         title: response.submitted ? "Registration Submitted" : "Validation Complete",
         description: response.validationDetails,
       });
+      // Clear saved data on successful submission
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
@@ -334,6 +356,25 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     }
   };
   
+  const handleSave = () => {
+    try {
+      const currentData = getValues();
+      const { doorPhoto, ...dataToSave } = currentData; // Don't save the file object
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+      toast({
+        title: "Draft Saved",
+        description: "Your registration progress has been saved locally.",
+      });
+    } catch (e) {
+      console.error("Failed to save form data:", e);
+      toast({
+        variant: "destructive",
+        title: "Save Failed",
+        description: "Could not save your progress.",
+      });
+    }
+  };
+
   const handleGetLocation = () => {
     if (navigator.geolocation) {
         setIsLoading(true);
@@ -666,8 +707,12 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                 )}
               </CardContent>
               {!isFormReadOnly && (
-                <CardFooter>
-                  <Button type="submit" disabled={isLoading || !isDataReadyForReview} className="w-full md:w-auto">
+                <CardFooter className="flex justify-between items-center">
+                   <Button type="button" variant="outline" onClick={handleSave} disabled={isLoading}>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save for Later
+                  </Button>
+                  <Button type="submit" disabled={isLoading || !isDataReadyForReview}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -726,3 +771,5 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     </div>
   );
 }
+
+    

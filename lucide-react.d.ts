@@ -52,4 +52,7 @@ declare module 'lucide-react' {
   export const ChevronUp: Icon;
   export const X: Icon;
   export const Globe: Icon;
+  export const Save: Icon;
 }
+
+    
