@@ -320,20 +320,16 @@ export default function AccessRequestsPage() {
                         </TableHeader>
                           <TableBody>
                             {requests.map((request) => (
-                              <React.Fragment key={request.id}>
+                               <Collapsible asChild key={request.id} open={openCollapsible === request.id} onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
+                               <>
                                 <TableRow className="hover:bg-muted/50">
                                   <TableCell>
                                     {request.purpose === 'Tenant' && (
-                                      <Collapsible
-                                        open={openCollapsible === request.id}
-                                        onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}
-                                      >
                                         <CollapsibleTrigger asChild>
                                           <Button variant="ghost" size="icon" className="h-8 w-8">
                                             <ChevronRight className={cn("h-4 w-4 transition-transform", openCollapsible === request.id && "rotate-90")} />
                                           </Button>
                                         </CollapsibleTrigger>
-                                      </Collapsible>
                                     )}
                                   </TableCell>
                                   <TableCell>
@@ -390,7 +386,7 @@ export default function AccessRequestsPage() {
                                 </TableRow>
                                 {request.purpose === 'Tenant' && (
                                   <CollapsibleContent asChild>
-                                      <TableRow className={cn(openCollapsible !== request.id && "hidden")}>
+                                      <TableRow>
                                           <TableCell colSpan={7} className="p-0">
                                             <div className="bg-secondary/50 p-6">
                                               <h4 className="font-semibold text-lg mb-4">Tenant Details</h4>
@@ -414,7 +410,8 @@ export default function AccessRequestsPage() {
                                       </TableRow>
                                   </CollapsibleContent>
                                 )}
-                              </React.Fragment>
+                                </>
+                              </Collapsible>
                             ))}
                           </TableBody>
                     </Table>
