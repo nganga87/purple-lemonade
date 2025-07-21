@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft, Building, Globe, Save, FileText } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft, Building, Globe, Save, FileText, Fingerprint } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -33,6 +33,7 @@ const formSchema = z.object({
   state: z.string().optional(),
   addressName: z.string().min(1, 'An address name is required (e.g., Home, Office).'),
   titleDeedNumber: z.string().optional(),
+  idNumber: z.string().optional(),
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   physicalAddress: z.string().min(1, 'Physical address is required.'),
   doorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
@@ -138,6 +139,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       state: '',
       addressName: '',
       titleDeedNumber: '',
+      idNumber: '',
       gpsCoordinates: '',
       physicalAddress: '',
     },
@@ -150,6 +152,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const doorPhoto = watch('doorPhoto');
   const addressName = watch('addressName');
   const titleDeedNumber = watch('titleDeedNumber');
+  const idNumber = watch('idNumber');
 
   useEffect(() => {
     try {
@@ -530,12 +533,13 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                           </FormItem>
                         )}
                       />
+                      <div className="grid sm:grid-cols-2 gap-4">
                        <FormField
                         control={form.control}
                         name="titleDeedNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>5. Title Deed Number (Optional)</FormLabel>
+                            <FormLabel>5. Title Deed Number</FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -543,18 +547,38 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                               </div>
                             </FormControl>
                             <FormDescription>
-                              The official land registration or title deed number.
+                              (Optional)
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+                       <FormField
+                        control={form.control}
+                        name="idNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>6. ID/Passport No.</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input placeholder="Owner's ID" {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                             <FormDescription>
+                              (Optional)
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      </div>
                       <FormField
                         control={form.control}
                         name="gpsCoordinates"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>6. GPS Coordinates</FormLabel>
+                            <FormLabel>7. GPS Coordinates</FormLabel>
                             <div className="flex gap-2">
                                 <FormControl>
                                   <div className="relative flex-grow">
@@ -576,7 +600,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                       />
                        {generatedAddress && (
                           <FormItem>
-                            <FormLabel>7. Generated Crypto Wallet Address</FormLabel>
+                            <FormLabel>8. Generated Crypto Wallet Address</FormLabel>
                              <FormControl>
                               <div className="relative flex-grow bg-secondary p-2 rounded-md">
                                 <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -594,7 +618,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                     name="doorPhoto"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>8. Door Photo</FormLabel>
+                        <FormLabel>9. Door Photo</FormLabel>
                         <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>
                           <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
@@ -711,6 +735,10 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                            <div>
                               <span className="font-semibold text-muted-foreground">Title Deed Number:</span>
                               <p>{titleDeedNumber || 'N/A'}</p>
+                          </div>
+                           <div>
+                              <span className="font-semibold text-muted-foreground">ID / Passport Number:</span>
+                              <p>{idNumber || 'N/A'}</p>
                           </div>
                           <div>
                               <span className="font-semibold text-muted-foreground">GPS Coordinates:</span>

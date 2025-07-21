@@ -33,7 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Loader2, Mail, Home, User, CheckCircle, QrCode } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Home, User, CheckCircle, QrCode, Fingerprint } from 'lucide-react';
 import Image from 'next/image';
 import { generateSubAddress } from './utils';
 
@@ -42,6 +42,7 @@ const formSchema = z.object({
   memberName: z.string().min(1, 'Family member name is required.'),
   memberEmail: z.string().email('Please enter a valid email.'),
   relationship: z.string().min(1, 'Relationship is required.'),
+  idNumber: z.string().min(1, 'ID/Passport number is required.'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -78,6 +79,7 @@ export function AddFamilyMemberForm({ onBack }: AddFamilyMemberFormProps) {
       memberName: '',
       memberEmail: '',
       relationship: '',
+      idNumber: '',
     },
   });
 
@@ -184,22 +186,40 @@ export function AddFamilyMemberForm({ onBack }: AddFamilyMemberFormProps) {
                   )}
                 />
               </div>
-              <FormField
-                control={form.control}
-                name="relationship"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>4. Relationship</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input placeholder="e.g., Spouse, Child, Parent" {...field} className="pl-10" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="relationship"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>4. Relationship</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <Input placeholder="e.g., Spouse, Child, Parent" {...field} className="pl-10" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="idNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>5. ID / Passport Number</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <Input placeholder="Enter government-issued ID number" {...field} className="pl-10" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </CardContent>
             <CardFooter>
               <Button type="submit" disabled={isLoading}>

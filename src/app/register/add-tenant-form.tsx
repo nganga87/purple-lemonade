@@ -34,7 +34,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud, CheckCircle, QrCode } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud, CheckCircle, QrCode, Fingerprint } from 'lucide-react';
 import Image from 'next/image';
 import { generateSubAddress } from './utils';
 
@@ -42,6 +42,7 @@ const formSchema = z.object({
   property: z.string().min(1, 'Please select a property.'),
   tenantName: z.string().min(1, 'Tenant name is required.'),
   tenantEmail: z.string().email('Please enter a valid email.'),
+  idNumber: z.string().min(1, 'ID/Passport number is required.'),
   apartmentNumber: z.string().min(1, 'Apartment/unit number is required.'),
   doorPhoto: z.instanceof(File, { message: 'A photo of the tenant\'s door is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
 });
@@ -81,6 +82,7 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
       property: '',
       tenantName: '',
       tenantEmail: '',
+      idNumber: '',
       apartmentNumber: '',
     },
   });
@@ -201,13 +203,30 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
                 />
               </div>
 
+               <FormField
+                control={form.control}
+                name="idNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>4. Tenant's ID / Passport Number</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input placeholder="Enter government-issued ID number" {...field} className="pl-10" />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className="grid md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="apartmentNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>4. House / Apartment Number</FormLabel>
+                      <FormLabel>5. House / Apartment Number</FormLabel>
                       <FormControl>
                          <div className="relative">
                           <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -224,7 +243,7 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
                   name="doorPhoto"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>5. Tenant's Door Photo</FormLabel>
+                      <FormLabel>6. Tenant's Door Photo</FormLabel>
                       <FormControl>
                         <label className="relative flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors">
                           {photoPreview ? (
