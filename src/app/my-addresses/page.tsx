@@ -359,15 +359,15 @@ export default function MyAddressesPage() {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                     <DialogTrigger asChild>
-                                        <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)} disabled={selectedAddress.isPrimary}>
+                                        <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)} disabled={selectedAddress.status !== 'Verified'}>
                                             <Edit className="mr-2 h-4 w-4" />
                                             <span>Edit Details</span>
                                         </DropdownMenuItem>
                                     </DialogTrigger>
-                                    <DropdownMenuItem onSelect={() => handleSetPrimary(selectedAddress.nftId)} disabled={selectedAddress.isPrimary}>Set as Primary</DropdownMenuItem>
+                                    <DropdownMenuItem onSelect={() => handleSetPrimary(selectedAddress.nftId)} disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>Set as Primary</DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <AlertDialogTrigger asChild>
-                                        <DropdownMenuItem className="text-destructive" disabled={selectedAddress.isPrimary}>
+                                        <DropdownMenuItem className="text-destructive" disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>
                                             <Trash2 className="mr-2 h-4 w-4" />
                                             <span>Archive</span>
                                         </DropdownMenuItem>
