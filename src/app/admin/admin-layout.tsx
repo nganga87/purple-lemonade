@@ -39,6 +39,7 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Logo } from '@/components/icons';
+import { Separator } from '@/components/ui/separator';
 
 type AdminLayoutProps = {
     children: React.ReactNode;
@@ -109,12 +110,21 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
+             <Separator className="my-1" />
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton href="#">
                   <Settings />
                   Platform Settings
                 </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <Link href="/admin/login">
+                    <SidebarMenuButton className="text-destructive hover:bg-destructive/10 hover:text-destructive">
+                      <LogOut />
+                      Exit Portal
+                    </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarFooter>
