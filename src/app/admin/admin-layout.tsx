@@ -46,6 +46,14 @@ type AdminLayoutProps = {
 }
 
 export function AdminLayout({ children, active }: AdminLayoutProps) {
+  const pageTitle = {
+    dashboard: 'Dashboard',
+    audit: 'Address Audit',
+    users: 'User Management',
+    clients: 'B2B Clients',
+    monetization: 'Monetization'
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
@@ -67,16 +75,18 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
                  </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                 <SidebarMenuButton href="#">
+                 <SidebarMenuButton href="#" disabled>
                   <Users />
                   User Management
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <Briefcase />
-                  B2B Clients
-                </SidebarMenuButton>
+                <Link href="/admin/b2b-clients">
+                  <SidebarMenuButton isActive={active === 'clients'}>
+                    <Briefcase />
+                    B2B Clients
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                  <Link href="/admin/address-audit">
@@ -121,7 +131,7 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
                 </Link>
               )}
               <h1 className="text-2xl font-headline font-semibold capitalize">
-                {active === 'audit' ? 'Address Audit' : active}
+                {pageTitle[active]}
               </h1>
             </div>
             <div className="flex items-center gap-4">
