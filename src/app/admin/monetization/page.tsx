@@ -3,8 +3,8 @@
 
 import React, { useState } from 'react';
 import { AdminLayout } from '../admin-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History, Users } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History, Users, PlusCircle, Trash2, Globe, ShieldAlert } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { countries } from '@/lib/countries';
 
 const revenueData = [
   { month: 'Jan', api: 2400, marketplace: 1600 },
@@ -29,26 +31,35 @@ const pricingPlans = [
     { name: 'Enterprise', price: 'Custom', apiCalls: 'Unlimited', users: 'Unlimited' },
 ];
 
-const recentTransactions = [
-    { id: 'TRN-001', date: '2024-08-15', type: 'Marketplace Sale', amount: '2.5 ETH', details: 'NFT ID 0x...a9b -> 0x...c4d' },
-    { id: 'TRN-002', date: '2024-08-14', type: 'API Subscription', amount: '$99.00', details: 'E-Shop Now - Pro Plan' },
-    { id: 'TRN-003', date: '2024-08-12', type: 'API Subscription', amount: '$2,500.00', details: 'Global Logistics - Enterprise' },
-    { id: 'TRN-004', date: '2024-08-11', type: 'Marketplace Sale', amount: '10.0 ETH', details: 'NFT ID 0x...f9c -> 0x...b2a' },
+const initialRevenueStreams = [
+    { id: 'marketplace', name: 'Marketplace Sale Commission', description: 'Percentage fee for each sale on the Address NFT Marketplace.', value: 2.5, type: 'percentage', isActive: true, icon: ShoppingCart },
+    { id: 'api_lookup', name: 'API Lookup Fee', description: 'Flat rate fee for each API address lookup request.', value: 0.10, type: 'flat', isActive: true, icon: FileText },
+    { id: 'transfer', name: 'NFT Transfer Fee', description: 'Commission on wallet-to-wallet address NFT transfers.', value: 0.1, type: 'percentage', isActive: true, icon: ArrowLeftRight },
+    { id: 'minting', name: 'Address Minting Fee', description: 'One-time fee charged for creating a new digital address NFT.', value: 5.00, type: 'flat', isActive: true, icon: History },
+    { id: 'handshake', name: 'Handshake Delivery Fee', description: 'Service fee for verified, in-person "handshake" deliveries.', value: 1.00, type: 'flat', isActive: false, icon: Users },
+];
+
+const taxRules = [
+    { id: 'tax-1', jurisdiction: 'California, US', rate: '8.25%', type: 'Sales Tax' },
+    { id: 'tax-2', jurisdiction: 'United Kingdom', rate: '20.0%', type: 'VAT' },
+    { id: 'tax-3', jurisdiction: 'Quebec, CA', rate: '14.975%', type: 'GST + QST' },
 ];
 
 export default function MonetizationPage() {
-  const [marketplaceFee, setMarketplaceFee] = useState(2.5);
-  const [isMarketplaceActive, setIsMarketplaceActive] = useState(true);
-  const [apiFee, setApiFee] = useState(0.001);
-  const [isApiActive, setIsApiActive] = useState(true);
-  const [lookupFee, setLookupFee] = useState(0.10);
-  const [isLookupActive, setIsLookupActive] = useState(true);
-  const [handshakeFee, setHandshakeFee] = useState(1.00);
-  const [isHandshakeActive, setIsHandshakeActive] = useState(false);
-  const [transferFee, setTransferFee] = useState(0.1);
-  const [isTransferActive, setIsTransferActive] = useState(true);
-  const [mintingFee, setMintingFee] = useState(5.00);
-  const [isMintingActive, setIsMintingActive] = useState(true);
+  const [revenueStreams, setRevenueStreams] = useState(initialRevenueStreams);
+
+  const handleStreamChange = (id: string, field: 'value' | 'isActive', value: number | boolean) => {
+    setRevenueStreams(prevStreams =>
+      prevStreams.map(stream =>
+        stream.id === id ? { ...stream, [field]: value } : stream
+      )
+    );
+  };
+
+  const handleDeleteStream = (id: string) => {
+    setRevenueStreams(prevStreams => prevStreams.filter(stream => stream.id !== id));
+  };
+
 
   return (
     <AdminLayout active="monetization">
@@ -112,164 +123,147 @@ export default function MonetizationPage() {
             <CardDescription>Configure commission rates and activate/deactivate revenue streams.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
-              <div className="flex items-center gap-4 flex-1">
-                <ShoppingCart className="h-6 w-6 text-muted-foreground"/>
-                <div>
-                    <Label htmlFor="marketplace-fee" className="font-semibold">Marketplace Sale Commission</Label>
-                    <p className="text-sm text-muted-foreground">Percentage fee for each sale on the Address NFT Marketplace.</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="relative flex-grow md:flex-grow-0">
-                  <Input 
-                    id="marketplace-fee" type="number" value={marketplaceFee}
-                    onChange={(e) => setMarketplaceFee(parseFloat(e.target.value))}
-                    className="w-full md:w-32 pr-8"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
-                </div>
-                <Switch id="marketplace-switch" checked={isMarketplaceActive} onCheckedChange={setIsMarketplaceActive}/>
-                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
-              </div>
-            </div>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
-              <div className="flex items-center gap-4 flex-1">
-                 <FileText className="h-6 w-6 text-muted-foreground"/>
-                 <div>
-                    <Label htmlFor="api-fee" className="font-semibold">API Lookup Fee</Label>
-                    <p className="text-sm text-muted-foreground">Flat rate fee for each API address lookup request.</p>
+             {revenueStreams.map(stream => {
+                const Icon = stream.icon;
+                return (
+                 <div key={stream.id} className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
+                    <div className="flex items-center gap-4 flex-1">
+                        <Icon className="h-6 w-6 text-muted-foreground"/>
+                        <div>
+                            <Label htmlFor={`${stream.id}-fee`} className="font-semibold">{stream.name}</Label>
+                            <p className="text-sm text-muted-foreground">{stream.description}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                        <div className="relative flex-grow md:flex-grow-0">
+                          {stream.type === 'flat' && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>}
+                          <Input 
+                            id={`${stream.id}-fee`} type="number" value={stream.value}
+                            onChange={(e) => handleStreamChange(stream.id, 'value', parseFloat(e.target.value))}
+                            step={stream.type === 'percentage' ? "0.1" : "0.01"}
+                            className={`w-full md:w-32 ${stream.type === 'flat' ? 'pl-7' : 'pr-8'}`}
+                          />
+                          {stream.type === 'percentage' && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>}
+                        </div>
+                        <Switch id={`${stream.id}-switch`} checked={stream.isActive} onCheckedChange={(checked) => handleStreamChange(stream.id, 'isActive', checked)}/>
+                        <Button size="sm" variant="ghost"><Save className="h-4 w-4"/> <span className="sr-only">Save</span></Button>
+                        <Button size="sm" variant="ghost" className="text-destructive" onClick={() => handleDeleteStream(stream.id)}><Trash2 className="h-4 w-4"/><span className="sr-only">Delete</span></Button>
+                    </div>
                  </div>
-              </div>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                 <div className="relative flex-grow md:flex-grow-0">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                  <Input id="api-fee" type="number" value={lookupFee} onChange={(e) => setLookupFee(parseFloat(e.target.value))} step="0.01" className="w-full md:w-32 pl-7"/>
-                </div>
-                <Switch id="api-switch" checked={isLookupActive} onCheckedChange={setIsLookupActive}/>
-                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
-              </div>
-            </div>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
-              <div className="flex items-center gap-4 flex-1">
-                 <ArrowLeftRight className="h-6 w-6 text-muted-foreground"/>
-                 <div>
-                    <Label htmlFor="transfer-fee" className="font-semibold">NFT Transfer Fee</Label>
-                    <p className="text-sm text-muted-foreground">Commission on wallet-to-wallet address NFT transfers.</p>
-                 </div>
-              </div>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                 <div className="relative flex-grow md:flex-grow-0">
-                  <Input id="transfer-fee" type="number" value={transferFee} onChange={(e) => setTransferFee(parseFloat(e.target.value))} step="0.1" className="w-full md:w-32 pr-8"/>
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
-                </div>
-                <Switch id="transfer-switch" checked={isTransferActive} onCheckedChange={setIsTransferActive}/>
-                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
-              </div>
-            </div>
-             <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
-              <div className="flex items-center gap-4 flex-1">
-                 <History className="h-6 w-6 text-muted-foreground"/>
-                 <div>
-                    <Label htmlFor="minting-fee" className="font-semibold">Address Minting Fee</Label>
-                    <p className="text-sm text-muted-foreground">One-time fee charged for creating a new digital address NFT.</p>
-                 </div>
-              </div>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                 <div className="relative flex-grow md:flex-grow-0">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                  <Input id="minting-fee" type="number" value={mintingFee} onChange={(e) => setMintingFee(parseFloat(e.target.value))} step="0.50" className="w-full md:w-32 pl-7"/>
-                </div>
-                <Switch id="minting-switch" checked={isMintingActive} onCheckedChange={setIsMintingActive}/>
-                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
-              </div>
-            </div>
-             <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
-              <div className="flex items-center gap-4 flex-1">
-                 <Users className="h-6 w-6 text-muted-foreground"/>
-                 <div>
-                    <Label htmlFor="handshake-fee" className="font-semibold">Handshake Delivery Fee</Label>
-                    <p className="text-sm text-muted-foreground">Service fee for verified, in-person "handshake" deliveries.</p>
-                 </div>
-              </div>
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                 <div className="relative flex-grow md:flex-grow-0">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                  <Input id="handshake-fee" type="number" value={handshakeFee} onChange={(e) => setHandshakeFee(parseFloat(e.target.value))} step="0.50" className="w-full md:w-32 pl-7"/>
-                </div>
-                <Switch id="handshake-switch" checked={isHandshakeActive} onCheckedChange={setIsHandshakeActive}/>
-                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
-              </div>
-            </div>
+                );
+             })}
           </CardContent>
+          <CardFooter>
+            <Button variant="outline">
+                <PlusCircle className="mr-2 h-4 w-4"/>
+                Add New Revenue Stream
+            </Button>
+          </CardFooter>
         </Card>
         
-        <div className="grid gap-8 md:grid-cols-2">
-            <Card>
-                <CardHeader>
-                    <CardTitle>API Pricing Plans</CardTitle>
-                    <CardDescription>Manage the subscription tiers for B2B clients.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Plan</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead>API Calls</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+        <Card>
+            <CardHeader>
+                <CardTitle>Tax Management</CardTitle>
+                <CardDescription>Set and manage tax rates for different jurisdictions.</CardDescription>
+            </CardHeader>
+            <CardContent className='space-y-6'>
+                <div className="p-4 rounded-lg border bg-secondary/50">
+                    <h4 className="font-semibold mb-4">Add New Tax Rule</h4>
+                    <div className="grid md:grid-cols-4 gap-4 items-end">
+                        <div className="space-y-1 md:col-span-2">
+                            <Label>Jurisdiction</Label>
+                            <div className="flex gap-2">
+                                <Select>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select Country" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {countries.map(country => (
+                                            <SelectItem key={country.code} value={country.code}>{country.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Input placeholder="State/Province (Optional)" />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor="tax-rate">Tax Rate</Label>
+                             <div className="relative">
+                                <Input id="tax-rate" type="number" placeholder="e.g., 8.25" />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">%</span>
+                            </div>
+                        </div>
+                        <Button>Add Tax Rule</Button>
+                    </div>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2">Active Tax Rules</h4>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Jurisdiction</TableHead>
+                        <TableHead>Rate</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {taxRules.map(rule => (
+                           <TableRow key={rule.id}>
+                            <TableCell className="font-medium">{rule.jurisdiction}</TableCell>
+                            <TableCell>{rule.rate}</TableCell>
+                            <TableCell>
+                                <Badge variant="outline">{rule.type}</Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                               <Button variant="ghost" size="icon">
+                                    <Edit className="h-4 w-4" />
+                                </Button>
+                               <Button variant="ghost" size="icon" className="text-destructive">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </TableCell>
+                           </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </div>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>API Pricing Plans</CardTitle>
+                <CardDescription>Manage the subscription tiers for B2B clients.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Plan</TableHead>
+                            <TableHead>Price</TableHead>
+                            <TableHead>API Calls</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {pricingPlans.map((plan) => (
+                            <TableRow key={plan.name}>
+                                <TableCell className="font-medium">{plan.name}</TableCell>
+                                <TableCell>{plan.price}</TableCell>
+                                <TableCell>{plan.apiCalls}</TableCell>
+                                <TableCell className="text-right">
+                                    <Button variant="ghost" size="icon">
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                </TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {pricingPlans.map((plan) => (
-                                <TableRow key={plan.name}>
-                                    <TableCell className="font-medium">{plan.name}</TableCell>
-                                    <TableCell>{plan.price}</TableCell>
-                                    <TableCell>{plan.apiCalls}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon">
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Recent Transactions</CardTitle>
-                    <CardDescription>A log of recent high-value transactions.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Type</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {recentTransactions.map((tx) => (
-                                <TableRow key={tx.id}>
-                                    <TableCell>{tx.date}</TableCell>
-                                    <TableCell><Badge variant="outline">{tx.type}</Badge></TableCell>
-                                    <TableCell className="font-mono">{tx.amount}</TableCell>
-                                    <TableCell className="text-right">
-                                        <Button variant="ghost" size="icon">
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-        </div>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
       </main>
     </AdminLayout>
   );
