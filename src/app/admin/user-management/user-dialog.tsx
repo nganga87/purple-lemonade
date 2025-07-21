@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { format } from "date-fns"
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,15 +32,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, Calendar as CalendarIcon, UserPlus, KeyRound, Copy } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, UserPlus, KeyRound, Copy } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { countries } from '@/lib/countries';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
-import { Calendar } from '@/components/ui/calendar';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -53,9 +49,9 @@ const userSchema = z.object({
   bio: z.string().optional(),
   phone: z.string().optional(),
   homeAddress: z.string().startsWith('0x', { message: 'Must be a valid Digital Address NFT ID.' }).optional().or(z.literal('')),
-  workAddress: z.string().optional(),
+  workAddress: z.string().startsWith('0x', { message: 'Must be a valid Digital Address NFT ID.' }).optional().or(z.literal('')),
   workCountry: z.string().optional(),
-  dateOfBirth: z.date().optional(),
+  dateOfBirth: z.string().optional(),
   gender: z.string().optional(),
 });
 
@@ -80,6 +76,7 @@ const defaultValues: Omit<AdminUser, 'id'> = {
   workAddress: '',
   workCountry: '',
   gender: '',
+  dateOfBirth: '',
 };
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
@@ -88,11 +85,11 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
 
   const form = useForm<AdminUser>({
     resolver: zodResolver(userSchema),
-    defaultValues: user ? { ...user, dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : undefined } : defaultValues,
+    defaultValues: user || defaultValues,
   });
 
   useEffect(() => {
-    form.reset(user ? { ...user, dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : undefined } : defaultValues);
+    form.reset(user || defaultValues);
   }, [user, form, isOpen]);
 
 
@@ -249,40 +246,9 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
                           <FormLabel>Date of birth</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={"outline"}
-                                  className={cn(
-                                    "pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, "PPP")
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                captionLayout="dropdown-buttons"
-                                fromYear={1920}
-                                toYear={new Date().getFullYear() - 18}
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date > new Date() || date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
+                           <FormControl>
+                            <Input type="date" {...field} />
+                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -394,13 +360,19 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                     name="workAddress"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Work Address</FormLabel>
-                        <FormControl>
-                           <div className="relative">
-                            <Briefcase className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Textarea placeholder="User's office or work address..." {...field} className="pl-10" />
-                          </div>
-                        </FormControl>
+                        <FormLabel>Work Digital Address NFT ID</FormLabel>
+                         <div className="flex gap-2">
+                            <FormControl>
+                              <div className="relative flex-grow">
+                                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input placeholder="0x..." {...field} className="pl-10 font-mono" />
+                              </div>
+                            </FormControl>
+                             <Button type="button" variant="outline" size="icon" onClick={() => handlePaste('workAddress')}>
+                                <Copy className="h-4 w-4" />
+                                <span className="sr-only">Paste</span>
+                            </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -421,3 +393,5 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
     </Dialog>
   );
 }
+
+    
