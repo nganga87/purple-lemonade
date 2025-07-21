@@ -419,7 +419,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       </Button>
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle className="font-headline text-2xl">AI-Powered Address Registration</CardTitle>
+          <CardTitle className="font-headline text-2xl">Register a New Property</CardTitle>
           <CardDescription>
             {isFormReadOnly ? "Your address has been submitted for validation." : "Follow the steps to submit your address and location for validation."}
           </CardDescription>
@@ -771,5 +771,3 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     </div>
   );
 }
-
-    

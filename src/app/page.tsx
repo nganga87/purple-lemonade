@@ -19,8 +19,6 @@ export default function LandingPage() {
           <nav className="hidden items-center gap-6 text-sm md:flex">
              <Link
               href="/exchange"
-              target="_blank"
-              rel="noopener noreferrer"
               className="font-medium text-foreground/60 transition-colors hover:text-foreground/80"
             >
               Marketplace
@@ -90,8 +88,8 @@ export default function LandingPage() {
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} AddressChain. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <Link href="#" className="hover:text-primary">Terms of Service</Link>
-            <Link href="#" className="hover:text-primary">Privacy Policy</Link>
+            <Link href="/" className="hover:text-primary">Terms of Service</Link>
+            <Link href="/" className="hover:text-primary">Privacy Policy</Link>
           </div>
         </div>
       </footer>

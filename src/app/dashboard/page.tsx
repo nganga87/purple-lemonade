@@ -132,7 +132,7 @@ export default function DashboardPage() {
                 </Link>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <Link href="/exchange" target="_blank" rel="noopener noreferrer">
+                <Link href="/exchange">
                     <SidebarMenuButton>
                     <CandlestickChart />
                     Address Marketplace

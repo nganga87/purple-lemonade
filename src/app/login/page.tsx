@@ -37,8 +37,8 @@ export default function LoginPage() {
                 <Input id="password" type="password" placeholder="••••••••" className="pl-10" required />
               </div>
             </div>
-            <Button type="submit" className="w-full mt-2">
-              Log In
+            <Button asChild type="submit" className="w-full mt-2">
+              <Link href="/dashboard">Log In</Link>
             </Button>
           </form>
         </CardContent>
