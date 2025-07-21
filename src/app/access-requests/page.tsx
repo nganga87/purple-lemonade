@@ -86,7 +86,7 @@ const initialRequests = [
   {
     id: 'REQ-001',
     name: 'Alice Johnson',
-    avatar: 'https://placehold.co/100x100.png?text=AJ',
+    avatar: 'https://placehold.co/100x100.png',
     purpose: 'Tenant',
     date: '2024-08-15',
     status: 'Pending',
@@ -97,7 +97,7 @@ const initialRequests = [
   {
     id: 'REQ-002',
     name: 'Bob Williams',
-    avatar: 'https://placehold.co/100x100.png?text=BW',
+    avatar: 'https://placehold.co/100x100.png',
     purpose: 'Family Member',
     date: '2024-08-14',
     status: 'Pending',
@@ -106,7 +106,7 @@ const initialRequests = [
   {
     id: 'REQ-003',
     name: 'Charlie Brown',
-    avatar: 'https://placehold.co/100x100.png?text=CB',
+    avatar: 'https://placehold.co/100x100.png',
     purpose: 'Guest (Short-term)',
     date: '2024-08-12',
     status: 'Pending',
@@ -115,7 +115,7 @@ const initialRequests = [
     {
     id: 'REQ-004',
     name: 'David Smith',
-    avatar: 'https://placehold.co/100x100.png?text=DS',
+    avatar: 'https://placehold.co/100x100.png',
     purpose: 'Tenant',
     date: '2024-07-20',
     status: 'Approved',
@@ -126,7 +126,7 @@ const initialRequests = [
   {
     id: 'REQ-005',
     name: 'Eve Davis',
-    avatar: 'https://placehold.co/100x100.png?text=ED',
+    avatar: 'https://placehold.co/100x100.png',
     purpose: 'Family Member',
     date: '2024-07-18',
     status: 'Rejected',
