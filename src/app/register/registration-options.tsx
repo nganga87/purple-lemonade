@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Building, UserPlus, ArrowRight } from 'lucide-react';
 
-export type RegistrationChoice = 'new-property' | 'add-tenant';
+export type RegistrationChoice = 'new-property' | 'add-tenant' | 'add-family-member';
 
 interface RegistrationOptionsProps {
   onChoice: (choice: RegistrationChoice) => void;
@@ -37,21 +37,19 @@ export function RegistrationOptions({ onChoice }: RegistrationOptionsProps) {
                 Continue <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </button>
-            <button
-              onClick={() => onChoice('add-tenant')}
-              className="group text-left p-6 border rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <div className="flex items-center gap-4 mb-2">
+            <div className="p-6 border rounded-lg">
+               <div className="flex items-center gap-4 mb-2">
                 <UserPlus className="h-8 w-8 text-accent" />
-                <h3 className="font-headline text-xl font-semibold">Add a Tenant</h3>
+                <h3 className="font-headline text-xl font-semibold">Grant Access to an Address</h3>
               </div>
               <p className="text-muted-foreground mb-4">
                 Grant access to a tenant or family member to use one of your already verified addresses.
               </p>
-               <div className="flex items-center text-accent font-medium">
-                Continue <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <div className="flex flex-col gap-2">
+                  <Button variant="outline" onClick={() => onChoice('add-tenant')} className="justify-start">Add a Tenant</Button>
+                  <Button variant="outline" onClick={() => onChoice('add-family-member')} className="justify-start">Add a Family Member</Button>
               </div>
-            </button>
+            </div>
           </div>
         </CardContent>
       </Card>

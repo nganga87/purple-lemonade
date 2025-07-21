@@ -44,6 +44,7 @@ import { Logo } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RegistrationOptions, type RegistrationChoice } from './registration-options';
 import { AddTenantForm } from './add-tenant-form';
+import { AddFamilyMemberForm } from './add-family-member-form';
 
 const RegisterForm = dynamic(() => import('./register-form').then(mod => mod.RegisterForm), {
   ssr: false,
@@ -69,6 +70,8 @@ export default function RegisterPage() {
         return <RegisterForm onBack={handleResetChoice} />;
       case 'add-tenant':
         return <AddTenantForm onBack={handleResetChoice} />;
+      case 'add-family-member':
+        return <AddFamilyMemberForm onBack={handleResetChoice} />;
       default:
         return <RegistrationOptions onChoice={setChoice} />;
     }
