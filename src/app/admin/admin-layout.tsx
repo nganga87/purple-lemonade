@@ -26,6 +26,7 @@ import {
   ShieldCheck,
   Briefcase,
   ArrowLeft,
+  ShieldAlert,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -43,7 +44,7 @@ import { Separator } from '@/components/ui/separator';
 
 type AdminLayoutProps = {
     children: React.ReactNode;
-    active: 'dashboard' | 'audit' | 'users' | 'clients' | 'monetization';
+    active: 'dashboard' | 'audit' | 'users' | 'clients' | 'monetization' | 'incident-response';
 }
 
 export function AdminLayout({ children, active }: AdminLayoutProps) {
@@ -52,7 +53,8 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
     audit: 'Address Audit',
     users: 'User Management',
     clients: 'B2B Clients',
-    monetization: 'Monetization'
+    monetization: 'Monetization',
+    'incident-response': 'Incident Response'
   };
 
   return (
@@ -104,6 +106,14 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
                     <SidebarMenuButton isActive={active === 'monetization'}>
                         <DollarSign />
                         Monetization
+                    </SidebarMenuButton>
+                 </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                 <Link href="/admin/incident-response">
+                    <SidebarMenuButton isActive={active === 'incident-response'}>
+                        <ShieldAlert />
+                        Incident Response
                     </SidebarMenuButton>
                  </Link>
               </SidebarMenuItem>

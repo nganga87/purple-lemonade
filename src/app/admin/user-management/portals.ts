@@ -1,3 +1,4 @@
+
 export type Portal = {
   id: string;
   name: string;
@@ -29,6 +30,11 @@ export const portals: Portal[] = [
     id: 'monetization',
     name: 'Monetization',
     description: 'Configure pricing, fees, and tax rules.',
+  },
+  {
+    id: 'incident-response',
+    name: 'Incident Response',
+    description: 'Manage asset recovery for users after major incidents.',
   },
   {
     id: 'platform-settings',
