@@ -123,11 +123,11 @@ export default function MonetizationPage() {
   };
   
   const handleAddTaxRule = () => {
-    if (!newTaxCountry || !newTaxRate) {
+    if (!newTaxCountry || !newTaxRate || !newTaxType) {
         toast({
             variant: "destructive",
             title: "Validation Error",
-            description: "Country and Tax Rate are required.",
+            description: "Country, Tax Rate, and Tax Type are required.",
         });
         return;
     }
@@ -318,7 +318,7 @@ export default function MonetizationPage() {
             <CardContent className='space-y-6'>
                 <div className="p-4 rounded-lg border bg-secondary/50">
                     <h4 className="font-semibold mb-4">Add New Tax Rule</h4>
-                    <div className="grid md:grid-cols-4 gap-4 items-end">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                         <div className="space-y-1 md:col-span-2">
                             <Label>Jurisdiction</Label>
                             <div className="flex gap-2">
@@ -342,7 +342,11 @@ export default function MonetizationPage() {
                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">%</span>
                             </div>
                         </div>
-                        <Button onClick={handleAddTaxRule}>Add Tax Rule</Button>
+                         <div className="space-y-1">
+                            <Label htmlFor="tax-type">Tax Type</Label>
+                            <Input id="tax-type" placeholder="e.g., VAT, Sales Tax" value={newTaxType} onChange={(e) => setNewTaxType(e.target.value)} />
+                        </div>
+                        <Button onClick={handleAddTaxRule} className="w-full">Add Tax Rule</Button>
                     </div>
                 </div>
 
