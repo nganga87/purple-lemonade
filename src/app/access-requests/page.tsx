@@ -18,11 +18,6 @@ import {
   SidebarMenuBadge,
 } from '@/components/ui/sidebar';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import {
   LayoutDashboard,
   MapPin,
   PlusCircle,
@@ -320,16 +315,13 @@ export default function AccessRequestsPage() {
                         </TableHeader>
                           <TableBody>
                             {requests.map((request) => (
-                               <Collapsible asChild key={request.id} open={openCollapsible === request.id} onOpenChange={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
-                               <>
+                               <React.Fragment key={request.id}>
                                 <TableRow className="hover:bg-muted/50">
                                   <TableCell>
                                     {request.purpose === 'Tenant' && (
-                                        <CollapsibleTrigger asChild>
-                                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setOpenCollapsible(prev => prev === request.id ? null : request.id)}>
                                             <ChevronRight className={cn("h-4 w-4 transition-transform", openCollapsible === request.id && "rotate-90")} />
-                                          </Button>
-                                        </CollapsibleTrigger>
+                                        </Button>
                                     )}
                                   </TableCell>
                                   <TableCell>
@@ -384,34 +376,31 @@ export default function AccessRequestsPage() {
                                   </DropdownMenu>
                                   </TableCell>
                                 </TableRow>
-                                {request.purpose === 'Tenant' && (
-                                  <CollapsibleContent asChild>
-                                      <TableRow>
-                                          <TableCell colSpan={7} className="p-0">
-                                            <div className="bg-secondary/50 p-6">
-                                              <h4 className="font-semibold text-lg mb-4">Tenant Details</h4>
-                                              <div className="grid md:grid-cols-2 gap-6">
-                                                  <div className="space-y-4">
-                                                    <div className="flex items-center gap-2">
-                                                        <Building className="h-5 w-5 text-muted-foreground" />
-                                                        <div>
-                                                            <p className="text-sm text-muted-foreground">House/Apt Number</p>
-                                                            <p className="font-medium">{request.houseNumber}</p>
-                                                        </div>
-                                                    </div>
+                                {request.purpose === 'Tenant' && openCollapsible === request.id && (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="p-0">
+                                          <div className="bg-secondary/50 p-6">
+                                            <h4 className="font-semibold text-lg mb-4">Tenant Details</h4>
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                <div className="space-y-4">
+                                                  <div className="flex items-center gap-2">
+                                                      <Building className="h-5 w-5 text-muted-foreground" />
+                                                      <div>
+                                                          <p className="text-sm text-muted-foreground">House/Apt Number</p>
+                                                          <p className="font-medium">{request.houseNumber}</p>
+                                                      </div>
                                                   </div>
-                                                  <div>
-                                                    <p className="text-sm text-muted-foreground mb-2">Door Picture</p>
-                                                    <Image src={request.doorPicture!} alt={`Door for ${request.houseNumber}`} width={200} height={150} className="rounded-lg border shadow-md" data-ai-hint="apartment door"/>
-                                                  </div>
-                                              </div>
+                                                </div>
+                                                <div>
+                                                  <p className="text-sm text-muted-foreground mb-2">Door Picture</p>
+                                                  <Image src={request.doorPicture!} alt={`Door for ${request.houseNumber}`} width={200} height={150} className="rounded-lg border shadow-md" data-ai-hint="apartment door"/>
+                                                </div>
                                             </div>
-                                          </TableCell>
-                                      </TableRow>
-                                  </CollapsibleContent>
+                                          </div>
+                                        </TableCell>
+                                    </TableRow>
                                 )}
-                                </>
-                              </Collapsible>
+                                </React.Fragment>
                             ))}
                           </TableBody>
                     </Table>
