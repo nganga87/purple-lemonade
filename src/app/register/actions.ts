@@ -1,3 +1,4 @@
+
 'use server';
 
 import { validateDoorPhoto, type ValidateDoorPhotoInput, type ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
@@ -35,6 +36,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     const doorPhoto = formData.get('doorPhoto') as File | null;
     const gpsCoordinates = formData.get('gpsCoordinates') as string | null;
     const cryptoAddress = formData.get('cryptoAddress') as string | null;
+    const countryCode = formData.get('countryCode') as string | null;
 
     if (!doorPhoto || doorPhoto.size === 0) {
       return { isValid: false, validationDetails: 'Door photo is missing or empty.', error: 'Door photo is missing or empty.' };
@@ -44,6 +46,9 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     }
     if (!cryptoAddress) {
         return { isValid: false, validationDetails: 'Crypto wallet address is required.', error: 'Crypto wallet address is required.' };
+    }
+    if (!countryCode) {
+        return { isValid: false, validationDetails: 'Country code is required.', error: 'Country code is required.' };
     }
 
     // Fetch satellite image based on GPS
@@ -56,6 +61,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
       satelliteImageDataUri,
       gpsCoordinates,
       cryptoAddress,
+      countryCode,
     };
 
     const result = await validateDoorPhoto(input);

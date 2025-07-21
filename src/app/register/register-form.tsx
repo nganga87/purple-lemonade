@@ -85,7 +85,7 @@ const drawSignatureOnImage = (imageSrc: string, cryptoAddress: string, physicalA
   });
 };
 
-// Mock function to generate a crypto address from a seed (e.g., GPS coordinates)
+// Mock function to generate a crypto address from a seed
 const generateMockAddress = (seed: string): string => {
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
@@ -149,13 +149,14 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   }, [countryCode, setValue]);
 
   useEffect(() => {
-    if (gpsCoordinates) {
-        const newAddress = generateMockAddress(gpsCoordinates);
+    if (gpsCoordinates && countryCode) {
+        const seed = `${countryCode}:${gpsCoordinates}`;
+        const newAddress = generateMockAddress(seed);
         setGeneratedAddress(newAddress);
     } else {
         setGeneratedAddress(null);
     }
-  }, [gpsCoordinates]);
+  }, [gpsCoordinates, countryCode]);
 
  useEffect(() => {
     let stream: MediaStream | null = null;
@@ -191,7 +192,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       toast({
         variant: 'destructive',
         title: 'Complete Previous Steps',
-        description: 'You must provide GPS coordinates before adding a photo.',
+        description: 'You must provide country and GPS coordinates before adding a photo.',
       });
       return null;
     }
@@ -307,6 +308,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     formData.append('cryptoAddress', generatedAddress);
     formData.append('gpsCoordinates', values.gpsCoordinates);
     formData.append('doorPhoto', values.doorPhoto);
+    formData.append('countryCode', values.country);
     
     try {
       const response = await handleRegistration(formData);
@@ -518,7 +520,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                               </div>
                             </FormControl>
                             <FormDescription>
-                              This address is generated from your GPS coordinates.
+                              This "country-stamped" address is generated from your GPS & country.
                             </FormDescription>
                           </FormItem>
                       )}
