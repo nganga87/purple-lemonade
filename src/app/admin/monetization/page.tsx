@@ -14,6 +14,11 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countries } from '@/lib/countries';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+
 
 const revenueData = [
   { month: 'Jan', api: 2400, marketplace: 1600 },
@@ -45,8 +50,21 @@ const taxRules = [
     { id: 'tax-3', jurisdiction: 'Quebec, CA', rate: '14.975%', type: 'GST + QST' },
 ];
 
+type RevenueStream = {
+    id: string;
+    name: string;
+    description: string;
+    value: number;
+    type: 'percentage' | 'flat';
+    isActive: boolean;
+    icon: React.ComponentType<any>;
+}
+
 export default function MonetizationPage() {
-  const [revenueStreams, setRevenueStreams] = useState(initialRevenueStreams);
+  const [revenueStreams, setRevenueStreams] = useState<RevenueStream[]>(initialRevenueStreams);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newStream, setNewStream] = useState({ name: '', description: '', type: 'percentage' as 'percentage' | 'flat', value: 0 });
+  const { toast } = useToast();
 
   const handleStreamChange = (id: string, field: 'value' | 'isActive', value: number | boolean) => {
     setRevenueStreams(prevStreams =>
@@ -58,6 +76,36 @@ export default function MonetizationPage() {
 
   const handleDeleteStream = (id: string) => {
     setRevenueStreams(prevStreams => prevStreams.filter(stream => stream.id !== id));
+    toast({
+        variant: "destructive",
+        title: "Revenue Stream Deleted",
+        description: "The revenue stream has been successfully removed.",
+    });
+  };
+
+  const handleAddNewStream = () => {
+    if (!newStream.name || !newStream.description) {
+        toast({
+            variant: "destructive",
+            title: "Validation Error",
+            description: "Stream name and description are required.",
+        });
+        return;
+    }
+    const newId = newStream.name.toLowerCase().replace(/\s+/g, '_');
+    const newRevenueStream: RevenueStream = {
+        ...newStream,
+        id: newId,
+        isActive: true,
+        icon: FileText, // Default icon for new streams
+    };
+    setRevenueStreams(prev => [...prev, newRevenueStream]);
+    toast({
+        title: "Revenue Stream Added",
+        description: `Successfully added "${newStream.name}".`,
+    });
+    setNewStream({ name: '', description: '', type: 'percentage', value: 0 });
+    setIsAddDialogOpen(false);
   };
 
 
@@ -154,10 +202,56 @@ export default function MonetizationPage() {
              })}
           </CardContent>
           <CardFooter>
-            <Button variant="outline">
-                <PlusCircle className="mr-2 h-4 w-4"/>
-                Add New Revenue Stream
-            </Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4"/>
+                        Add New Revenue Stream
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add New Revenue Stream</DialogTitle>
+                        <DialogDescription>
+                            Define a new fee or commission to be charged on the platform.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="name" className="text-right">Name</Label>
+                            <Input id="name" value={newStream.name} onChange={(e) => setNewStream(s => ({...s, name: e.target.value}))} className="col-span-3" />
+                        </div>
+                        <div className="grid grid-cols-4 items-start gap-4">
+                            <Label htmlFor="description" className="text-right pt-2">Description</Label>
+                            <Textarea id="description" value={newStream.description} onChange={(e) => setNewStream(s => ({...s, description: e.target.value}))} className="col-span-3" />
+                        </div>
+                         <div className="grid grid-cols-4 items-center gap-4">
+                            <Label className="text-right">Type</Label>
+                            <RadioGroup defaultValue="percentage" className="col-span-3 flex gap-4" value={newStream.type} onValueChange={(value) => setNewStream(s => ({...s, type: value as 'percentage' | 'flat'}))}>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="percentage" id="r-percentage" />
+                                    <Label htmlFor="r-percentage">Percentage</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="flat" id="r-flat" />
+                                    <Label htmlFor="r-flat">Flat Fee</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="value" className="text-right">Value</Label>
+                            <div className="relative col-span-3">
+                                {newStream.type === 'flat' && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>}
+                                <Input id="value" type="number" value={newStream.value} onChange={(e) => setNewStream(s => ({...s, value: parseFloat(e.target.value) || 0}))} className={newStream.type === 'flat' ? 'pl-7' : 'pr-8'}/>
+                                {newStream.type === 'percentage' && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>}
+                            </div>
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" onClick={handleAddNewStream}>Add Stream</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
           </CardFooter>
         </Card>
         
