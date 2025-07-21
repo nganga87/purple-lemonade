@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { AdminLayout } from '../admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History } from 'lucide-react';
+import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History, Users } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
