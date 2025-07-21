@@ -149,6 +149,12 @@ export default function ExchangePage() {
     });
   }, [allListings, selectedCountry, selectedCity]);
 
+  const selectedCountryName = useMemo(() => {
+    if (!selectedCountry) return null;
+    const country = countries.find(c => c.code === selectedCountry);
+    return country ? country.name : null;
+  }, [selectedCountry]);
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -262,7 +268,11 @@ export default function ExchangePage() {
         <Card className="shadow-lg">
             <CardHeader>
                 <CardTitle className="font-headline">Address NFT Marketplace</CardTitle>
-                <CardDescription>Browse and acquire verified digital addresses from around the world.</CardDescription>
+                <CardDescription>
+                    {selectedCountryName
+                        ? <>Browsing listings in <span className="font-semibold text-primary">{selectedCountryName}</span>.</>
+                        : 'Browse and acquire verified digital addresses from around the world.'}
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="mb-6 p-4 border rounded-lg bg-secondary/50">
@@ -270,11 +280,12 @@ export default function ExchangePage() {
                     <div className="grid md:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-muted-foreground">Country</label>
-                            <Select onValueChange={setSelectedCountry}>
+                            <Select onValueChange={setSelectedCountry} value={selectedCountry}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select a country" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="">All Countries</SelectItem>
                                     {countries.map(country => (
                                       <SelectItem key={country.code} value={country.code}>{country.name}</SelectItem>
                                     ))}
@@ -303,7 +314,13 @@ export default function ExchangePage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredListings.length === 0 ? (
+                        {filteredListings.length === 0 && allListings.length > 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} className="text-center h-24">
+                                    No listings found for the selected filters.
+                                </TableCell>
+                            </TableRow>
+                        ) : filteredListings.length === 0 ? (
                            Array.from({ length: 5 }).map((_, index) => (
                              <TableRow key={index}>
                                <TableCell><Skeleton className="h-10 w-full" /></TableCell>
@@ -415,5 +432,3 @@ export default function ExchangePage() {
     </div>
   );
 }
-
-    
