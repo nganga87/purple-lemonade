@@ -31,10 +31,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { pricingPlans } from '../pricing-data';
+import { countries } from '@/lib/countries';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 const clientSchema = z.object({
   id: z.string().optional(),
@@ -42,6 +46,8 @@ const clientSchema = z.object({
   registrationNumber: z.string().min(1, 'Registration number is required.'),
   taxId: z.string().min(1, 'Tax ID / VAT number is required.'),
   plan: z.string().min(1, 'A plan must be selected.'),
+  countryOfRegistration: z.string().min(1, 'Country of registration is required.'),
+  countriesOfOperation: z.array(z.string()).min(1, 'At least one country of operation must be selected.'),
   
   contactName: z.string().min(1, 'Contact name is required.'),
   contactEmail: z.string().email('Please enter a valid email for the contact.'),
@@ -63,58 +69,73 @@ interface OnboardingDialogProps {
   client: Client | null;
 }
 
+const defaultValues = {
+      companyName: '',
+      registrationNumber: '',
+      taxId: '',
+      plan: 'Standard',
+      countryOfRegistration: '',
+      countriesOfOperation: [],
+      contactName: '',
+      contactEmail: '',
+      billingAddress: '',
+      bankName: '',
+      bankAccountNumber: '',
+      status: 'Pending Review' as const,
+      onboardedSince: new Date().toISOString().split('T')[0],
+};
+
 export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: OnboardingDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState('company');
 
   const form = useForm<Client>({
     resolver: zodResolver(clientSchema),
-    defaultValues: client || {
-      companyName: '',
-      registrationNumber: '',
-      taxId: '',
-      plan: 'Standard',
-      contactName: '',
-      contactEmail: '',
-      billingAddress: '',
-      bankName: '',
-      bankAccountNumber: '',
-      status: 'Pending Review',
-      onboardedSince: new Date().toISOString().split('T')[0],
-    },
+    defaultValues: client ? { ...client, countriesOfOperation: client.countriesOfOperation || [] } : defaultValues,
   });
 
   useEffect(() => {
     if (client) {
-      form.reset(client);
+      form.reset({ ...client, countriesOfOperation: client.countriesOfOperation || [] });
     } else {
-      form.reset({
-        companyName: '',
-        registrationNumber: '',
-        taxId: '',
-        plan: 'Standard',
-        contactName: '',
-        contactEmail: '',
-        billingAddress: '',
-        bankName: '',
-        bankAccountNumber: '',
-        status: 'Pending Review',
-        onboardedSince: new Date().toISOString().split('T')[0],
-      });
+      form.reset(defaultValues);
     }
-  }, [client, form]);
+    setCurrentTab('company');
+  }, [client, form, isOpen]);
+
 
   const handleNextTab = async () => {
     let fieldsToValidate: (keyof Client)[] = [];
-    if (currentTab === 'company') fieldsToValidate = ['companyName', 'registrationNumber', 'taxId', 'plan'];
-    if (currentTab === 'contact') fieldsToValidate = ['contactName', 'contactEmail'];
+    let nextTab = '';
+
+    switch (currentTab) {
+        case 'company':
+            fieldsToValidate = ['companyName', 'registrationNumber', 'taxId', 'plan', 'countryOfRegistration'];
+            nextTab = 'operations';
+            break;
+        case 'operations':
+            fieldsToValidate = ['countriesOfOperation'];
+            nextTab = 'contact';
+            break;
+        case 'contact':
+            fieldsToValidate = ['contactName', 'contactEmail'];
+            nextTab = 'billing';
+            break;
+    }
     
     const isValid = await form.trigger(fieldsToValidate);
     if (isValid) {
-        if(currentTab === 'company') setCurrentTab('contact');
-        if(currentTab === 'contact') setCurrentTab('billing');
+        setCurrentTab(nextTab);
     }
   };
+
+  const handleBackTab = () => {
+    switch (currentTab) {
+        case 'billing': setCurrentTab('contact'); break;
+        case 'contact': setCurrentTab('operations'); break;
+        case 'operations': setCurrentTab('company'); break;
+    }
+  }
 
   const onSubmit = (data: Client) => {
     setIsLoading(true);
@@ -139,8 +160,9 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="company">Company</TabsTrigger>
+                <TabsTrigger value="operations">Operations</TabsTrigger>
                 <TabsTrigger value="contact">Contact</TabsTrigger>
                 <TabsTrigger value="billing">Billing</TabsTrigger>
               </TabsList>
@@ -170,6 +192,28 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
                       </FormItem>
                     )}
                   />
+                   <FormField
+                        control={form.control}
+                        name="countryOfRegistration"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Country of Registration</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a country..." />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {countries.map(country => (
+                                            <SelectItem key={country.code} value={country.code}>{country.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                    <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="registrationNumber" render={({ field }) => (
                         <FormItem>
@@ -202,6 +246,48 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
                       <FormMessage />
                     </FormItem>
                   )} />
+                </TabsContent>
+                <TabsContent value="operations" className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="countriesOfOperation"
+                        render={() => (
+                            <FormItem>
+                                <FormLabel>Countries of Operation</FormLabel>
+                                <FormDescription>
+                                    Select all countries where this client will be utilizing address services.
+                                </FormDescription>
+                                <ScrollArea className="h-64 rounded-md border p-4">
+                                    {countries.map((country) => (
+                                        <FormField
+                                            key={country.code}
+                                            control={form.control}
+                                            name="countriesOfOperation"
+                                            render={({ field }) => (
+                                                <FormItem
+                                                    key={country.code}
+                                                    className="flex flex-row items-start space-x-3 space-y-0 py-2"
+                                                >
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value?.includes(country.code)}
+                                                            onCheckedChange={(checked) => {
+                                                                return checked
+                                                                    ? field.onChange([...(field.value || []), country.code])
+                                                                    : field.onChange(field.value?.filter((value) => value !== country.code));
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="font-normal">{country.name}</FormLabel>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    ))}
+                                </ScrollArea>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </TabsContent>
                 <TabsContent value="contact" className="space-y-4">
                     <FormField control={form.control} name="contactName" render={({ field }) => (
@@ -248,7 +334,7 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
             </Tabs>
             <DialogFooter className="pt-4 border-t">
               {currentTab !== 'company' && (
-                <Button type="button" variant="outline" onClick={() => setCurrentTab(currentTab === 'billing' ? 'contact' : 'company')}>
+                <Button type="button" variant="outline" onClick={handleBackTab}>
                   Back
                 </Button>
               )}
