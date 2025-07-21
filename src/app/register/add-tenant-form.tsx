@@ -104,7 +104,7 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const subAddressId = generateSubAddress(values.property, values.apartmentNumber);
+    const subAddressId = await generateSubAddress(values.property, values.apartmentNumber);
 
     toast({
       title: "Tenant Invitation Sent",
@@ -304,5 +304,3 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
     </div>
   );
 }
-
-    

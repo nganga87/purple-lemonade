@@ -50,7 +50,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [cameraStatus, setCameraStatus] = useState<'loading' | 'allowed' | 'denied' | 'notsupported'>('loading');
+  const [cameraStatus, setCameraStatus] = useState<'idle' | 'loading' | 'allowed' | 'denied' | 'notsupported'>('idle');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -61,33 +61,25 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
 
   const { setValue, trigger } = form;
 
-  useEffect(() => {
+  const requestCamera = async () => {
+    if (cameraStatus !== 'idle' && cameraStatus !== 'denied') return;
     let stream: MediaStream | null = null;
-    const getCameraPermission = async () => {
-      if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        setCameraStatus('loading');
         try {
-          stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          setCameraStatus('allowed');
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            setCameraStatus('allowed');
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream;
+            }
         } catch (error) {
-          console.error('Error accessing camera:', error);
-          setCameraStatus('denied');
+            console.error('Error accessing camera:', error);
+            setCameraStatus('denied');
         }
-      } else {
+    } else {
         setCameraStatus('notsupported');
-      }
-    };
-
-    getCameraPermission();
-
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
+    }
+  };
 
   const setFileInForm = useCallback((file: File) => {
       const previewUrl = URL.createObjectURL(file);
@@ -181,7 +173,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
         title: "Validation Submitted",
         description: "Your validation has been recorded.",
       });
-    } catch (err) {
+    } catch (err) => {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
       toast({
@@ -269,9 +261,9 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
                             render={({ field }) => (
                             <FormItem>
                                 <FormLabel>2. Capture Door Photo</FormLabel>
-                                <Tabs defaultValue="camera" className="w-full">
+                                <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>
                                 <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                                    <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
                                     <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="upload">

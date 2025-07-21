@@ -120,7 +120,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [cameraStatus, setCameraStatus] = useState<'loading' | 'allowed' | 'denied' | 'notsupported'>('loading');
+  const [cameraStatus, setCameraStatus] = useState<'idle' | 'loading' | 'allowed' | 'denied' | 'notsupported'>('idle');
   const [isCapturing, setIsCapturing] = useState(false);
   
   const [capturedImage, setCapturedImage] = useState<{ src: string, file: File } | null>(null);
@@ -164,34 +164,26 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     }
   }, [gpsCoordinates, countryCode]);
 
- useEffect(() => {
+  const requestCamera = async () => {
+    if (cameraStatus !== 'idle' && cameraStatus !== 'denied') return;
     let stream: MediaStream | null = null;
-    const getCameraPermission = async () => {
-      if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        try {
-          stream = await navigator.mediaDevices.getUserMedia({video: true});
-          setCameraStatus('allowed');
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        } catch (error) {
-          console.error('Error accessing camera:', error);
-          setCameraStatus('denied');
+    if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      setCameraStatus('loading');
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setCameraStatus('allowed');
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
         }
-      } else {
-        console.error('Camera not supported by this browser.');
-        setCameraStatus('notsupported');
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setCameraStatus('denied');
       }
-    };
-
-    getCameraPermission();
-    
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+    } else {
+      console.error('Camera not supported by this browser.');
+      setCameraStatus('notsupported');
     }
-  }, []);
+  };
 
   const processAndSetImage = useCallback(async (imageSrc: string, source: 'upload' | 'camera') => {
     if (!generatedAddress) {
@@ -538,9 +530,9 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>7. Door Photo</FormLabel>
-                        <Tabs defaultValue="camera" className="w-full">
+                        <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>
                           <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                            <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
                             <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
                           </TabsList>
                           <TabsContent value="upload">
