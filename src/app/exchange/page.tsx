@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -58,6 +58,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Skeleton } from '@/components/ui/skeleton';
+import { countries } from '@/lib/countries';
 
 const generateListings = (count: number) => {
   const listings = [];
@@ -68,14 +69,23 @@ const generateListings = (count: number) => {
     'Urban Loft Apartment', 'Industrial Park Bay', 'Beachfront Villa', 'Rural Farmstead', 'City Center Penthouse',
     'Tech Startup Garage', 'Retail Storefront', 'Historic District Home', 'Waterfront Condo', 'Ski Chalet Retreat'
   ];
-  const cities = ['Metropolis', 'Tranquil Town', 'Port City', 'Summit', 'Suburbia', 'Rivertown', 'Gleamwood', 'Starfall City', 'Oakhaven', 'Silver Creek'];
+  
+  const sampleCountries = [
+    { code: 'US', name: 'USA', cities: ['Metropolis', 'Springfield', 'Rivertown', 'Oakhaven'] },
+    { code: 'CA', name: 'Canada', cities: ['Toronto', 'Vancouver', 'Montreal', 'Calgary'] },
+    { code: 'GB', name: 'UK', cities: ['London', 'Manchester', 'Edinburgh', 'Birmingham'] },
+    { code: 'DE', name: 'Germany', cities: ['Berlin', 'Munich', 'Hamburg', 'Cologne'] },
+    { code: 'JP', name: 'Japan', cities: ['Tokyo', 'Osaka', 'Kyoto', 'Sapporo'] },
+  ];
+
   const listedBySuffix = ['Properties', 'Realty', 'Ventures', 'Holdings', 'Group'];
   const firstNames = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Heidi'];
   const lastNames = ['Johnson', 'Williams', 'Brown', 'Smith', 'Davis', 'Miller', 'Wilson', 'Moore'];
 
   for (let i = 0; i < count; i++) {
+    const countryData = sampleCountries[i % sampleCountries.length];
+    const city = countryData.cities[i % countryData.cities.length];
     const type = propertyTypes[i % propertyTypes.length];
-    const city = cities[i % cities.length];
     const streetNum = Math.floor(Math.random() * 2000) + 1;
     const streetName = ['Business Rd', 'Lake View', 'Industrial Way', 'Pine Ridge', 'Commerce Drive', 'Main St', 'Oak Ave', 'Elm St'][i % 8];
     const price = (Math.random() * 30 + 1).toFixed(1);
@@ -90,10 +100,11 @@ const generateListings = (count: number) => {
 
     listings.push({
       name: `${names[i % names.length]} #${i + 1}`,
-      address: `${streetNum} ${streetName}, ${city}, USA`,
+      address: `${streetNum} ${streetName}, ${city}, ${countryData.name}`,
+      countryCode: countryData.code,
       price: `${price} ETH`,
       type: type,
-      nftId: `0x${[...Array(12)].map(() => Math.floor(Math.random() * 16).toString(16)).join('').toUpperCase()}...`,
+      nftId: `0x${[...Array(12)].map(() => Math.floor(Math.random() * 16).toString(16)).join('').toUpperCase()}${i}`,
       listedBy: listedBy,
       avatar: `https://placehold.co/32x32.png?text=${listedBy.charAt(0)}`,
       status: statuses[i % statuses.length],
@@ -101,6 +112,7 @@ const generateListings = (count: number) => {
   }
   return listings;
 };
+
 
 const mySaleListings = [
     { name: 'Work', address: '456 Oak Avenue, Springfield, USA 67890', price: '9.5 ETH', status: 'Listed', views: 124 },
@@ -116,11 +128,26 @@ function NavLink({ href, children }: { href: string, children: React.ReactNode }
 }
 
 export default function ExchangePage() {
-  const [marketplaceListings, setMarketplaceListings] = useState<any[]>([]);
-
+  const [allListings, setAllListings] = useState<any[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [selectedState, setSelectedState] = useState<string>('');
+  const [selectedCity, setSelectedCity] = useState<string>('');
+  
   useEffect(() => {
-    setMarketplaceListings(generateListings(200));
+    setAllListings(generateListings(200));
   }, []);
+
+  const filteredListings = useMemo(() => {
+    if (!selectedCountry) {
+        return allListings;
+    }
+    return allListings.filter(listing => {
+        const countryMatch = listing.countryCode === selectedCountry;
+        const cityMatch = selectedCity ? listing.address.toLowerCase().includes(selectedCity.toLowerCase()) : true;
+        // State filtering is not implemented in mock data, but this is where it would go
+        return countryMatch && cityMatch;
+    });
+  }, [allListings, selectedCountry, selectedCity]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -132,9 +159,9 @@ export default function ExchangePage() {
               <span className="font-headline font-bold text-lg">Digital Address</span>
             </Link>
              <nav className="hidden md:flex items-center gap-6">
-                <NavLink href="#">Buy</NavLink>
-                <NavLink href="#">Sell</NavLink>
-                <NavLink href="#">Market</NavLink>
+                <NavLink href="/exchange">Buy</NavLink>
+                <NavLink href="/exchange">Sell</NavLink>
+                <NavLink href="/exchange">Market</NavLink>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="p-0 h-auto text-sm font-medium text-muted-foreground transition-colors hover:text-primary focus-visible:ring-0">
@@ -243,26 +270,24 @@ export default function ExchangePage() {
                     <div className="grid md:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-muted-foreground">Country</label>
-                            <Select>
+                            <Select onValueChange={setSelectedCountry}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select a country" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="usa">United States</SelectItem>
-                                    <SelectItem value="canada">Canada</SelectItem>
-                                    <SelectItem value="uk">United Kingdom</SelectItem>
-                                    <SelectItem value="germany">Germany</SelectItem>
-                                    <SelectItem value="japan">Japan</SelectItem>
+                                    {countries.map(country => (
+                                      <SelectItem key={country.code} value={country.code}>{country.name}</SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-muted-foreground">State/Province</label>
-                            <Input placeholder="e.g., California" disabled />
+                            <Input placeholder="e.g., California" disabled={!selectedCountry} />
                         </div>
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-muted-foreground">City</label>
-                            <Input placeholder="e.g., San Francisco" disabled />
+                            <Input placeholder="e.g., San Francisco" disabled={!selectedCountry} onChange={(e) => setSelectedCity(e.target.value)} />
                         </div>
                     </div>
                 </div>
@@ -278,7 +303,7 @@ export default function ExchangePage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {marketplaceListings.length === 0 ? (
+                        {filteredListings.length === 0 ? (
                            Array.from({ length: 5 }).map((_, index) => (
                              <TableRow key={index}>
                                <TableCell><Skeleton className="h-10 w-full" /></TableCell>
@@ -290,7 +315,7 @@ export default function ExchangePage() {
                              </TableRow>
                            ))
                         ) : (
-                          marketplaceListings.map((listing) => (
+                          filteredListings.map((listing) => (
                           <TableRow key={listing.nftId}>
                               <TableCell>
                                   <div className="flex items-center gap-3">
@@ -390,3 +415,5 @@ export default function ExchangePage() {
     </div>
   );
 }
+
+    
