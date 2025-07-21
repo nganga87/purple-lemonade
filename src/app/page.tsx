@@ -1,10 +1,10 @@
-
-import { ArrowRight, KeyRound, Mail } from 'lucide-react';
+import { ArrowRight, KeyRound, Mail, ArrowLeftRight, Globe, TrendingUp } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 
 export default function LandingPage() {
@@ -81,6 +81,58 @@ export default function LandingPage() {
                 <p className="text-sm text-muted-foreground">Your address, secured as a unique digital asset on the blockchain.</p>
             </div>
           </div>
+        </section>
+
+        <section className="bg-secondary py-12 md:py-24">
+            <div className="container">
+                 <div className="mx-auto max-w-2xl text-center">
+                    <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl">For Businesses & Developers</h2>
+                    <p className="mt-4 text-muted-foreground md:text-xl">
+                        Verify addresses, prevent fraud, and streamline logistics with our simple, powerful API.
+                    </p>
+                </div>
+                <div className="mt-12 grid gap-8 md:grid-cols-3">
+                    <Card>
+                        <CardHeader className="items-center text-center">
+                           <div className="p-3 rounded-full bg-primary/10 mb-2">
+                             <ArrowLeftRight className="h-8 w-8 text-primary"/>
+                           </div>
+                           <CardTitle className="font-headline">E-commerce & Retail</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center text-muted-foreground">
+                            Reduce failed deliveries and cart abandonment by validating addresses at checkout in real-time.
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader className="items-center text-center">
+                           <div className="p-3 rounded-full bg-primary/10 mb-2">
+                            <TrendingUp className="h-8 w-8 text-primary"/>
+                           </div>
+                           <CardTitle className="font-headline">Logistics & Delivery</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center text-muted-foreground">
+                            Optimize routes and ensure first-time delivery success with pin-point accurate, verified location data.
+                        </CardContent>
+                    </Card>
+                     <Card>
+                        <CardHeader className="items-center text-center">
+                           <div className="p-3 rounded-full bg-primary/10 mb-2">
+                            <Globe className="h-8 w-8 text-primary"/>
+                           </div>
+                           <CardTitle className="font-headline">Finance & KYC</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center text-muted-foreground">
+                            Meet regulatory requirements and onboard users faster with undeniable proof-of-residence verification.
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="mt-12 text-center">
+                    <Button size="lg">
+                        Get API Keys
+                        <ArrowRight className="ml-2 h-4 w-4"/>
+                    </Button>
+                </div>
+            </div>
         </section>
       </main>
 
