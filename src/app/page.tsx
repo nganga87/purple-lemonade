@@ -1,4 +1,4 @@
-import { ArrowRight, KeyRound, Mail, ArrowLeftRight, Globe, TrendingUp } from 'lucide-react';
+import { ArrowRight, KeyRound, Mail } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,26 +16,6 @@ export default function LandingPage() {
             <Logo className="h-6 w-6 text-primary" />
             <span className="font-headline font-bold text-lg">Digital Address</span>
           </Link>
-          <nav className="hidden items-center gap-6 text-sm md:flex">
-             <Link
-              href="/exchange"
-              className="font-medium text-foreground/60 transition-colors hover:text-foreground/80"
-            >
-              Marketplace
-            </Link>
-            <Link
-              href="/for-businesses"
-              className="font-medium text-foreground/60 transition-colors hover:text-foreground/80"
-            >
-              For Businesses
-            </Link>
-             <Link
-              href="/admin/login"
-              className="font-medium text-foreground/60 transition-colors hover:text-foreground/80"
-            >
-              Admin
-            </Link>
-          </nav>
           <div className="flex items-center gap-2">
             <Link href="/login">
               <Button variant="ghost">Log In</Button>
