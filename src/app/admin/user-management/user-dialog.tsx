@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, Calendar as CalendarIcon, UserPlus } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, Calendar as CalendarIcon, UserPlus, KeyRound } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -52,7 +52,7 @@ const userSchema = z.object({
   jobTitle: z.string().optional(),
   bio: z.string().optional(),
   phone: z.string().optional(),
-  homeAddress: z.string().optional(),
+  homeAddress: z.string().startsWith('0x', { message: 'Must be a valid Digital Address NFT ID.' }).optional().or(z.literal('')),
   workAddress: z.string().optional(),
   workCountry: z.string().optional(),
   dateOfBirth: z.date().optional(),
@@ -256,7 +256,7 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                                 mode="single"
                                 captionLayout="dropdown-buttons"
                                 fromYear={1900}
-                                toYear={new Date().getFullYear()}
+                                toYear={new Date().getFullYear() - 18}
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 disabled={(date) =>
@@ -355,11 +355,11 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                     name="homeAddress"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Home Address</FormLabel>
+                        <FormLabel>Home Digital Address NFT ID</FormLabel>
                         <FormControl>
                            <div className="relative">
-                            <Home className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-                            <Textarea placeholder="User's home address..." {...field} className="pl-10" />
+                            <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input placeholder="0x..." {...field} className="pl-10 font-mono" />
                           </div>
                         </FormControl>
                         <FormMessage />
