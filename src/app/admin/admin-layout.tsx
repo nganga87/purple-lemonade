@@ -58,10 +58,12 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                 <SidebarMenuButton href="/admin/dashboard" isActive={active === 'dashboard'}>
-                    <LayoutDashboard />
-                    Dashboard
-                  </SidebarMenuButton>
+                 <Link href="/admin/dashboard">
+                    <SidebarMenuButton isActive={active === 'dashboard'}>
+                        <LayoutDashboard />
+                        Dashboard
+                    </SidebarMenuButton>
+                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                  <SidebarMenuButton href="#">
@@ -76,10 +78,12 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                 <SidebarMenuButton href="/admin/address-audit" isActive={active === 'audit'}>
-                  <ShieldCheck />
-                  Address Audit
-                </SidebarMenuButton>
+                 <Link href="/admin/address-audit">
+                    <SidebarMenuButton isActive={active === 'audit'}>
+                    <ShieldCheck />
+                    Address Audit
+                    </SidebarMenuButton>
+                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton href="#">
