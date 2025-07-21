@@ -29,6 +29,12 @@ export default function LandingPage() {
             >
               For Businesses
             </Link>
+             <Link
+              href="/admin/login"
+              className="font-medium text-foreground/60 transition-colors hover:text-foreground/80"
+            >
+              Admin
+            </Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/login">
