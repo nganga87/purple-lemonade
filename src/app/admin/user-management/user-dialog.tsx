@@ -32,11 +32,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Mail, User, Briefcase, Phone } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, Home, Globe } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
+import { countries } from '@/lib/countries';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -47,6 +48,9 @@ const userSchema = z.object({
   jobTitle: z.string().optional(),
   bio: z.string().optional(),
   phone: z.string().optional(),
+  homeAddress: z.string().optional(),
+  workAddress: z.string().optional(),
+  workCountry: z.string().optional(),
 });
 
 export type AdminUser = z.infer<typeof userSchema>;
@@ -66,6 +70,9 @@ const defaultValues: AdminUser = {
   jobTitle: '',
   bio: '',
   phone: '',
+  homeAddress: '',
+  workAddress: '',
+  workCountry: '',
 };
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
@@ -104,9 +111,10 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Tabs defaultValue="account">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="account">Account</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="location">Location</TabsTrigger>
               </TabsList>
               <div className="py-4 max-h-[50vh] overflow-y-auto px-1">
                 <TabsContent value="account" className="space-y-4">
@@ -234,6 +242,65 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                         <FormLabel>Bio / Notes</FormLabel>
                         <FormControl>
                           <Textarea placeholder="A short description or any relevant notes about the user." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                 <TabsContent value="location" className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="workCountry"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Work Location Country</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                               <div className="flex items-center gap-2">
+                                <Globe className="h-5 w-5 text-muted-foreground" />
+                                <SelectValue placeholder="Select a country..." />
+                               </div>
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {countries.map(country => (
+                              <SelectItem key={country.code} value={country.code}>{country.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="homeAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Home Address</FormLabel>
+                        <FormControl>
+                           <div className="relative">
+                            <Home className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                            <Textarea placeholder="User's home address..." {...field} className="pl-10" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={form.control}
+                    name="workAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Work Address</FormLabel>
+                        <FormControl>
+                           <div className="relative">
+                            <Briefcase className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                            <Textarea placeholder="User's office or work address..." {...field} className="pl-10" />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
