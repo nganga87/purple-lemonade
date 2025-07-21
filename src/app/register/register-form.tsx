@@ -19,13 +19,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { handleRegistration } from './actions';
 import type { ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft, Building } from 'lucide-react';
+import { Loader2, UploadCloud, CheckCircle, XCircle, MapPin, Camera, LocateFixed, Wallet, AlertTriangle, RefreshCw, Eye, Home, ArrowLeft, Building, Globe } from 'lucide-react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { countries, type Country } from '@/lib/countries';
 
 const formSchema = z.object({
+  country: z.string().min(1, 'Please select a country.'),
+  state: z.string().optional(),
   addressName: z.string().min(1, 'An address name is required (e.g., Home, Office).'),
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   physicalAddress: z.string().min(1, 'Physical address is required.'),
@@ -104,6 +108,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [doorPhotoPreview, setDoorPhotoPreview] = useState<string | null>(null);
   const [generatedAddress, setGeneratedAddress] = useState<string | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const doorPhotoRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
@@ -118,6 +123,8 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      country: '',
+      state: '',
       addressName: '',
       gpsCoordinates: '',
       physicalAddress: '',
@@ -125,10 +132,21 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   });
 
   const { watch, setValue } = form;
+  const countryCode = watch('country');
   const gpsCoordinates = watch('gpsCoordinates');
   const physicalAddress = watch('physicalAddress');
   const doorPhoto = watch('doorPhoto');
   const addressName = watch('addressName');
+
+  useEffect(() => {
+    if (countryCode) {
+      const country = countries.find(c => c.code === countryCode) || null;
+      setSelectedCountry(country);
+      setValue('state', ''); // Reset state selection when country changes
+    } else {
+      setSelectedCountry(null);
+    }
+  }, [countryCode, setValue]);
 
   useEffect(() => {
     if (gpsCoordinates) {
@@ -346,7 +364,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     }
   };
 
-  const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto && addressName;
+  const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto && addressName && countryCode;
   const isFormReadOnly = result?.isValid === true;
 
   return (
@@ -368,7 +386,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
               <CardContent className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-6">
-                    <FormField
+                     <FormField
                       control={form.control}
                       name="addressName"
                       render={({ field }) => (
@@ -387,12 +405,84 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                         </FormItem>
                       )}
                     />
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <FormField
+                          control={form.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>2. Country</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                   <SelectTrigger>
+                                      <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                      <span className="pl-6">
+                                        <SelectValue placeholder="Select..." />
+                                      </span>
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {countries.map(country => (
+                                    <SelectItem key={country.code} value={country.code}>
+                                      {country.name} ({country.phoneCode})
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="state"
+                          render={({ field }) => (
+                             <FormItem>
+                              <FormLabel>3. State/Province</FormLabel>
+                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedCountry?.states}>
+                                <FormControl>
+                                  <SelectTrigger>
+                                    <SelectValue placeholder={selectedCountry?.states ? "Select..." : "N/A"} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {selectedCountry?.states?.map(state => (
+                                    <SelectItem key={state.code} value={state.code}>
+                                      {state.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                    </div>
                      <FormField
+                        control={form.control}
+                        name="physicalAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>4. Physical Address</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input placeholder="Street, City, Postal Code" {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                            <FormDescription>
+                              This will be included in the digital signature on your photo.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
                         control={form.control}
                         name="gpsCoordinates"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>2. GPS Coordinates</FormLabel>
+                            <FormLabel>5. GPS Coordinates</FormLabel>
                             <div className="flex gap-2">
                                 <FormControl>
                                   <div className="relative flex-grow">
@@ -412,30 +502,9 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                           </FormItem>
                         )}
                       />
-
-                      <FormField
-                        control={form.control}
-                        name="physicalAddress"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>3. Physical Address</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <Input placeholder="e.g., 123 Main St, Anytown, USA" {...field} className="pl-10" />
-                              </div>
-                            </FormControl>
-                            <FormDescription>
-                              This will be included in the digital signature on your photo.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
                        {generatedAddress && (
                           <FormItem>
-                            <FormLabel>4. Generated Crypto Wallet Address</FormLabel>
+                            <FormLabel>6. Generated Crypto Wallet Address</FormLabel>
                              <FormControl>
                               <div className="relative flex-grow bg-secondary p-2 rounded-md">
                                 <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -453,7 +522,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                     name="doorPhoto"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>5. Door Photo</FormLabel>
+                        <FormLabel>7. Door Photo</FormLabel>
                         <Tabs defaultValue="camera" className="w-full">
                           <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="camera" disabled={cameraStatus === 'denied' || cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
