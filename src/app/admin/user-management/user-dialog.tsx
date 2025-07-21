@@ -31,8 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, UserPlus, KeyRound, Copy } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -45,7 +44,7 @@ const userSchema = z.object({
   name: z.string().min(1, 'Full name is required.'),
   email: z.string().email('Please enter a valid email.'),
   role: z.string().min(1, 'Please select a role.'),
-  status: z.enum(['Active', 'Inactive']).default('Active'),
+  status: z.enum(['Active', 'Inactive', 'Pending Approval', 'Suspended']).default('Pending Approval'),
   jobTitle: z.string().optional(),
   bio: z.string().optional(),
   phone: z.string().optional(),
@@ -69,7 +68,7 @@ const defaultValues: Omit<AdminUser, 'id'> = {
   name: '',
   email: '',
   role: 'support-agent',
-  status: 'Active' as const,
+  status: 'Pending Approval' as const,
   jobTitle: '',
   bio: '',
   phone: '',
@@ -223,9 +222,6 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormDescription>
-                          Assigning a role determines the user's permissions.
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -234,19 +230,42 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                       control={form.control}
                       name="status"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                          <div className="space-y-0.5">
-                            <FormLabel>Status</FormLabel>
-                            <FormDescription>
-                              Inactive users cannot log in to the admin portal.
-                            </FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value === 'Active'}
-                              onCheckedChange={(checked) => field.onChange(checked ? 'Active' : 'Inactive')}
-                            />
-                          </FormControl>
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a status" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="Active">
+                                        <div className="flex flex-col">
+                                            <span>Active</span>
+                                            <span className="text-xs text-muted-foreground">User can log in and access features based on role.</span>
+                                        </div>
+                                    </SelectItem>
+                                    <SelectItem value="Pending Approval">
+                                         <div className="flex flex-col">
+                                            <span>Pending Approval</span>
+                                            <span className="text-xs text-muted-foreground">Account created, awaiting admin approval.</span>
+                                        </div>
+                                    </SelectItem>
+                                    <SelectItem value="Suspended">
+                                        <div className="flex flex-col">
+                                            <span>Suspended</span>
+                                            <span className="text-xs text-muted-foreground">User is temporarily blocked from logging in.</span>
+                                        </div>
+                                    </SelectItem>
+                                    <SelectItem value="Inactive">
+                                         <div className="flex flex-col">
+                                            <span>Inactive</span>
+                                            <span className="text-xs text-muted-foreground">User is deactivated and cannot log in.</span>
+                                        </div>
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -347,8 +366,10 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                           <FormControl>
                             <SelectTrigger>
                                <div className="flex items-center gap-2">
-                                <Globe className="h-5 w-5 text-muted-foreground" />
-                                <SelectValue placeholder="Select a country..." />
+                                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <span className="pl-6">
+                                  <SelectValue placeholder="Select a country..." />
+                                </span>
                                </div>
                             </SelectTrigger>
                           </FormControl>

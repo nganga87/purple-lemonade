@@ -55,7 +55,7 @@ const initialUsers: AdminUser[] = [
     name: 'Bob Williams',
     email: 'bob.w@digitaladdress.com',
     role: 'compliance-officer',
-    status: 'Active',
+    status: 'Pending Approval',
   },
   {
     id: 'usr_4',
@@ -63,6 +63,13 @@ const initialUsers: AdminUser[] = [
     email: 'charlie.b@digitaladdress.com',
     role: 'support-agent',
     status: 'Inactive',
+  },
+   {
+    id: 'usr_5',
+    name: 'Diana Prince',
+    email: 'diana.p@digitaladdress.com',
+    role: 'support-agent',
+    status: 'Suspended',
   },
 ];
 
@@ -100,7 +107,7 @@ export function UserTable() {
       toast({ variant: 'destructive', title: `User Deleted`, description: `${userName} has been removed from the system.` });
   }
 
-  const handleSetStatus = (userId: string, status: 'Active' | 'Inactive') => {
+  const handleSetStatus = (userId: string, status: AdminUser['status']) => {
       setUsers(users.map(u => u.id === userId ? {...u, status} : u));
       const userName = users.find(u => u.id === userId)?.name;
       toast({ title: `Status Updated`, description: `${userName}'s status has been set to ${status}.` });
@@ -108,6 +115,20 @@ export function UserTable() {
 
   const getRoleName = (roleId: string) => {
     return roles.find(r => r.id === roleId)?.name || roleId;
+  }
+  
+  const getStatusBadgeVariant = (status: AdminUser['status']) => {
+    switch (status) {
+      case 'Active':
+        return 'bg-green-100 text-green-800';
+      case 'Pending Approval':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'Suspended':
+        return 'bg-orange-100 text-orange-800';
+      case 'Inactive':
+      default:
+        return '';
+    }
   }
 
   return (
@@ -147,7 +168,7 @@ export function UserTable() {
                     <Badge variant="outline">{getRoleName(user.role)}</Badge>
                 </TableCell>
                 <TableCell>
-                    <Badge variant={user.status === 'Active' ? 'default' : 'secondary'} className={user.status === 'Active' ? 'bg-green-100 text-green-800' : ''}>
+                    <Badge variant={user.status === 'Active' ? 'default' : 'secondary'} className={getStatusBadgeVariant(user.status)}>
                         {user.status}
                     </Badge>
                 </TableCell>
@@ -168,6 +189,12 @@ export function UserTable() {
                           <DropdownMenuSubContent>
                             <DropdownMenuItem onClick={() => handleSetStatus(user.id, 'Active')} disabled={user.status === 'Active'}>
                               Mark as Active
+                            </DropdownMenuItem>
+                             <DropdownMenuItem onClick={() => handleSetStatus(user.id, 'Pending Approval')} disabled={user.status === 'Pending Approval'}>
+                              Mark as Pending
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleSetStatus(user.id, 'Suspended')} disabled={user.status === 'Suspended'}>
+                              Mark as Suspended
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleSetStatus(user.id, 'Inactive')} disabled={user.status === 'Inactive'}>
                               Mark as Inactive
