@@ -40,7 +40,7 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Logo } from '@/components/icons';
+import { Logo } from '@/components/ui/logo';
 import {
   Table,
   TableBody,
@@ -129,7 +129,7 @@ function NavLink({ href, children }: { href: string, children: React.ReactNode }
 
 export default function ExchangePage() {
   const [allListings, setAllListings] = useState<any[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<string>('');
+  const [selectedCountry, setSelectedCountry] = useState<string>('US');
   const [selectedState, setSelectedState] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
   
