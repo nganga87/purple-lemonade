@@ -82,7 +82,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Badge } from '@/components/ui/badge';
 import { Logo } from '@/components/icons';
@@ -110,7 +109,7 @@ const initialAddresses = [
   },
   {
     isPrimary: false,
-    name: 'Vacation House',
+    name: 'New Property',
     address: '789 Pine Lane, Lakeside, USA 54321',
     nftId: '0x9D8C7B6A5F4E3D2C1B0A9F8E7D6C5B4A3F2E1D0C',
     gps: '41.7638° N, 72.6851° W',
@@ -197,7 +196,7 @@ export default function MyAddressesPage() {
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 p-2">
               <Logo className="w-8 h-8 text-primary" />
-              <h1 className="text-xl font-headline font-semibold">AddressChain</h1>
+              <h1 className="text-xl font-headline font-semibold">Digital Address</h1>
             </Link>
           </SidebarHeader>
           <SidebarContent>

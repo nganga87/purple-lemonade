@@ -95,7 +95,7 @@ export default function DashboardPage() {
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-2 p-2">
               <Logo className="w-8 h-8 text-primary" />
-              <h1 className="text-xl font-headline font-semibold">AddressChain</h1>
+              <h1 className="text-xl font-headline font-semibold">Digital Address</h1>
             </Link>
           </SidebarHeader>
           <SidebarContent>

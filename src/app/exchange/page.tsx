@@ -129,7 +129,7 @@ export default function ExchangePage() {
           <div className="flex items-center gap-6">
             <Link href="/" className="mr-2 flex items-center space-x-2">
               <Logo className="h-6 w-6 text-primary" />
-              <span className="font-headline font-bold text-lg">AddressChain</span>
+              <span className="font-headline font-bold text-lg">Digital Address</span>
             </Link>
              <nav className="hidden md:flex items-center gap-6">
                 <NavLink href="#">Buy</NavLink>

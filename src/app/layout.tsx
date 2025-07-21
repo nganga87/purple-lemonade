@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'AddressChain',
-  description: 'Revolutionizing Address Systems with Blockchain Technology',
+  title: 'Digital Address',
+  description: 'Your place, your pin, your proof.',
 };
 
 export default function RootLayout({

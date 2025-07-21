@@ -170,7 +170,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
         <header className="w-full max-w-4xl mx-auto mb-4">
             <Link href="/" className="mr-6 flex items-center space-x-2">
                 <Logo className="h-6 w-6 text-primary" />
-                <span className="font-headline font-bold">AddressChain Validator</span>
+                <span className="font-headline font-bold">Digital Address Validator</span>
             </Link>
         </header>
         <div className="w-full max-w-4xl mx-auto">

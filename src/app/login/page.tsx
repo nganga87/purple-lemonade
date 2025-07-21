@@ -12,7 +12,7 @@ export default function LoginPage() {
        <div className="absolute top-4 left-4">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Logo className="h-6 w-6 text-primary" />
-            <span className="font-headline font-bold">AddressChain</span>
+            <span className="font-headline font-bold">Digital Address</span>
           </Link>
         </div>
 

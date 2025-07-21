@@ -14,7 +14,7 @@ export default function LandingPage() {
         <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Logo className="h-6 w-6 text-primary" />
-            <span className="font-headline font-bold text-lg">AddressChain</span>
+            <span className="font-headline font-bold text-lg">Digital Address</span>
           </Link>
           <nav className="hidden items-center gap-6 text-sm md:flex">
              <Link
@@ -39,10 +39,10 @@ export default function LandingPage() {
         <section className="container grid lg:grid-cols-2 gap-12 lg:gap-20 items-center py-12 md:py-24 lg:py-32">
           <div className="flex flex-col items-start gap-6">
             <h1 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Secure Your Digital Address on the Blockchain
+              Your Place, Your Pin, Your Proof.
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
-              AddressChain provides a revolutionary way to manage and verify
+              Digital Address provides a revolutionary way to manage and verify
               physical addresses using the power of AI and blockchain technology.
               Prevent fraud, streamline deliveries, and own your address like never before.
             </p>
@@ -86,7 +86,7 @@ export default function LandingPage() {
 
       <footer className="border-t">
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} AddressChain. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Digital Address. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/" className="hover:text-primary">Terms of Service</Link>
             <Link href="/" className="hover:text-primary">Privacy Policy</Link>
