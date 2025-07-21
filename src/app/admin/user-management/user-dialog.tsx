@@ -32,9 +32,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Mail, User } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -42,6 +44,9 @@ const userSchema = z.object({
   email: z.string().email('Please enter a valid email.'),
   role: z.string().min(1, 'Please select a role.'),
   status: z.enum(['Active', 'Inactive']).default('Active'),
+  jobTitle: z.string().optional(),
+  bio: z.string().optional(),
+  phone: z.string().optional(),
 });
 
 export type AdminUser = z.infer<typeof userSchema>;
@@ -53,14 +58,17 @@ interface UserDialogProps {
   user: AdminUser | null;
 }
 
-const defaultValues = {
+const defaultValues: AdminUser = {
   name: '',
   email: '',
   role: 'support-agent',
   status: 'Active' as const,
+  jobTitle: '',
+  bio: '',
+  phone: '',
 };
 
-export function UserDialog({ isOpen, setIsOpen, onSave, user }: UserDialogProps) {
+export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -94,91 +102,147 @@ export function UserDialog({ isOpen, setIsOpen, onSave, user }: UserDialogProps)
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-             <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input placeholder="Enter user's full name..." {...field} className="pl-10" />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input type="email" placeholder="user@digitaladdress.com" {...field} className="pl-10" />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a role..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {roles.map(role => (
-                        <SelectItem key={role.id} value={role.id} disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}>
-                          <div className="flex flex-col">
-                            <span>{role.name}</span>
-                            <span className="text-xs text-muted-foreground">{role.description}</span>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <Tabs defaultValue="account">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="account">Account</TabsTrigger>
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+              </TabsList>
+              <div className="py-4 max-h-[50vh] overflow-y-auto px-1">
+                <TabsContent value="account" className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input placeholder="Enter user's full name..." {...field} className="pl-10" />
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Assigning a role determines the user's permissions.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel>Status</FormLabel>
-                      <FormDescription>
-                        Inactive users cannot log in to the admin portal.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value === 'Active'}
-                        onCheckedChange={(checked) => field.onChange(checked ? 'Active' : 'Inactive')}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-            <DialogFooter className="pt-4">
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input type="email" placeholder="user@digitaladdress.com" {...field} className="pl-10" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Role</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a role..." />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {roles.map(role => (
+                              <SelectItem key={role.id} value={role.id} disabled={role.id === 'super-admin' && user?.role !== 'super-admin'}>
+                                <div className="flex flex-col">
+                                  <span>{role.name}</span>
+                                  <span className="text-xs text-muted-foreground">{role.description}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Assigning a role determines the user's permissions.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                          <div className="space-y-0.5">
+                            <FormLabel>Status</FormLabel>
+                            <FormDescription>
+                              Inactive users cannot log in to the admin portal.
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value === 'Active'}
+                              onCheckedChange={(checked) => field.onChange(checked ? 'Active' : 'Inactive')}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                </TabsContent>
+                <TabsContent value="profile" className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="jobTitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Job Title</FormLabel>
+                        <FormControl>
+                           <div className="relative">
+                            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input placeholder="e.g., Compliance Manager" {...field} className="pl-10" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input type="tel" placeholder="+1 (555) 123-4567" {...field} className="pl-10" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bio / Notes</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="A short description or any relevant notes about the user." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+              </div>
+            </Tabs>
+            <DialogFooter className="pt-4 border-t mt-4">
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={isLoading}>
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
