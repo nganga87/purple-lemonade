@@ -439,20 +439,26 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                           render={({ field }) => (
                              <FormItem>
                               <FormLabel>3. State/Province</FormLabel>
-                               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedCountry?.states}>
+                              {selectedCountry && selectedCountry.states ? (
+                                <Select onValueChange={field.onChange} value={field.value} disabled={!selectedCountry?.states}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select..." />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {selectedCountry.states.map(state => (
+                                      <SelectItem key={state.code} value={state.code}>
+                                        {state.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : (
                                 <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder={selectedCountry?.states ? "Select..." : "N/A"} />
-                                  </SelectTrigger>
+                                  <Input placeholder="Enter state/province..." {...field} disabled={!selectedCountry} />
                                 </FormControl>
-                                <SelectContent>
-                                  {selectedCountry?.states?.map(state => (
-                                    <SelectItem key={state.code} value={state.code}>
-                                      {state.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              )}
                               <FormMessage />
                             </FormItem>
                           )}
