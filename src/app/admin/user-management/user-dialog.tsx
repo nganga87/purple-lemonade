@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, ShieldCheck } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, ShieldCheck, Fingerprint } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -40,7 +40,6 @@ import { countries } from '@/lib/countries';
 import { verifyNftId } from '@/lib/verify-nft';
 import { portals } from './portals';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -57,6 +56,7 @@ const userSchema = z.object({
   dateOfBirth: z.string().optional(),
   gender: z.string().optional(),
   permissions: z.array(z.string()).optional(),
+  biometricHash: z.string().optional(),
 });
 
 export type AdminUser = z.infer<typeof userSchema>;
@@ -82,6 +82,7 @@ const defaultValues: Omit<AdminUser, 'id'> = {
   gender: '',
   dateOfBirth: '',
   permissions: [],
+  biometricHash: '',
 };
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
@@ -152,10 +153,21 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
       });
     }
   };
+  
+  const handleGenerateBiometricHash = () => {
+    // In a real app, this would involve a complex process with a biometric scanner.
+    // For this prototype, we simulate it by generating a random hash.
+    const hash = `bio_${[...Array(32)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+    form.setValue('biometricHash', hash, { shouldValidate: true });
+    toast({
+      title: "Biometric Hash Generated",
+      description: "A simulated biometric hash has been created for this user.",
+    });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{user ? 'Edit User' : 'Add New User'}</DialogTitle>
           <DialogDescription>
@@ -165,11 +177,12 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Tabs defaultValue="account">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="account">Account</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="location">Location</TabsTrigger>
                 <TabsTrigger value="permissions">Permissions</TabsTrigger>
+                <TabsTrigger value="biometric">Biometric</TabsTrigger>
               </TabsList>
               <div className="py-4 max-h-[50vh] overflow-y-auto px-1">
                 <TabsContent value="account" className="space-y-4">
@@ -489,6 +502,36 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                       </FormItem>
                     )}
                   />
+                </TabsContent>
+                 <TabsContent value="biometric">
+                    <div className="space-y-4 rounded-lg border p-4">
+                        <div className="flex items-start gap-4">
+                             <Fingerprint className="h-8 w-8 text-muted-foreground mt-1" />
+                             <div>
+                                <FormLabel className="text-base">Biometric Handshake</FormLabel>
+                                <FormDescription>
+                                Link a unique biometric signature to this user's account for enhanced security.
+                                </FormDescription>
+                             </div>
+                        </div>
+
+                        <FormField
+                            control={form.control}
+                            name="biometricHash"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Biometric Hash</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="No biometric data linked..." {...field} readOnly className="font-mono bg-secondary"/>
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="button" variant="outline" onClick={handleGenerateBiometricHash}>
+                            Simulate Biometric Scan
+                        </Button>
+                    </div>
                 </TabsContent>
               </div>
             </Tabs>

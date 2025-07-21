@@ -64,4 +64,6 @@ declare module 'lucide-react' {
   export const ArrowUpRight: Icon;
   export const Phone: Icon;
   export const Calendar: Icon;
+  export const Fingerprint: Icon;
+  export const ArchiveRestore: Icon;
 }

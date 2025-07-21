@@ -21,7 +21,6 @@ import {
   LayoutDashboard,
   MapPin,
   PlusCircle,
-  CheckCircle2,
   Settings,
   Bell,
   UserCircle,
@@ -30,12 +29,14 @@ import {
   QrCode,
   Copy,
   MoreVertical,
-  ChevronDown,
   Edit,
   Trash2,
   Users,
   CandlestickChart,
   Check,
+  ArchiveRestore,
+  ShieldAlert,
+  FileText,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -54,9 +56,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent
 } from '@/components/ui/dropdown-menu';
 import {
   Select,
@@ -72,6 +71,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -88,7 +88,9 @@ import { Logo } from '@/components/icons';
 import { EditAddressForm } from './edit-address-form';
 import { deleteAddress } from './delete-address';
 import { useToast } from '@/hooks/use-toast';
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const initialAddresses = [
   {
@@ -115,6 +117,14 @@ const initialAddresses = [
     gps: '41.7638° N, 72.6851° W',
     status: 'Pending',
   },
+  {
+    isPrimary: false,
+    name: 'Damaged Warehouse',
+    address: '101 Industrial Way, Floodzone, USA 98765',
+    nftId: '0x4F5E6D7C8B9A0F1E2D3C4B5A6F7E8D9C0A1B2C3D',
+    gps: '40.7128° N, 74.0060° W',
+    status: 'Compromised',
+  },
 ];
 
 export type Address = typeof initialAddresses[0];
@@ -124,6 +134,8 @@ export default function MyAddressesPage() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses.find(a => a.isPrimary) || addresses[0] || null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [actionDialog, setActionDialog] = useState<'archive' | 'incident' | null>(null);
+
   const { toast } = useToast();
 
   const handleAddressSelect = (addressId: string) => {
@@ -187,7 +199,30 @@ export default function MyAddressesPage() {
       setTimeout(() => setIsCopied(false), 2000); // Revert after 2 seconds
     });
   };
+  
+  const handleReportIncident = (nftId: string) => {
+     setAddresses(addresses.map(addr => addr.nftId === nftId ? { ...addr, status: 'Compromised' } : addr));
+     setSelectedAddress(prev => prev && prev.nftId === nftId ? { ...prev, status: 'Compromised' } : prev);
+     toast({
+       variant: 'destructive',
+       title: "Incident Reported",
+       description: "The address has been marked as compromised and requires re-validation.",
+     });
+     setActionDialog(null);
+  }
 
+  const getStatusBadge = (status: Address['status']) => {
+    switch (status) {
+      case 'Verified':
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">Verified</Badge>;
+      case 'Pending':
+        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+      case 'Compromised':
+        return <Badge variant="destructive">Compromised</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  }
 
   return (
     <SidebarProvider>
@@ -343,93 +378,127 @@ export default function MyAddressesPage() {
                   </Select>
 
                   {selectedAddress && (
-                    <Card className="shadow-lg animate-in fade-in-50 duration-500">
-                      <CardHeader className="flex flex-row items-start justify-between">
-                        <div>
-                          <CardTitle className="font-headline">{selectedAddress.name}</CardTitle>
-                           <CardDescription>
-                            {selectedAddress.address}
-                          </CardDescription>
-                        </div>
-                        <div className="flex items-center gap-2">
-                           {selectedAddress.isPrimary && (
-                              <Badge variant="outline" className="mr-2 border-primary text-primary">Primary</Badge>
-                            )}
-                            <Badge variant={selectedAddress.status === 'Verified' ? 'secondary' : 'default'} className={selectedAddress.status === 'Verified' ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"}>
-                            {selectedAddress.status}
-                            </Badge>
-                             <AlertDialog>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                        <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                    <DialogTrigger asChild>
-                                        <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)} disabled={selectedAddress.status !== 'Verified'}>
-                                            <Edit className="mr-2 h-4 w-4" />
-                                            <span>Edit Details</span>
+                     <Card className="shadow-lg animate-in fade-in-50 duration-500">
+                        <Tabs defaultValue="details">
+                            <CardHeader className="flex flex-row items-start justify-between">
+                                <div>
+                                <TabsList>
+                                    <TabsTrigger value="details">Details</TabsTrigger>
+                                    <TabsTrigger value="succession">Succession</TabsTrigger>
+                                </TabsList>
+                                <CardTitle className="font-headline mt-4">{selectedAddress.name}</CardTitle>
+                                <CardDescription>
+                                    {selectedAddress.address}
+                                </CardDescription>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                {selectedAddress.isPrimary && (
+                                    <Badge variant="outline" className="mr-2 border-primary text-primary">Primary</Badge>
+                                )}
+                                {getStatusBadge(selectedAddress.status)}
+                                <AlertDialog open={!!actionDialog} onOpenChange={(open) => !open && setActionDialog(null)}>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <MoreVertical className="h-4 w-4" />
+                                        </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                        <DialogTrigger asChild>
+                                            <DropdownMenuItem onSelect={() => setIsEditDialogOpen(true)} disabled={selectedAddress.status !== 'Verified'}>
+                                                <Edit className="mr-2 h-4 w-4" />
+                                                <span>Edit Details</span>
+                                            </DropdownMenuItem>
+                                        </DialogTrigger>
+                                        <DropdownMenuItem onSelect={() => handleSetPrimary(selectedAddress.nftId)} disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>Set as Primary</DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                         <DropdownMenuItem className="text-destructive" onSelect={() => setActionDialog('incident')}>
+                                            <ShieldAlert className="mr-2 h-4 w-4" />
+                                            <span>Report Incident</span>
                                         </DropdownMenuItem>
-                                    </DialogTrigger>
-                                    <DropdownMenuItem onSelect={() => handleSetPrimary(selectedAddress.nftId)} disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>Set as Primary</DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <AlertDialogTrigger asChild>
-                                        <DropdownMenuItem className="text-destructive" disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>
+                                        <DropdownMenuItem className="text-destructive" onSelect={() => setActionDialog('archive')} disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>
                                             <Trash2 className="mr-2 h-4 w-4" />
                                             <span>Archive</span>
                                         </DropdownMenuItem>
-                                    </AlertDialogTrigger>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This action cannot be undone. This will permanently archive the address "{selectedAddress.name}".
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleArchiveAddress(selectedAddress.nftId)}>
-                                      Continue
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="grid md:grid-cols-3 gap-6">
-                        <div className="md:col-span-2 space-y-4">
-                          <div className="space-y-1">
-                            <h3 className="font-semibold">Address NFT ID</h3>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
-                              <p className="truncate">{selectedAddress.nftId}</p>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => handleCopy(selectedAddress.nftId)}
-                              >
-                                {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                              </Button>
-                            </div>
-                          </div>
-                           <div className="space-y-1">
-                                <h3 className="font-semibold">GPS Coordinates</h3>
-                                <p className="text-muted-foreground">{selectedAddress.gps}</p>
-                            </div>
-                        </div>
-                        <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
-                          <div className="p-2 bg-white rounded-lg shadow-md">
-                            <Image src="https://placehold.co/120x120.png" alt="QR Code" width={120} height={120} data-ai-hint="qr code" />
-                          </div>
-                           <Button variant="outline" size="sm" className="mt-4">
-                            <QrCode className="mr-2 h-4 w-4" />
-                            Show QR
-                          </Button>
-                        </div>
-                      </CardContent>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                        {actionDialog === 'archive' && `This action cannot be undone. This will permanently archive the address "${selectedAddress.name}".`}
+                                        {actionDialog === 'incident' && `This will mark the address "${selectedAddress.name}" as compromised, requiring re-validation. This action is recorded publicly.`}
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel onClick={() => setActionDialog(null)}>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => {
+                                            if (actionDialog === 'archive') handleArchiveAddress(selectedAddress.nftId);
+                                            if (actionDialog === 'incident') handleReportIncident(selectedAddress.nftId);
+                                        }}>
+                                        Continue
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                                </div>
+                            </CardHeader>
+                            <TabsContent value="details">
+                                <CardContent className="grid md:grid-cols-3 gap-6">
+                                    <div className="md:col-span-2 space-y-4">
+                                    {selectedAddress.status === 'Compromised' && (
+                                        <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
+                                            <h4 className="font-bold flex items-center gap-2"><ShieldAlert />Incident Reported</h4>
+                                            <p className="text-sm mt-1">This address is locked pending re-validation due to a reported incident (e.g., natural disaster). No transfers are permitted.</p>
+                                            <Button size="sm" className="mt-2"><ArchiveRestore className="mr-2 h-4 w-4"/>Start Re-validation</Button>
+                                        </div>
+                                    )}
+                                    <div className="space-y-1">
+                                        <h3 className="font-semibold">Address NFT ID</h3>
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
+                                        <p className="truncate">{selectedAddress.nftId}</p>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-7 w-7"
+                                            onClick={() => handleCopy(selectedAddress.nftId)}
+                                        >
+                                            {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                                        </Button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                            <h3 className="font-semibold">GPS Coordinates</h3>
+                                            <p className="text-muted-foreground">{selectedAddress.gps}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
+                                    <div className="p-2 bg-white rounded-lg shadow-md">
+                                        <Image src="https://placehold.co/120x120.png" alt="QR Code" width={120} height={120} data-ai-hint="qr code"/>
+                                    </div>
+                                    <Button variant="outline" size="sm" className="mt-4">
+                                        <QrCode className="mr-2 h-4 w-4" />
+                                        Show QR
+                                    </Button>
+                                    </div>
+                                </CardContent>
+                            </TabsContent>
+                             <TabsContent value="succession">
+                                <CardContent className="space-y-4">
+                                    <div className="p-4 rounded-lg bg-secondary border">
+                                        <h3 className="font-semibold flex items-center gap-2"><FileText className="h-5 w-5"/> Digital Will & Succession</h3>
+                                        <p className="text-sm text-muted-foreground mt-1">Designate a beneficiary to inherit this Digital Address NFT in the event of your incapacitation or death. This action requires administrative verification of legal documents to execute.</p>
+                                    </div>
+                                     <div className="space-y-2">
+                                        <Label htmlFor="beneficiary">Beneficiary Wallet Address</Label>
+                                        <Input id="beneficiary" placeholder="0x... (Beneficiary's Wallet Address)" />
+                                    </div>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button>Save Beneficiary</Button>
+                                </CardFooter>
+                            </TabsContent>
+                        </Tabs>
                     </Card>
                   )}
                 </div>
