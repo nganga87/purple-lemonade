@@ -280,12 +280,12 @@ export default function ExchangePage() {
                     <div className="grid md:grid-cols-3 gap-4">
                         <div className="space-y-1">
                             <label className="text-sm font-medium text-muted-foreground">Country</label>
-                            <Select onValueChange={setSelectedCountry} value={selectedCountry}>
+                            <Select onValueChange={(value) => setSelectedCountry(value === 'ALL' ? '' : value)} value={selectedCountry || 'ALL'}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select a country" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All Countries</SelectItem>
+                                    <SelectItem value="ALL">All Countries</SelectItem>
                                     {countries.map(country => (
                                       <SelectItem key={country.code} value={country.code}>{country.name}</SelectItem>
                                     ))}
