@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, Calendar as CalendarIcon, UserPlus, KeyRound } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, Calendar as CalendarIcon, UserPlus, KeyRound, Copy } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -104,6 +104,23 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
     onSave(data);
     setIsOpen(false);
     setIsLoading(false);
+  };
+  
+  const handlePaste = async (fieldName: 'homeAddress' | 'workAddress') => {
+    try {
+      const text = await navigator.clipboard.readText();
+      form.setValue(fieldName, text, { shouldValidate: true });
+      toast({
+        title: 'Pasted from clipboard!',
+        description: `The address has been pasted into the ${fieldName === 'homeAddress' ? 'Home' : 'Work'} Address field.`,
+      });
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Paste Failed',
+        description: 'Could not read from clipboard. Please check browser permissions.',
+      });
+    }
   };
 
   return (
@@ -255,7 +272,7 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                               <Calendar
                                 mode="single"
                                 captionLayout="dropdown-buttons"
-                                fromYear={1900}
+                                fromYear={1920}
                                 toYear={new Date().getFullYear() - 18}
                                 selected={field.value}
                                 onSelect={field.onChange}
@@ -356,12 +373,18 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Home Digital Address NFT ID</FormLabel>
-                        <FormControl>
-                           <div className="relative">
-                            <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input placeholder="0x..." {...field} className="pl-10 font-mono" />
-                          </div>
-                        </FormControl>
+                        <div className="flex gap-2">
+                            <FormControl>
+                            <div className="relative flex-grow">
+                                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input placeholder="0x..." {...field} className="pl-10 font-mono" />
+                            </div>
+                            </FormControl>
+                            <Button type="button" variant="outline" size="icon" onClick={() => handlePaste('homeAddress')}>
+                                <Copy className="h-4 w-4" />
+                                <span className="sr-only">Paste</span>
+                            </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
