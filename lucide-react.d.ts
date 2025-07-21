@@ -22,10 +22,6 @@ declare module 'lucide-react' {
   export const Users: Icon;
   export const CheckCircle2: Icon;
   export const MoreVertical: Icon;
-  export const ChevronDown: Icon;
-  export const Edit: Icon;
-  export const Trash2: Icon;
-  export const MoreHorizontal: Icon;
   export const ChevronRight: Icon;
   export const UserCheck: Icon;
   export const UserX: Icon;
@@ -66,5 +62,8 @@ declare module 'lucide-react' {
   export const Calendar: Icon;
   export const Fingerprint: Icon;
   export const ArchiveRestore: Icon;
+  export const ChevronDown: Icon;
+  export const MoreHorizontal: Icon;
+  export const Edit: Icon;
+  export const Trash2: Icon;
 }
-

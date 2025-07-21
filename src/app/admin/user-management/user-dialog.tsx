@@ -370,7 +370,7 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                         <FormLabel>Additional Phone Number</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                             <Input type="tel" placeholder="Spouse or family member..." {...field} className="pl-10" />
                           </div>
                         </FormControl>
