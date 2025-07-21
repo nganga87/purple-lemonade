@@ -45,7 +45,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
   const [result, setResult] = useState<CompareValidationPhotosOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [doorPhotoPreview, setDoorPhotoPreview] = useState<string | null>(null);
-  const [locationVerified, setLocationVerified] = useState(false);
+  const [mapOpened, setMapOpened] = useState(false);
   const { toast } = useToast();
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -118,14 +118,14 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
     setValue('validatorDoorPhoto', new File([], ''), { shouldValidate: true });
   }
 
-  const handleVerifyLocation = () => {
+  const handleOpenMap = () => {
     const [lat, lng] = mockRequest.gpsCoordinates.split(',');
     const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
     window.open(url, '_blank');
-    setLocationVerified(true);
+    setMapOpened(true);
     toast({
       title: 'Map Opened',
-      description: 'Please verify the location on the map and return to this tab to submit your photo.',
+      description: 'Please confirm the location on the map, then return to this tab.',
     });
   };
 
@@ -163,7 +163,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
   };
   
   const isFormReadOnly = result?.isMatch === true;
-  const canSubmit = locationVerified && photo && photo.size > 0;
+  const canSubmit = mapOpened && photo && photo.size > 0;
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-background font-body p-4">
@@ -207,13 +207,17 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
                         <div className="space-y-4">
                             <FormItem>
                                 <FormLabel>1. Verify Location</FormLabel>
-                                <Button type="button" onClick={handleVerifyLocation} className="w-full" variant={locationVerified ? "secondary" : "default"}>
-                                  {locationVerified ? <CheckCircle className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
-                                  {locationVerified ? "Location Viewed" : "Verify Location on Map"}
+                                 <Alert>
+                                  <MapPin className="h-4 w-4" />
+                                  <AlertTitle>Action Required</AlertTitle>
+                                  <AlertDescription>
+                                    Click the button below to open Google Maps in a new tab. Confirm you are at the correct location, then return here to complete the next step.
+                                  </AlertDescription>
+                                </Alert>
+                                <Button type="button" onClick={handleOpenMap} className="w-full" disabled={mapOpened}>
+                                  {mapOpened ? <CheckCircle className="mr-2 h-4 w-4" /> : <MapPin className="mr-2 h-4 w-4" />}
+                                  {mapOpened ? "Map Opened" : "Open Map to Verify Location"}
                                 </Button>
-                                <FormDescription>
-                                  Click to open Google Maps at the target GPS coordinates. Confirm you are at this location before proceeding.
-                                </FormDescription>
                             </FormItem>
                         </div>
 
