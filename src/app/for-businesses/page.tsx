@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, Globe, ArrowLeftRight, TrendingUp, KeyRound, Copy, Check, Loader2 } from 'lucide-react';
+import { ArrowRight, Globe, ArrowLeftRight, TrendingUp, KeyRound, Copy, Check, Loader2, X } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -126,14 +126,20 @@ export default function ForBusinessesPage() {
                 {apiKey && (
                   <Card className="max-w-2xl mx-auto mt-12 shadow-lg animate-in fade-in-50 duration-500">
                     <CardHeader>
-                      <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-full bg-primary/10">
-                            <KeyRound className="h-6 w-6 text-primary"/>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-full bg-primary/10">
+                                <KeyRound className="h-6 w-6 text-primary"/>
+                            </div>
+                            <div>
+                              <CardTitle className="font-headline">Your API Key</CardTitle>
+                              <CardDescription>Use this key in your application's backend to access our services.</CardDescription>
+                            </div>
                         </div>
-                        <div>
-                          <CardTitle className="font-headline">Your API Key</CardTitle>
-                          <CardDescription>Use this key in your application's backend to access our services.</CardDescription>
-                        </div>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setApiKey(null)}>
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Close</span>
+                        </Button>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
