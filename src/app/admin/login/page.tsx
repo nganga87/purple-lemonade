@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Mail, Lock } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 export default function AdminLoginPage() {
   return (
@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Administrator Portal</CardTitle>
-          <CardDescription>Please log in to continue.</CardDescription>
+          <CardDescription>Enter your email to receive a login link.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-4">
@@ -27,14 +27,7 @@ export default function AdminLoginPage() {
               <label htmlFor="email">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="admin@example.com" className="pl-10" required />
-              </div>
-            </div>
-            <div className="grid gap-2">
-               <label htmlFor="password">Password</label>
-               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="password" type="password" placeholder="••••••••" className="pl-10" required />
+                <Input id="email" type="email" placeholder="admin@digitaladdress.com" className="pl-10" required />
               </div>
             </div>
             <Button asChild type="submit" className="w-full mt-2">

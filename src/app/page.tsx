@@ -81,6 +81,8 @@ export default function LandingPage() {
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Digital Address. All rights reserved.</p>
           <div className="flex items-center gap-4">
+            <Link href="/for-businesses" className="hover:text-primary">For Businesses</Link>
+            <Link href="/admin/login" className="hover:text-primary">Admin</Link>
             <Link href="/" className="hover:text-primary">Terms of Service</Link>
             <Link href="/" className="hover:text-primary">Privacy Policy</Link>
           </div>
