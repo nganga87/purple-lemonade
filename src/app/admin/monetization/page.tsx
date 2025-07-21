@@ -1,14 +1,17 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AdminLayout } from '../admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase } from 'lucide-react';
+import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const revenueData = [
   { month: 'Jan', api: 2400, marketplace: 1600 },
@@ -34,6 +37,11 @@ const recentTransactions = [
 ];
 
 export default function MonetizationPage() {
+  const [marketplaceFee, setMarketplaceFee] = useState(2.5);
+  const [isMarketplaceActive, setIsMarketplaceActive] = useState(true);
+  const [apiFee, setApiFee] = useState(0.001);
+  const [isApiActive, setIsApiActive] = useState(true);
+
   return (
     <AdminLayout active="monetization">
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
@@ -88,6 +96,64 @@ export default function MonetizationPage() {
                     </LineChart>
                 </ResponsiveContainer>
             </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Revenue Stream Management</CardTitle>
+            <CardDescription>Configure commission rates and activate/deactivate revenue streams.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
+              <div className="flex-1">
+                <Label htmlFor="marketplace-fee" className="font-semibold">Marketplace Fees</Label>
+                <p className="text-sm text-muted-foreground">Set the commission percentage for each sale on the Address NFT Marketplace.</p>
+              </div>
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="relative flex-grow md:flex-grow-0">
+                  <Input 
+                    id="marketplace-fee"
+                    type="number"
+                    value={marketplaceFee}
+                    onChange={(e) => setMarketplaceFee(parseFloat(e.target.value))}
+                    className="w-full md:w-32 pr-8"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
+                </div>
+                <Switch 
+                  id="marketplace-switch"
+                  checked={isMarketplaceActive}
+                  onCheckedChange={setIsMarketplaceActive}
+                />
+                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
+              </div>
+            </div>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 border rounded-lg gap-4">
+              <div className="flex-1">
+                <Label htmlFor="api-fee" className="font-semibold">API Usage Fees</Label>
+                <p className="text-sm text-muted-foreground">Set the per-call rate for API usage beyond the subscription plan limits.</p>
+              </div>
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                 <div className="relative flex-grow md:flex-grow-0">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input
+                    id="api-fee"
+                    type="number"
+                    value={apiFee}
+                    onChange={(e) => setApiFee(parseFloat(e.target.value))}
+                    step="0.001"
+                    className="w-full md:w-32 pl-7"
+                  />
+                </div>
+                <Switch
+                  id="api-switch"
+                  checked={isApiActive}
+                  onCheckedChange={setIsApiActive}
+                />
+                <Button size="sm"><Save className="mr-2 h-4 w-4"/>Save</Button>
+              </div>
+            </div>
+          </CardContent>
         </Card>
         
         <div className="grid gap-8 md:grid-cols-2">
