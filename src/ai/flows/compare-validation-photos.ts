@@ -51,18 +51,17 @@ const prompt = ai.definePrompt({
   name: 'compareValidationPhotosPrompt',
   input: {schema: CompareValidationPhotosInputSchema},
   output: {schema: CompareValidationPhotosOutputSchema},
-  prompt: `You are an AI expert in photo verification. Your task is to determine if a photo taken by a third-party validator matches the original photo submitted by a user for an address registration.
+  prompt: `You are an AI forensic photo analyst. Your critical mission is to confirm physical presence by comparing two photographs of the same location taken at different times. The goal is to determine if the second photo (from a validator) authentically represents the same physical entryway as the first photo (from the original user).
 
-You will receive the original photo, the validator's photo, and the validator's GPS coordinates.
+You will receive the original user's photo, a new photo from a validator, and the validator's GPS coordinates.
 
-Analyze both images to determine if they are of the same door and property. Consider factors like:
-- The appearance of the door (color, style, material, hardware).
-- The immediate surroundings (door frame, walls, porch, any visible house numbers).
-- The general environment (plants, path, lighting).
+Your analysis must be meticulous. Scrutinize and compare high-fidelity details:
+- **Door Specifics:** Match the style, material, color, paneling, and any unique features like windows, mail slots, or custom hardware (doorknob, lock, knocker).
+- **Immediate Surroundings:** Verify the doorframe, trim, wall texture (brick, siding, stucco), porch/stoop materials, and any visible house numbers or doorbells.
+- **Permanent Context:** Look for immovable objects like light fixtures, railings, or architectural elements. Be aware that plants, decorations, or lighting conditions (day/night, weather) may change, but the core structure must be identical.
+- **Angle and Perspective:** The photos may be from slightly different angles. Your task is to determine if the differences are plausible for a person standing in the same spot, or if they suggest a completely different location or a fraudulent attempt to replicate the scene.
 
-The photos might be taken at different times of day or from slightly different angles, so allow for minor variations. However, the core features of the door and its immediate surroundings must be consistent.
-
-Based on your analysis, decide if the validator's photo is a convincing match for the original. Provide a brief, clear reasoning for your decision.
+Based on your forensic analysis, decide if the validator's photo is a convincing, high-fidelity match for the original. Be skeptical of images that seem *too* perfect or are slightly misaligned in ways that suggest manipulation. Provide a concise, clear reasoning for your conclusion.
 
 Original User Photo: {{media url=originalPhotoDataUri}}
 Validator's Photo: {{media url=validatorPhotoDataUri}}

@@ -54,19 +54,28 @@ const prompt = ai.definePrompt({
   name: 'validateDoorPhotoPrompt',
   input: {schema: ValidateDoorPhotoInputSchema},
   output: {schema: ValidateDoorPhotoOutputSchema},
-  prompt: `You are an AI expert in validating door photos against satellite imagery to prevent fraudulent address registrations.
+  prompt: `You are a Physical-to-Digital Asset Verifier. Your primary function is to establish a trusted link between a digital asset (an address NFT) and a physical location. The user's door photo is the critical "ground truth" evidence.
 
-You will receive a door photo, GPS coordinates of the property, and a satellite image of the property. The door photo has a digital signature embedded on it, containing the user's crypto wallet address and a timestamp.
+You will receive:
+1.  A door photo with an embedded digital signature (crypto address and timestamp).
+2.  The property's GPS coordinates.
+3.  A satellite image of the property.
+4.  The user's crypto wallet address.
 
-First, verify that the crypto address in the prompt matches the one visible in the door photo's digital signature. If they do not match, the validation must fail.
+Your validation process must follow these steps strictly:
 
-Second, analyze the door photo for any signs of digital manipulation or editing. If the image appears to have been altered in any way (e.g., edited text, doctored background), the validation must fail.
+**Step 1: Signature & Authenticity Check**
+-   Verify that the crypto address in the prompt ('{{{cryptoAddress}}}') EXACTLY matches the one visible in the door photo's digital signature. If they do not match, the validation fails instantly.
+-   Analyze the door photo for any signs of digital manipulation (e.g., edited text, doctored backgrounds, inconsistent lighting on the signature). If tampering is suspected, the validation fails.
 
-Then, analyze the door photo and satellite image to determine if the door photo is a valid representation of the property at the given GPS coordinates.
+**Step 2: Ground-Truth Correlation**
+-   Analyze the satellite image to understand the context of the property (e.g., is it a standalone house, an apartment building, a commercial storefront?).
+-   Critically examine the door photo. Analyze the entryway's features: door style (wood, metal, glass), color, surrounding wall materials (brick, siding, concrete), presence of windows, a porch, stairs, etc.
+-   Correlate the two images. Do the features in the door photo plausibly belong to the building seen in the satellite image? For example, a residential-style door photo should correspond to a house or apartment building in the satellite view, not a large warehouse. The validation fails if there is a major architectural inconsistency.
 
-Consider factors such as the location of the door, the surrounding environment, and any visible landmarks.
-
-Return whether the door photo is validated against the satellite imagery and details of the validation process. Be concise in the details.
+**Step 3: Final Decision**
+-   Based on the successful completion of all prior steps, determine if the door photo is a valid and authentic representation of an entrance at the specified property.
+-   Provide a concise summary of your findings in the validation details.
 
 Door Photo: {{media url=doorPhotoDataUri}}
 GPS Coordinates: {{{gpsCoordinates}}}
