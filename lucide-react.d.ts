@@ -53,4 +53,9 @@ declare module 'lucide-react' {
   export const X: Icon;
   export const Globe: Icon;
   export const Save: Icon;
+  export const FileText: Icon;
+  export const History: Icon;
+  export const ShoppingCart: Icon;
+  export const ShieldAlert: Icon;
+  export const Loader2: Icon;
 }
