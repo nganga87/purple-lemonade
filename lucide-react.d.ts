@@ -67,3 +67,4 @@ declare module 'lucide-react' {
   export const Fingerprint: Icon;
   export const ArchiveRestore: Icon;
 }
+

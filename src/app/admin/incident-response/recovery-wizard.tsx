@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import {
   CheckCircle,
+  Fingerprint,
   KeyRound,
   Loader2,
   LocateFixed,
@@ -26,6 +27,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import type { Incident } from './incidents';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 interface RecoveryWizardProps {
   isOpen: boolean;
@@ -36,6 +38,7 @@ interface RecoveryWizardProps {
 
 const steps = [
   { id: 'verify', name: 'Verify Details' },
+  { id: 'identity', name: 'Verify ID' },
   { id: 'contact', name: 'Contact & Successor' },
   { id: 'resolve', name: 'Resolve Incident' },
 ];
@@ -137,24 +140,48 @@ export function RecoveryWizard({
                 <VerificationItem id="userName" label="Registered Owner" value={incident.affectedUser.name} icon={<User />} />
             </div>
           )}
-          {currentStep === 1 && (
+           {currentStep === 1 && (
+            <div className="space-y-4">
+                <h3 className="font-semibold text-lg">Step 2: Identity Document Verification</h3>
+                <p className="text-muted-foreground text-sm">Verify the user's identity by comparing their provided government-issued ID with the information on file.</p>
+                <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label>ID / Passport (Front)</Label>
+                        <Image src="https://placehold.co/300x180.png" width={300} height={180} alt="ID front" className="rounded-lg border shadow-sm w-full" data-ai-hint="id card"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>ID (Back)</Label>
+                        <Image src="https://placehold.co/300x180.png" width={300} height={180} alt="ID back" className="rounded-lg border shadow-sm w-full" data-ai-hint="id card"/>
+                    </div>
+                </div>
+                 <div className="flex items-start gap-4 p-3 rounded-md border bg-secondary/50">
+                    <div className="text-primary mt-1"><Fingerprint /></div>
+                    <div className="flex-1">
+                        <p className="text-sm font-semibold">Confirm Identity</p>
+                        <p className="text-sm text-muted-foreground">Check that the name and photo on the ID match the user's profile and biometric data on file.</p>
+                    </div>
+                    <Checkbox id="identity" checked={verifiedItems['identity']} onCheckedChange={(checked) => handleCheckboxChange('identity', !!checked)} />
+                </div>
+            </div>
+          )}
+          {currentStep === 2 && (
              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Step 2: Dynamic Factor & Successor Verification</h3>
+                <h3 className="font-semibold text-lg">Step 3: Dynamic Factor & Successor Verification</h3>
                 <p className="text-muted-foreground text-sm">Verify the user's linked contact details and the designated successor information. Contact the user if possible.</p>
                 <VerificationItem id="phone" label="Linked Phone Number" value="+1-555-XXX-1234" icon={<Phone />} />
                 <VerificationItem id="successorName" label="Designated Successor" value={incident.successor.name} icon={<UserCheck />} />
                 <VerificationItem id="successorAddress" label="Successor's Wallet Address" value={incident.successor.address} icon={<KeyRound />} />
             </div>
           )}
-          {currentStep === 2 && (
+          {currentStep === 3 && (
              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Step 3: Resolution & Final Actions</h3>
+                <h3 className="font-semibold text-lg">Step 4: Resolution & Final Actions</h3>
                 <p className="text-muted-foreground text-sm">Document the actions taken to resolve this incident. This will be recorded in the address's immutable history.</p>
                  <div className="space-y-2">
                     <Label htmlFor="resolution-notes">Resolution Notes</Label>
                     <Textarea
                         id="resolution-notes"
-                        placeholder="e.g., Verified user identity via video call. Initiated transfer of NFT to the designated successor's wallet address. Reason: Memory Loss..."
+                        placeholder="e.g., Verified user identity via video call and ID check. Initiated transfer of NFT to the designated successor's wallet address. Reason: Memory Loss..."
                         value={resolutionNotes}
                         onChange={(e) => setResolutionNotes(e.target.value)}
                         rows={6}
