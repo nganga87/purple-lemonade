@@ -41,6 +41,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
+import { verifyNftId } from './verify-nft';
+import { useToast } from '@/hooks/use-toast';
 
 const clientSchema = z.object({
   id: z.string().optional(),
@@ -90,6 +92,7 @@ const defaultValues = {
 export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: OnboardingDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [currentTab, setCurrentTab] = useState('company');
+  const { toast } = useToast();
 
   const form = useForm<Client>({
     resolver: zodResolver(clientSchema),
@@ -139,15 +142,40 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
     }
   }
 
-  const onSubmit = (data: Client) => {
+  const onSubmit = async (data: Client) => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      // Step 1: Verify the NFT ID
+      const verificationResult = await verifyNftId(data.billingAddress);
+
+      if (!verificationResult.success) {
+        toast({
+          variant: "destructive",
+          title: "Verification Failed",
+          description: verificationResult.message,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Step 2: Proceed with saving if verification is successful
+      // Simulate API call for saving
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       onSave(data);
-      setIsLoading(false);
       setIsOpen(false);
       setCurrentTab('company');
-    }, 1000);
+
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Onboarding Failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -347,7 +375,7 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
               ) : (
                 <Button type="submit" disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    {client ? 'Save Changes' : 'Submit for Review'}
+                    {isLoading ? 'Verifying...' : client ? 'Save Changes' : 'Submit for Review'}
                 </Button>
               )}
             </DialogFooter>
