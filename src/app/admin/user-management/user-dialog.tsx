@@ -38,6 +38,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { countries } from '@/lib/countries';
+import { verifyNftId } from '@/lib/verify-nft';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -95,12 +96,40 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
 
   const onSubmit = async (data: AdminUser) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    onSave(data);
-    setIsOpen(false);
-    setIsLoading(false);
+    try {
+      if (data.homeAddress) {
+        const verificationResult = await verifyNftId(data.homeAddress);
+        if (!verificationResult.success) {
+          toast({ variant: "destructive", title: "Home Address Verification Failed", description: verificationResult.message });
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (data.workAddress) {
+        const verificationResult = await verifyNftId(data.workAddress);
+        if (!verificationResult.success) {
+          toast({ variant: "destructive", title: "Work Address Verification Failed", description: verificationResult.message });
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      onSave(data);
+      setIsOpen(false);
+    } catch (error) {
+       toast({
+        variant: "destructive",
+        title: "Submission Failed",
+        description: "An unexpected error occurred during verification.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const handlePaste = async (fieldName: 'homeAddress' | 'workAddress') => {
@@ -384,7 +413,7 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={isLoading}>
                   {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                  {user ? 'Save Changes' : 'Add User'}
+                  {isLoading ? 'Verifying...' : user ? 'Save Changes' : 'Add User'}
               </Button>
             </DialogFooter>
           </form>

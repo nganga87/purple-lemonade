@@ -41,7 +41,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
-import { verifyNftId } from './verify-nft';
+import { verifyNftId } from '@/lib/verify-nft';
 import { useToast } from '@/hooks/use-toast';
 
 const clientSchema = z.object({
