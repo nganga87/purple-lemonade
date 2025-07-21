@@ -40,7 +40,7 @@ import {
   DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Logo } from '@/components/ui/logo';
+import { Logo } from '@/components/icons';
 import {
   Table,
   TableBody,
