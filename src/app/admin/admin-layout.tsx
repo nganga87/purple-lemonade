@@ -87,10 +87,12 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
                  </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <DollarSign />
-                  Monetization
-                </SidebarMenuButton>
+                 <Link href="/admin/monetization">
+                    <SidebarMenuButton isActive={active === 'monetization'}>
+                        <DollarSign />
+                        Monetization
+                    </SidebarMenuButton>
+                 </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
