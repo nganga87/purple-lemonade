@@ -63,4 +63,5 @@ declare module 'lucide-react' {
   export const DollarSign: Icon;
   export const ArrowUpRight: Icon;
   export const Phone: Icon;
+  export const Calendar: Icon;
 }

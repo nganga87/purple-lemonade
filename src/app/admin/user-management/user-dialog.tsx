@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { format } from "date-fns"
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,12 +33,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Mail, User, Briefcase, Phone, Home, Globe } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, Home, Globe, Calendar as CalendarIcon, UserPlus } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { countries } from '@/lib/countries';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -51,6 +55,8 @@ const userSchema = z.object({
   homeAddress: z.string().optional(),
   workAddress: z.string().optional(),
   workCountry: z.string().optional(),
+  dateOfBirth: z.date().optional(),
+  gender: z.string().optional(),
 });
 
 export type AdminUser = z.infer<typeof userSchema>;
@@ -62,7 +68,7 @@ interface UserDialogProps {
   user: AdminUser | null;
 }
 
-const defaultValues: AdminUser = {
+const defaultValues: Omit<AdminUser, 'id'> = {
   name: '',
   email: '',
   role: 'support-agent',
@@ -73,6 +79,7 @@ const defaultValues: AdminUser = {
   homeAddress: '',
   workAddress: '',
   workCountry: '',
+  gender: '',
 };
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
@@ -81,11 +88,11 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
 
   const form = useForm<AdminUser>({
     resolver: zodResolver(userSchema),
-    defaultValues: user || defaultValues,
+    defaultValues: user ? { ...user, dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : undefined } : defaultValues,
   });
 
   useEffect(() => {
-    form.reset(user || defaultValues);
+    form.reset(user ? { ...user, dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth) : undefined } : defaultValues);
   }, [user, form, isOpen]);
 
 
@@ -218,6 +225,72 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                       </FormItem>
                     )}
                   />
+                   <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="dateOfBirth"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Date of birth</FormLabel>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                    "pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value ? (
+                                    format(field.value, "PPP")
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date > new Date() || date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Gender</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select..." />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                              <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                   </div>
                   <FormField
                     control={form.control}
                     name="phone"
