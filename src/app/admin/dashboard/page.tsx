@@ -22,13 +22,11 @@ import {
   Bell,
   UserCircle,
   LogOut,
-  Wallet,
   MoreHorizontal,
   DollarSign,
-  ArrowUpRight,
   ShieldCheck,
+  Briefcase,
 } from 'lucide-react';
-import { Briefcase, Building } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -324,3 +322,5 @@ export default function AdminDashboardPage() {
     </SidebarProvider>
   );
 }
+
+    
