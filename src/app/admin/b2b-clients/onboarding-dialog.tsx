@@ -34,11 +34,13 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2 } from 'lucide-react';
+import { Loader2, KeyRound } from 'lucide-react';
 import { pricingPlans } from '../pricing-data';
 import { countries } from '@/lib/countries';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Link from 'next/link';
 
 const clientSchema = z.object({
   id: z.string().optional(),
@@ -52,7 +54,7 @@ const clientSchema = z.object({
   contactName: z.string().min(1, 'Contact name is required.'),
   contactEmail: z.string().email('Please enter a valid email for the contact.'),
   
-  billingAddress: z.string().min(1, 'Billing address is required.'),
+  billingAddress: z.string().min(1, 'Digital Address NFT ID is required.').startsWith('0x', { message: "Must be a valid blockchain address starting with 0x"}),
   bankName: z.string().min(1, 'Bank name is required.'),
   bankAccountNumber: z.string().min(1, 'Bank account number is required.'),
 
@@ -295,10 +297,21 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
                     )} />
                 </TabsContent>
                 <TabsContent value="billing" className="space-y-4">
+                    <Alert>
+                        <AlertTitle>Billing Address Requirement</AlertTitle>
+                        <AlertDescription>
+                            The client must have a registered Digital Address for billing. Ask the client to provide their verified Address NFT ID. If they don't have one, they must register one first.
+                        </AlertDescription>
+                    </Alert>
                     <FormField control={form.control} name="billingAddress" render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Billing Address</FormLabel>
-                        <FormControl><Textarea placeholder="Enter full billing address" {...field} /></FormControl>
+                        <FormLabel>Digital Address NFT ID</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input placeholder="0x..." {...field} className="pl-10 font-mono" />
+                            </div>
+                         </FormControl>
                         <FormMessage />
                         </FormItem>
                     )} />
