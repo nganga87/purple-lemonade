@@ -35,6 +35,7 @@ import {
   Trash2,
   Users,
   CandlestickChart,
+  Check,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -123,6 +124,7 @@ export default function MyAddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses.find(a => a.isPrimary) || addresses[0] || null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const { toast } = useToast();
 
   const handleAddressSelect = (addressId: string) => {
@@ -178,6 +180,13 @@ export default function MyAddressesPage() {
         description: errorMessage,
       });
     }
+  };
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000); // Revert after 2 seconds
+    });
   };
 
 
@@ -397,8 +406,13 @@ export default function MyAddressesPage() {
                             <h3 className="font-semibold">Address NFT ID</h3>
                             <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
                               <p className="truncate">{selectedAddress.nftId}</p>
-                              <Button variant="ghost" size="icon" className="h-7 w-7">
-                                <Copy className="h-4 w-4" />
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => handleCopy(selectedAddress.nftId)}
+                              >
+                                {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                               </Button>
                             </div>
                           </div>

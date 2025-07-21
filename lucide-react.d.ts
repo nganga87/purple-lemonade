@@ -54,5 +54,3 @@ declare module 'lucide-react' {
   export const Globe: Icon;
   export const Save: Icon;
 }
-
-    
