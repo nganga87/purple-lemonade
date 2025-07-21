@@ -31,13 +31,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, ShieldCheck } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { countries } from '@/lib/countries';
 import { verifyNftId } from '@/lib/verify-nft';
+import { portals } from './portals';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -53,6 +56,7 @@ const userSchema = z.object({
   workCountry: z.string().optional(),
   dateOfBirth: z.string().optional(),
   gender: z.string().optional(),
+  permissions: z.array(z.string()).optional(),
 });
 
 export type AdminUser = z.infer<typeof userSchema>;
@@ -77,6 +81,7 @@ const defaultValues: Omit<AdminUser, 'id'> = {
   workCountry: '',
   gender: '',
   dateOfBirth: '',
+  permissions: [],
 };
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
@@ -160,10 +165,11 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Tabs defaultValue="account">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="account">Account</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="location">Location</TabsTrigger>
+                <TabsTrigger value="permissions">Permissions</TabsTrigger>
               </TabsList>
               <div className="py-4 max-h-[50vh] overflow-y-auto px-1">
                 <TabsContent value="account" className="space-y-4">
@@ -424,6 +430,62 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                             </Button>
                         </div>
                         <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                 <TabsContent value="permissions">
+                  <FormField
+                    control={form.control}
+                    name="permissions"
+                    render={() => (
+                      <FormItem>
+                        <div className="mb-4">
+                          <FormLabel className="text-base">Portal Access</FormLabel>
+                          <FormDescription>
+                            Select which admin portals this user can access.
+                          </FormDescription>
+                        </div>
+                        <div className="space-y-4">
+                          {portals.map((portal) => (
+                            <FormField
+                              key={portal.id}
+                              control={form.control}
+                              name="permissions"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={portal.id}
+                                    className="flex flex-row items-center justify-between rounded-lg border p-4"
+                                  >
+                                    <div className="space-y-0.5">
+                                      <FormLabel className="text-sm font-medium">
+                                        {portal.name}
+                                      </FormLabel>
+                                      <FormDescription>
+                                        {portal.description}
+                                      </FormDescription>
+                                    </div>
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(portal.id)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...(field.value || []), portal.id])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                  (value) => value !== portal.id
+                                                )
+                                              )
+                                        }}
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          ))}
+                        </div>
                       </FormItem>
                     )}
                   />
