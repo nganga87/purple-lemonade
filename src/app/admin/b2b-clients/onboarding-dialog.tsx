@@ -174,20 +174,9 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Company Name</FormLabel>
-                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a company or type to add..." />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Global Logistics">Global Logistics</SelectItem>
-                            <SelectItem value="E-Shop Now">E-Shop Now</SelectItem>
-                            <SelectItem value="Quick Couriers">Quick Couriers</SelectItem>
-                            <SelectItem value="Innovate Tech">Innovate Tech</SelectItem>
-                            <SelectItem value="Sunrise Foods">Sunrise Foods</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <Input placeholder="Enter company name..." {...field} />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
