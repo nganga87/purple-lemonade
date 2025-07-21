@@ -393,5 +393,3 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
     </Dialog>
   );
 }
-
-    
