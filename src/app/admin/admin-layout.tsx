@@ -75,10 +75,12 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
                  </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                 <SidebarMenuButton href="#" disabled>
-                  <Users />
-                  User Management
-                </SidebarMenuButton>
+                 <Link href="/admin/user-management">
+                  <SidebarMenuButton isActive={active === 'users'}>
+                    <Users />
+                    User Management
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Link href="/admin/b2b-clients">
