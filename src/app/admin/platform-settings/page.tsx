@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { AdminLayout } from '../admin-layout';
 import {
   Card,
@@ -23,9 +23,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PlatformSettingsPage() {
+  const { toast } = useToast();
+  
+  // State for Domain & DNS settings
+  const [domainRegistrar, setDomainRegistrar] = useState('Namecheap');
+  const [domainExpiry, setDomainExpiry] = useState('2025-10-26');
+  const [dnsProvider, setDnsProvider] = useState('Cloudflare');
+  const [paymentMethod, setPaymentMethod] = useState('Corporate Visa **** 1234');
+
+  const handleSaveDomainSettings = () => {
+    // In a real app, you would send this data to a secure backend.
+    console.log('Saving Domain Settings:', { domainRegistrar, domainExpiry, dnsProvider, paymentMethod });
+    toast({
+      title: 'Settings Saved',
+      description: 'Domain & DNS settings have been updated.',
+    });
+  };
+
   return (
     <AdminLayout active="platform-settings">
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
@@ -168,27 +185,46 @@ export default function PlatformSettingsPage() {
                   <h4 className="font-semibold text-muted-foreground">Domain Details</h4>
                   <div className="space-y-2">
                     <Label htmlFor="domain-registrar">Domain Registrar</Label>
-                    <Input id="domain-registrar" defaultValue="Namecheap" placeholder="e.g., Google Domains"/>
+                    <Input 
+                      id="domain-registrar" 
+                      value={domainRegistrar}
+                      onChange={(e) => setDomainRegistrar(e.target.value)}
+                      placeholder="e.g., Google Domains"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="domain-expiry">Domain Expiry Date</Label>
-                    <Input id="domain-expiry" type="date" defaultValue="2025-10-26"/>
+                    <Input 
+                      id="domain-expiry" 
+                      type="date" 
+                      value={domainExpiry}
+                      onChange={(e) => setDomainExpiry(e.target.value)}
+                    />
                   </div>
                </div>
                <div className="space-y-4">
-                  <h4 className="font-semibold text-muted-foreground">Payment Details</h4>
+                  <h4 className="font-semibold text-muted-foreground">Provider Details</h4>
                    <div className="space-y-2">
                     <Label htmlFor="dns-provider">DNS Provider</Label>
-                    <Input id="dns-provider" defaultValue="Cloudflare" placeholder="e.g., AWS Route 53"/>
+                    <Input 
+                      id="dns-provider" 
+                      value={dnsProvider}
+                      onChange={(e) => setDnsProvider(e.target.value)}
+                      placeholder="e.g., AWS Route 53"
+                    />
                   </div>
                    <div className="space-y-2">
                     <Label htmlFor="payment-method">Payment Method</Label>
-                    <Input id="payment-method" defaultValue="Corporate Visa **** 1234"/>
+                    <Input 
+                      id="payment-method" 
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
                   </div>
                </div>
             </CardContent>
             <CardFooter>
-              <Button>
+              <Button onClick={handleSaveDomainSettings}>
                 <Save className="mr-2 h-4 w-4" /> Save Domain Settings
               </Button>
             </CardFooter>
