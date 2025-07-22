@@ -46,8 +46,7 @@ const addresses = [
 ];
 
 
-export default function ResolveAddressPage({ params }: { params: { nftId: string } }) {
-  const nftId = params.nftId;
+export default function ResolveAddressPage({ params: { nftId } }: { params: { nftId: string } }) {
   const addressDetails = addresses.find(addr => addr.nftId.toLowerCase() === nftId.toLowerCase());
   const [isCopied, setIsCopied] = useState(false);
   const { toast } = useToast();
