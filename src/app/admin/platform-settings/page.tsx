@@ -152,6 +152,47 @@ export default function PlatformSettingsPage() {
               </Button>
             </CardFooter>
           </Card>
+
+          {/* Domain & DNS Card */}
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LinkIcon className="h-5 w-5" /> Domain & DNS Management
+              </CardTitle>
+              <CardDescription>
+                Manage domain registrar and DNS provider details.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-2 gap-6">
+               <div className="space-y-4">
+                  <h4 className="font-semibold text-muted-foreground">Domain Details</h4>
+                  <div className="space-y-2">
+                    <Label htmlFor="domain-registrar">Domain Registrar</Label>
+                    <Input id="domain-registrar" defaultValue="Namecheap" placeholder="e.g., Google Domains"/>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="domain-expiry">Domain Expiry Date</Label>
+                    <Input id="domain-expiry" type="date" defaultValue="2025-10-26"/>
+                  </div>
+               </div>
+               <div className="space-y-4">
+                  <h4 className="font-semibold text-muted-foreground">Payment Details</h4>
+                   <div className="space-y-2">
+                    <Label htmlFor="dns-provider">DNS Provider</Label>
+                    <Input id="dns-provider" defaultValue="Cloudflare" placeholder="e.g., AWS Route 53"/>
+                  </div>
+                   <div className="space-y-2">
+                    <Label htmlFor="payment-method">Payment Method</Label>
+                    <Input id="payment-method" defaultValue="Corporate Visa **** 1234"/>
+                  </div>
+               </div>
+            </CardContent>
+            <CardFooter>
+              <Button>
+                <Save className="mr-2 h-4 w-4" /> Save Domain Settings
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       </main>
     </AdminLayout>
