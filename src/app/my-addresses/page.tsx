@@ -37,6 +37,7 @@ import {
   ArchiveRestore,
   ShieldAlert,
   FileText,
+  Link as LinkIcon,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -210,6 +211,22 @@ export default function MyAddressesPage() {
      });
      setActionDialog(null);
   }
+
+  const handleGetDirections = () => {
+    if (!selectedAddress || !selectedAddress.gps) return;
+    try {
+        const cleanedGps = selectedAddress.gps.replace(/[°N°W°S°E\s]/g, '');
+        const [lat, lng] = cleanedGps.split(',');
+        if (lat && lng) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            window.open(url, '_blank', 'noopener,noreferrer');
+        } else {
+             toast({ variant: 'destructive', title: 'Invalid GPS Format' });
+        }
+    } catch (error) {
+        toast({ variant: 'destructive', title: 'Could not open maps' });
+    }
+  };
 
   const getStatusBadge = (status: Address['status']) => {
     switch (status) {
@@ -474,6 +491,10 @@ export default function MyAddressesPage() {
                                             <h3 className="font-semibold">GPS Coordinates</h3>
                                             <p className="text-muted-foreground">{selectedAddress.gps}</p>
                                         </div>
+                                        <Button variant="outline" size="sm" onClick={handleGetDirections} disabled={!selectedAddress.gps}>
+                                          <LinkIcon className="mr-2 h-4 w-4"/>
+                                          Get Directions
+                                        </Button>
                                     </div>
                                     <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
                                     <div className="p-2 bg-white rounded-lg shadow-md">
