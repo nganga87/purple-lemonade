@@ -1,13 +1,26 @@
-import { ArrowRight, KeyRound, Mail } from 'lucide-react';
+
+'use client';
+
+import React, { useState } from 'react';
+import { ArrowRight, KeyRound, Mail, Search } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
+  const [nftId, setNftId] = useState('');
+  const router = useRouter();
+
+  const handleResolve = () => {
+    if (nftId.trim()) {
+      router.push(`/resolve/${nftId.trim()}`);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background font-body">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -29,7 +42,7 @@ export default function LandingPage() {
 
       <main className="flex-1">
         <section className="container grid lg:grid-cols-2 gap-12 lg:gap-20 items-center py-12 md:py-24 lg:py-32">
-          <div className="flex flex-col items-start gap-6">
+          <div className="flex flex-col items-start gap-8">
             <h1 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
               Your Place, Your Pin, Your Proof.
             </h1>
@@ -38,25 +51,58 @@ export default function LandingPage() {
               physical addresses using the power of AI and blockchain technology.
               Prevent fraud, streamline deliveries, and own your address like never before.
             </p>
-            <div className="w-full max-w-md space-y-4">
-              <p className="font-semibold">Get started now:</p>
-              <div className="grid gap-2">
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    type="email"
-                    placeholder="Enter your email address"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-                <Link href="/register">
-                  <Button className="w-full">
-                    Create My Digital Address
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
+            <div className="w-full max-w-md space-y-6">
+               <Card className="bg-secondary/50">
+                <CardHeader>
+                    <CardTitle className="font-headline">Create Your Address</CardTitle>
+                    <CardDescription>Get started now by creating your own secure Digital Address.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-2">
+                        <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                            type="email"
+                            placeholder="Enter your email address"
+                            className="pl-10"
+                            required
+                        />
+                        </div>
+                        <Link href="/register">
+                        <Button className="w-full">
+                            Create My Digital Address
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                        </Link>
+                    </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Find a Digital Address</CardTitle>
+                    <CardDescription>Paste an NFT ID to resolve its physical location and get directions.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-2">
+                        <div className="relative">
+                            <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                                type="text"
+                                placeholder="0x..."
+                                className="pl-10 font-mono"
+                                value={nftId}
+                                onChange={(e) => setNftId(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleResolve()}
+                            />
+                        </div>
+                        <Button variant="outline" className="w-full" onClick={handleResolve}>
+                            <Search className="mr-2 h-4 w-4" />
+                            Resolve Address
+                        </Button>
+                    </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
           <div className="relative w-full h-full min-h-[400px]">
