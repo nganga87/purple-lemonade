@@ -72,7 +72,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -134,6 +133,7 @@ export default function MyAddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses.find(a => a.isPrimary) || addresses[0] || null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [actionDialog, setActionDialog] = useState<'archive' | 'incident' | null>(null);
 
@@ -497,13 +497,37 @@ export default function MyAddressesPage() {
                                         </Button>
                                     </div>
                                     <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
-                                    <div className="p-2 bg-white rounded-lg shadow-md">
-                                        <Image src="https://placehold.co/120x120.png" alt="QR Code" width={120} height={120} data-ai-hint="qr code"/>
-                                    </div>
-                                    <Button variant="outline" size="sm" className="mt-4">
-                                        <QrCode className="mr-2 h-4 w-4" />
-                                        Show QR
-                                    </Button>
+                                    <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+                                      <DialogTrigger asChild>
+                                        <div className="flex flex-col items-center cursor-pointer">
+                                          <div className="p-2 bg-white rounded-lg shadow-md">
+                                              <Image src="https://placehold.co/120x120.png" alt="QR Code" width={120} height={120} data-ai-hint="qr code"/>
+                                          </div>
+                                          <Button variant="outline" size="sm" className="mt-4">
+                                              <QrCode className="mr-2 h-4 w-4" />
+                                              Show QR
+                                          </Button>
+                                        </div>
+                                      </DialogTrigger>
+                                      <DialogContent className="sm:max-w-md">
+                                          <DialogHeader>
+                                          <DialogTitle>Scan QR Code</DialogTitle>
+                                          <DialogDescription>
+                                              Scan this code for quick access to the address details.
+                                          </DialogDescription>
+                                          </DialogHeader>
+                                          <div className="flex flex-col items-center justify-center p-4">
+                                              <div className="p-4 bg-white rounded-lg shadow-md">
+                                                  <Image src="https://placehold.co/256x256.png" alt="QR Code" width={256} height={256} data-ai-hint="qr code" />
+                                              </div>
+                                              <div className="text-center mt-4">
+                                                  <p className="font-semibold">{selectedAddress.name}</p>
+                                                  <p className="text-sm text-muted-foreground">{selectedAddress.address}</p>
+                                                  <p className="text-xs font-mono text-muted-foreground mt-2">{selectedAddress.nftId}</p>
+                                              </div>
+                                          </div>
+                                      </DialogContent>
+                                    </Dialog>
                                     </div>
                                 </CardContent>
                             </TabsContent>
