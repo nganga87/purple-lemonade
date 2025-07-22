@@ -46,7 +46,8 @@ const addresses = [
 ];
 
 
-export default function ResolveAddressPage({ params: { nftId } }: { params: { nftId: string } }) {
+export default function ResolveAddressPage({ params }: { params: { nftId: string } }) {
+  const { nftId } = params;
   const addressDetails = addresses.find(addr => addr.nftId.toLowerCase() === nftId.toLowerCase());
   const [isCopied, setIsCopied] = useState(false);
   const { toast } = useToast();
@@ -111,9 +112,14 @@ export default function ResolveAddressPage({ params: { nftId } }: { params: { nf
                 <p className="pl-8 text-lg font-medium text-foreground">{addressDetails.address}</p>
               </div>
               <div className="space-y-1 rounded-md border bg-background p-4">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <KeyRound className="h-5 w-5" />
-                  <span className="text-sm font-semibold">Digital Address NFT ID</span>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                    <KeyRound className="h-5 w-5" />
+                    <span className="text-sm font-semibold">Digital Address NFT ID</span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopy(addressDetails.nftId, 'NFT ID')}>
+                        <Copy className="h-4 w-4" />
+                    </Button>
                 </div>
                 <p className="pl-8 font-mono text-sm text-foreground break-all">{addressDetails.nftId}</p>
               </div>
