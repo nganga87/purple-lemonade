@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, KeyRound, Mail, Search } from 'lucide-react';
+import { ArrowRight, KeyRound, Mail, Search, Copy } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,14 +10,35 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 export default function LandingPage() {
   const [nftId, setNftId] = useState('');
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleResolve = () => {
     if (nftId.trim()) {
       router.push(`/resolve/${nftId.trim()}`);
+    }
+  };
+
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) {
+        setNftId(text);
+        toast({
+          title: 'Pasted from clipboard!',
+          description: 'The address has been pasted into the input field.',
+        });
+      }
+    } catch (err) {
+      toast({
+        variant: 'destructive',
+        title: 'Paste Failed',
+        description: 'Could not read from clipboard. Please check browser permissions.',
+      });
     }
   };
 
@@ -96,10 +117,15 @@ export default function LandingPage() {
                                 onKeyDown={(e) => e.key === 'Enter' && handleResolve()}
                             />
                         </div>
-                        <Button variant="outline" className="w-full" onClick={handleResolve}>
-                            <Search className="mr-2 h-4 w-4" />
-                            Resolve Address
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button variant="outline" className="w-full" onClick={handleResolve}>
+                                <Search className="mr-2 h-4 w-4" />
+                                Resolve Address
+                            </Button>
+                             <Button type="button" variant="outline" size="icon" onClick={handlePaste} aria-label="Paste Address">
+                                <Copy className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
               </Card>
