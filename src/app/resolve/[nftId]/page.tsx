@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Logo } from '@/components/icons';
-import { MapPin, KeyRound, CheckCircle, Copy, Check } from 'lucide-react';
+import { MapPin, KeyRound, CheckCircle, Copy, Check, LocateFixed } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 // Mock data store. In a real application, you would fetch this from a database.
@@ -47,9 +47,9 @@ const addresses = [
 
 
 export default function ResolveAddressPage({ params }: { params: { nftId: string } }) {
-  const { nftId } = params;
+  const nftId = params.nftId;
   const addressDetails = addresses.find(addr => addr.nftId.toLowerCase() === nftId.toLowerCase());
-  const [isCopied, setIsCopied] = useState(false);
+  const [copiedItem, setCopiedItem] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleGetDirections = () => {
@@ -66,14 +66,14 @@ export default function ResolveAddressPage({ params }: { params: { nftId: string
     }
   };
 
-  const handleCopy = (text: string, type: 'Address' | 'NFT ID') => {
+  const handleCopy = (text: string, type: 'Address' | 'NFT ID' | 'GPS') => {
     navigator.clipboard.writeText(text).then(() => {
-      setIsCopied(true);
+      setCopiedItem(type);
       toast({
         title: `${type} Copied!`,
         description: `The ${type.toLowerCase()} has been copied to your clipboard.`,
       });
-      setTimeout(() => setIsCopied(false), 2000); // Revert after 2 seconds
+      setTimeout(() => setCopiedItem(null), 2000); // Revert after 2 seconds
     });
   };
 
@@ -99,17 +99,27 @@ export default function ResolveAddressPage({ params }: { params: { nftId: string
               <CardDescription>This address has been verified on the Digital Address platform.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-1 rounded-md border bg-background p-4">
+              <div className="space-y-4 rounded-md border bg-background p-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 text-muted-foreground">
                       <MapPin className="h-5 w-5" />
                       <span className="text-sm font-semibold">Physical Address</span>
                     </div>
                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopy(addressDetails.address, 'Address')}>
-                        {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        {copiedItem === 'Address' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                      </Button>
                 </div>
                 <p className="pl-8 text-lg font-medium text-foreground">{addressDetails.address}</p>
+                <div className="pl-8 flex gap-2 pt-2">
+                    <Button onClick={handleGetDirections} size="sm">
+                        <MapPin className="mr-2 h-4 w-4"/>
+                        Get Directions
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={() => handleCopy(addressDetails.gps, 'GPS')}>
+                         {copiedItem === 'GPS' ? <Check className="mr-2 h-4 w-4 text-green-500" /> : <LocateFixed className="mr-2 h-4 w-4" />}
+                        Copy GPS
+                    </Button>
+                </div>
               </div>
               <div className="space-y-1 rounded-md border bg-background p-4">
                 <div className="flex items-center justify-between">
@@ -118,17 +128,12 @@ export default function ResolveAddressPage({ params }: { params: { nftId: string
                     <span className="text-sm font-semibold">Digital Address NFT ID</span>
                     </div>
                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopy(addressDetails.nftId, 'NFT ID')}>
-                        <Copy className="h-4 w-4" />
+                         {copiedItem === 'NFT ID' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                     </Button>
                 </div>
                 <p className="pl-8 font-mono text-sm text-foreground break-all">{addressDetails.nftId}</p>
               </div>
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleGetDirections} className="w-full" size="lg">
-                Get Directions on Google Maps
-              </Button>
-            </CardFooter>
           </>
         ) : (
           <>
