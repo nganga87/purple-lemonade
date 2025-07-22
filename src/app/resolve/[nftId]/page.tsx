@@ -46,7 +46,7 @@ const addresses = [
 
 
 export default function ResolveAddressPage({ params }: { params: { nftId: string } }) {
-  const { nftId } = params;
+  const nftId = params.nftId;
   const addressDetails = addresses.find(addr => addr.nftId.toLowerCase() === nftId.toLowerCase());
 
   const handleGetDirections = () => {
