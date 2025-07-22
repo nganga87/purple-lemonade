@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Logo } from '@/components/icons';
 import { MapPin, KeyRound, CheckCircle, Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -118,10 +118,12 @@ export default function ResolveAddressPage({ params }: { params: { nftId: string
                 </div>
                 <p className="pl-8 font-mono text-sm text-foreground break-all">{addressDetails.nftId}</p>
               </div>
+            </CardContent>
+            <CardFooter>
               <Button onClick={handleGetDirections} className="w-full" size="lg">
                 Get Directions on Google Maps
               </Button>
-            </CardContent>
+            </CardFooter>
           </>
         ) : (
           <>
