@@ -27,6 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { countries, type Country } from '@/lib/countries';
 import Link from 'next/link';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
@@ -37,6 +38,9 @@ const formSchema = z.object({
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   physicalAddress: z.string().min(1, 'Physical address is required.'),
   doorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
+  terms: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions to proceed.",
+  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -142,10 +146,11 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       idNumber: '',
       gpsCoordinates: '',
       physicalAddress: '',
+      terms: false,
     },
   });
 
-  const { watch, setValue, reset, getValues } = form;
+  const { watch, setValue, reset, getValues, formState: { isValid } } = form;
   const countryCode = watch('country');
   const gpsCoordinates = watch('gpsCoordinates');
   const physicalAddress = watch('physicalAddress');
@@ -153,6 +158,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const addressName = watch('addressName');
   const titleDeedNumber = watch('titleDeedNumber');
   const idNumber = watch('idNumber');
+  const terms = watch('terms');
 
   useEffect(() => {
     try {
@@ -160,7 +166,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       if (savedData) {
         const parsedData:Partial<FormValues> = JSON.parse(savedData);
         // We don't restore the file input, but we restore the text fields
-        const { doorPhoto, ...restOfData } = parsedData;
+        const { doorPhoto, terms, ...restOfData } = parsedData;
         reset(restOfData);
         toast({
           title: "Draft Loaded",
@@ -724,7 +730,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                   />
                 </div>
 
-                {isDataReadyForReview && !isFormReadOnly && (
+                {(isDataReadyForReview || isFormReadOnly) && (
                   <div className="border-t pt-6 space-y-4">
                       <h3 className="text-lg font-medium flex items-center gap-2"><Eye className="h-5 w-5"/> Review Your Data</h3>
                       <div className="p-4 rounded-lg bg-secondary space-y-3 text-sm">
@@ -759,6 +765,33 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                       </div>
                   </div>
                 )}
+                 {!isFormReadOnly && (
+                    <FormField
+                        control={form.control}
+                        name="terms"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 mt-6 shadow-sm">
+                            <FormControl>
+                                <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                                <FormLabel>
+                                Agree to terms and conditions
+                                </FormLabel>
+                                <FormDescription>
+                                Your data is secure. Only your generated digital address is shared with companies you authorize. By proceeding, you agree to our{' '}
+                                <Link href="/terms" className="underline hover:text-primary">Terms of Service</Link> and{' '}
+                                <Link href="/privacy" className="underline hover:text-primary">Privacy Policy</Link>.
+                                </FormDescription>
+                                <FormMessage />
+                            </div>
+                            </FormItem>
+                        )}
+                        />
+                 )}
               </CardContent>
               {!isFormReadOnly && (
                 <CardFooter className="flex justify-between items-center">
@@ -766,7 +799,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                     <Save className="mr-2 h-4 w-4" />
                     Save for Later
                   </Button>
-                  <Button type="submit" disabled={isLoading || !isDataReadyForReview}>
+                  <Button type="submit" disabled={isLoading || !isValid}>
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
