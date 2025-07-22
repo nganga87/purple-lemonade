@@ -240,6 +240,10 @@ export default function MyAddressesPage() {
         return <Badge variant="secondary">{status}</Badge>;
     }
   }
+  
+  const getQrCodeUrl = (data: string, size: number) => {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
+  }
 
   return (
     <SidebarProvider>
@@ -501,7 +505,7 @@ export default function MyAddressesPage() {
                                       <DialogTrigger asChild>
                                         <div className="flex flex-col items-center cursor-pointer">
                                           <div className="p-2 bg-white rounded-lg shadow-md">
-                                              <Image src="https://placehold.co/120x120.png" alt="QR Code" width={120} height={120} data-ai-hint="qr code"/>
+                                              <Image src={getQrCodeUrl(selectedAddress.nftId, 120)} alt="QR Code" width={120} height={120} data-ai-hint="qr code"/>
                                           </div>
                                           <Button variant="outline" size="sm" className="mt-4">
                                               <QrCode className="mr-2 h-4 w-4" />
@@ -518,7 +522,7 @@ export default function MyAddressesPage() {
                                           </DialogHeader>
                                           <div className="flex flex-col items-center justify-center p-4">
                                               <div className="p-4 bg-white rounded-lg shadow-md">
-                                                  <Image src="https://placehold.co/256x256.png" alt="QR Code" width={256} height={256} data-ai-hint="qr code" />
+                                                  <Image src={getQrCodeUrl(selectedAddress.nftId, 256)} alt="QR Code" width={256} height={256} data-ai-hint="qr code" />
                                               </div>
                                               <div className="text-center mt-4">
                                                   <p className="font-semibold">{selectedAddress.name}</p>
