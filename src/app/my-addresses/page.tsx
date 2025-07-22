@@ -72,6 +72,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogTrigger,
+  DialogFooter
 } from "@/components/ui/dialog"
 import {
   AlertDialog,
@@ -244,6 +245,31 @@ export default function MyAddressesPage() {
   const getQrCodeUrl = (data: string, size: number) => {
     return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
   }
+
+  const handleCopyQr = async () => {
+    if (!selectedAddress) return;
+    try {
+      const imageUrl = getQrCodeUrl(selectedAddress.nftId, 256);
+      const data = await fetch(imageUrl);
+      const blob = await data.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob,
+        }),
+      ]);
+      toast({
+        title: "QR Code Copied",
+        description: "The QR code image has been copied to your clipboard.",
+      });
+    } catch (err) {
+      console.error('Failed to copy QR code: ', err);
+      toast({
+        variant: "destructive",
+        title: "Copy Failed",
+        description: "Could not copy the QR code image.",
+      });
+    }
+  };
 
   return (
     <SidebarProvider>
@@ -530,6 +556,12 @@ export default function MyAddressesPage() {
                                                   <p className="text-xs font-mono text-muted-foreground mt-2">{selectedAddress.nftId}</p>
                                               </div>
                                           </div>
+                                           <DialogFooter>
+                                            <Button onClick={handleCopyQr} className="w-full">
+                                              <Copy className="mr-2 h-4 w-4" />
+                                              Copy Image
+                                            </Button>
+                                          </DialogFooter>
                                       </DialogContent>
                                     </Dialog>
                                     </div>
