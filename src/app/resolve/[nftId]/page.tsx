@@ -1,12 +1,13 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Logo } from '@/components/icons';
-import { MapPin, KeyRound, CheckCircle } from 'lucide-react';
+import { MapPin, KeyRound, CheckCircle, Copy, Check } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock data store. In a real application, you would fetch this from a database.
 const addresses = [
@@ -48,6 +49,8 @@ const addresses = [
 export default function ResolveAddressPage({ params }: { params: { nftId: string } }) {
   const nftId = params.nftId;
   const addressDetails = addresses.find(addr => addr.nftId.toLowerCase() === nftId.toLowerCase());
+  const [isCopied, setIsCopied] = useState(false);
+  const { toast } = useToast();
 
   const handleGetDirections = () => {
     if (!addressDetails || !addressDetails.gps) return;
@@ -61,6 +64,17 @@ export default function ResolveAddressPage({ params }: { params: { nftId: string
     } catch (error) {
         console.error('Could not open maps', error);
     }
+  };
+
+  const handleCopy = (text: string, type: 'Address' | 'NFT ID') => {
+    navigator.clipboard.writeText(text).then(() => {
+      setIsCopied(true);
+      toast({
+        title: `${type} Copied!`,
+        description: `The ${type.toLowerCase()} has been copied to your clipboard.`,
+      });
+      setTimeout(() => setIsCopied(false), 2000); // Revert after 2 seconds
+    });
   };
 
   return (
@@ -86,9 +100,14 @@ export default function ResolveAddressPage({ params }: { params: { nftId: string
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1 rounded-md border bg-background p-4">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <MapPin className="h-5 w-5" />
-                  <span className="text-sm font-semibold">Physical Address</span>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <MapPin className="h-5 w-5" />
+                      <span className="text-sm font-semibold">Physical Address</span>
+                    </div>
+                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopy(addressDetails.address, 'Address')}>
+                        {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                     </Button>
                 </div>
                 <p className="pl-8 text-lg font-medium text-foreground">{addressDetails.address}</p>
               </div>
