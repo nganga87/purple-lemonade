@@ -56,7 +56,7 @@ const clientSchema = z.object({
   contactName: z.string().min(1, 'Contact name is required.'),
   contactEmail: z.string().email('Please enter a valid email for the contact.'),
   
-  billingAddress: z.string().min(1, 'Digital Address NFT ID is required.').startsWith('0x', { message: "Must be a valid blockchain address starting with 0x"}),
+  billingAddressNftId: z.string().min(1, 'Digital Address NFT ID is required.').startsWith('0x', { message: "Must be a valid blockchain address starting with 0x"}),
   bankName: z.string().min(1, 'Bank name is required.'),
   bankAccountNumber: z.string().min(1, 'Bank account number is required.'),
 
@@ -82,7 +82,7 @@ const defaultValues = {
       countriesOfOperation: [],
       contactName: '',
       contactEmail: '',
-      billingAddress: '',
+      billingAddressNftId: '',
       bankName: '',
       bankAccountNumber: '',
       status: 'Pending Review' as const,
@@ -147,7 +147,7 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
 
     try {
       // Step 1: Verify the NFT ID
-      const verificationResult = await verifyNftId(data.billingAddress);
+      const verificationResult = await verifyNftId(data.billingAddressNftId);
 
       if (!verificationResult.success) {
         toast({
@@ -331,7 +331,7 @@ export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: Onboardi
                             The client must have a registered Digital Address for billing. Ask the client to provide their verified Address NFT ID. If they don't have one, they must register one first.
                         </AlertDescription>
                     </Alert>
-                    <FormField control={form.control} name="billingAddress" render={({ field }) => (
+                    <FormField control={form.control} name="billingAddressNftId" render={({ field }) => (
                         <FormItem>
                         <FormLabel>Digital Address NFT ID</FormLabel>
                           <FormControl>

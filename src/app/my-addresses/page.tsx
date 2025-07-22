@@ -410,7 +410,10 @@ export default function MyAddressesPage() {
                                                 <span>Edit Details</span>
                                             </DropdownMenuItem>
                                         </DialogTrigger>
-                                        <DropdownMenuItem onSelect={() => handleSetPrimary(selectedAddress.nftId)} disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>Set as Primary</DropdownMenuItem>
+                                        <DropdownMenuItem onSelect={() => handleSetPrimary(selectedAddress.nftId)} disabled={selectedAddress.isPrimary || selectedAddress.status !== 'Verified'}>
+                                           <Check className="mr-2 h-4 w-4" />
+                                           <span>Set as Primary</span>
+                                        </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                          <DropdownMenuItem className="text-destructive" onSelect={() => setActionDialog('incident')}>
                                             <ShieldAlert className="mr-2 h-4 w-4" />
