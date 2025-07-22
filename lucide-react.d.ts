@@ -66,4 +66,5 @@ declare module 'lucide-react' {
   export const MoreHorizontal: Icon;
   export const Edit: Icon;
   export const Trash2: Icon;
+  export const Search: Icon;
 }

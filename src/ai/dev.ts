@@ -4,3 +4,4 @@ config();
 import '@/ai/flows/validate-door-photo.ts';
 import '@/ai/flows/compare-validation-photos.ts';
 import '@/ai/flows/generate-address-report.ts';
+import '@/ai/flows/find-address-by-clue.ts';

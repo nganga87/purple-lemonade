@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Table,
@@ -26,9 +27,12 @@ import {
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Globe, CheckCircle2, History, MoreHorizontal } from 'lucide-react';
+import { Globe, CheckCircle2, History, MoreHorizontal, Search, Loader2 } from 'lucide-react';
 import { AdminLayout } from '../admin-layout';
 import { countries } from '@/lib/countries';
+import { Input } from '@/components/ui/input';
+import { findAddressByClue, type FindAddressByClueOutput } from '@/ai/flows/find-address-by-clue';
+import { useToast } from '@/hooks/use-toast';
 
 const allValidationActivities = [
   { id: 'VAL-001', address: '123 Main St, Anytown, US', date: '2024-08-15', status: 'Verified', validator: 'ValidatorCorp' },
@@ -42,6 +46,36 @@ const allValidationActivities = [
 
 export default function AddressAuditPage() {
   const [selectedCountry, setSelectedCountry] = useState<string>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<FindAddressByClueOutput | null>(null);
+  const { toast } = useToast();
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    setIsSearching(true);
+    setSearchResults(null);
+    try {
+      const results = await findAddressByClue({ clue: searchQuery });
+      setSearchResults(results);
+       if (results.foundAddresses.length === 0) {
+        toast({
+          title: "No Results Found",
+          description: "The search query did not match any records.",
+        });
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+      toast({
+        variant: "destructive",
+        title: "Search Failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const filteredActivities = useMemo(() => {
     if (selectedCountry === 'ALL') {
@@ -49,6 +83,21 @@ export default function AddressAuditPage() {
     }
     return allValidationActivities.filter(activity => activity.address.endsWith(`, ${selectedCountry}`));
   }, [selectedCountry]);
+  
+   const getStatusBadge = (status: 'Verified' | 'Pending' | 'Compromised' | 'Rejected') => {
+    switch (status) {
+      case 'Verified':
+        return <Badge variant="secondary" className="bg-green-100 text-green-800">Verified</Badge>;
+      case 'Pending':
+        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+      case 'Compromised':
+        return <Badge variant="destructive">Compromised</Badge>;
+      case 'Rejected':
+        return <Badge variant="destructive">Rejected</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  }
 
   return (
     <AdminLayout active="audit">
@@ -87,10 +136,63 @@ export default function AddressAuditPage() {
         </div>
 
         <Card>
+            <CardHeader>
+                <CardTitle>Identity Search</CardTitle>
+                <CardDescription>
+                    In an emergency, find a user's address with any clue (name, ID, phone, etc.).
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex gap-2">
+                    <Input 
+                        placeholder="Enter a name, email, address fragment, phone, or ID number..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    <Button onClick={handleSearch} disabled={isSearching}>
+                        {isSearching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
+                        Search
+                    </Button>
+                </div>
+            </CardContent>
+            {isSearching && (
+              <CardFooter>
+                  <p className="text-sm text-muted-foreground">Searching immutable records...</p>
+              </CardFooter>
+            )}
+             {searchResults && searchResults.foundAddresses.length > 0 && (
+                <CardContent>
+                    <h3 className="font-semibold mb-2">Search Results</h3>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Owner</TableHead>
+                                <TableHead>Physical Address</TableHead>
+                                <TableHead>NFT ID</TableHead>
+                                <TableHead>Status</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {searchResults.foundAddresses.map(result => (
+                                <TableRow key={result.nftId}>
+                                    <TableCell>{result.ownerName}</TableCell>
+                                    <TableCell>{result.physicalAddress}</TableCell>
+                                    <TableCell className="font-mono">{result.nftId}</TableCell>
+                                    <TableCell>{getStatusBadge(result.status)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            )}
+        </Card>
+
+        <Card>
           <CardHeader>
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                    <CardTitle>Validation Activity</CardTitle>
+                    <CardTitle>Validation Activity Log</CardTitle>
                     <CardDescription>
                     {selectedCountry === 'ALL' ? 'Global overview of recent address validations.' : `Showing activities for ${countries.find(c => c.code === selectedCountry)?.name}.`}
                     </CardDescription>
@@ -129,13 +231,7 @@ export default function AddressAuditPage() {
                     <TableCell className="font-medium">{activity.address}</TableCell>
                     <TableCell>{activity.date}</TableCell>
                     <TableCell>
-                      <Badge variant={
-                          activity.status === 'Verified' ? 'default' : activity.status === 'Rejected' ? 'destructive' : 'secondary'
-                      } className={
-                          activity.status === 'Verified' ? 'bg-green-100 text-green-800' : activity.status === 'Rejected' ? 'bg-red-100 text-red-800' : ''
-                      }>
-                          {activity.status}
-                      </Badge>
+                      {getStatusBadge(activity.status as 'Verified' | 'Pending' | 'Rejected')}
                     </TableCell>
                     <TableCell>{activity.validator}</TableCell>
                     <TableCell className="text-right">
