@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Loader2, Mail, Home, User, CheckCircle, QrCode, Fingerprint } from 'lucide-react';
 import Image from 'next/image';
 import { generateSubAddress } from './utils';
+import { addresses as userProperties } from '@/lib/addresses';
 
 const formSchema = z.object({
   property: z.string().min(1, 'Please select a property.'),
@@ -46,17 +47,6 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
-
-const userProperties = [
-  {
-    address: '123 Main Street, Anytown, USA 12345',
-    nftId: '0x7A1B2c3D4e5F6a7B8c9d0E1f2A3b4C5d6E7f8A9B',
-  },
-  {
-    address: '456 Oak Avenue, Springfield, USA 67890',
-    nftId: '0x1A2B3c4D5e6F7a8B9c0d1E2f3A4b5C6d7E8f9A0C',
-  },
-];
 
 interface AddFamilyMemberFormProps {
   onBack: () => void;
@@ -136,7 +126,7 @@ export function AddFamilyMemberForm({ onBack }: AddFamilyMemberFormProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {userProperties.map(prop => (
+                        {userProperties.filter(p => p.status === 'Verified').map(prop => (
                           <SelectItem key={prop.nftId} value={prop.nftId}>
                             <div className="flex flex-col">
                               <span>{prop.address}</span>

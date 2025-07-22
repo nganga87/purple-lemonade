@@ -92,53 +92,17 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
-const initialAddresses = [
-  {
-    isPrimary: true,
-    name: 'Home',
-    address: '123 Main Street, Anytown, USA 12345',
-    nftId: '0x7A1B2c3D4e5F6a7B8c9d0E1f2A3b4C5d6E7f8A9B',
-    gps: '34.0522° N, 118.2437° W',
-    status: 'Verified',
-  },
-  {
-    isPrimary: false,
-    name: 'Work',
-    address: '456 Oak Avenue, Springfield, USA 67890',
-    nftId: '0x1A2B3c4D5e6F7a8B9c0d1E2f3A4b5C6d7E8f9A0C',
-    gps: '39.7817° N, 89.6501° W',
-    status: 'Verified',
-  },
-  {
-    isPrimary: false,
-    name: 'New Property',
-    address: '789 Pine Lane, Lakeside, USA 54321',
-    nftId: '0x9D8C7B6A5F4E3D2C1B0A9F8E7D6C5B4A3F2E1D0C',
-    gps: '41.7638° N, 72.6851° W',
-    status: 'Pending',
-  },
-  {
-    isPrimary: false,
-    name: 'Damaged Warehouse',
-    address: '101 Industrial Way, Floodzone, USA 98765',
-    nftId: '0x4F5E6D7C8B9A0F1E2D3C4B5A6F7E8D9C0A1B2C3D',
-    gps: '40.7128° N, 74.0060° W',
-    status: 'Compromised',
-  },
-];
-
-export type Address = typeof initialAddresses[0];
+import { addresses as initialAddresses, type Address } from '@/lib/addresses';
 
 export default function MyAddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses.find(a => a.isPrimary) || addresses[0] || null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
   const [actionDialog, setActionDialog] = useState<'archive' | 'incident' | null>(null);
 
   const { toast } = useToast();
+  const [copiedItem, setCopiedItem] = useState<string | null>(null);
 
   const handleAddressSelect = (addressId: string) => {
     const address = addresses.find(addr => addr.nftId === addressId);
@@ -195,10 +159,14 @@ export default function MyAddressesPage() {
     }
   };
 
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, type: 'Address' | 'NFT ID' | 'GPS') => {
     navigator.clipboard.writeText(text).then(() => {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000); // Revert after 2 seconds
+      setCopiedItem(type);
+      toast({
+        title: `${type} Copied!`,
+        description: `The ${type.toLowerCase()} has been copied to your clipboard.`,
+      });
+      setTimeout(() => setCopiedItem(null), 2000);
     });
   };
   
@@ -504,17 +472,14 @@ export default function MyAddressesPage() {
                                         </div>
                                     )}
                                     <div className="space-y-1">
-                                        <h3 className="font-semibold">Address NFT ID</h3>
+                                        <div className="flex items-center justify-between">
+                                          <h3 className="font-semibold">Address NFT ID</h3>
+                                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopy(selectedAddress.nftId, 'NFT ID')}>
+                                            {copiedItem === 'NFT ID' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                                          </Button>
+                                        </div>
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
                                         <p className="truncate">{selectedAddress.nftId}</p>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7"
-                                            onClick={() => handleCopy(selectedAddress.nftId)}
-                                        >
-                                            {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                                        </Button>
                                         </div>
                                     </div>
                                     <div className="space-y-1">

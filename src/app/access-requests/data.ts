@@ -1,0 +1,53 @@
+export const initialRequests = [
+  {
+    id: 'REQ-001',
+    name: 'Alice Johnson',
+    avatar: 'https://placehold.co/100x100.png',
+    purpose: 'Tenant',
+    date: '2024-08-15',
+    status: 'Pending',
+    address: '123 Main Street, Anytown, USA 12345',
+    houseNumber: 'Apt 2B',
+    doorPicture: 'https://placehold.co/400x300.png',
+  },
+  {
+    id: 'REQ-002',
+    name: 'Bob Williams',
+    avatar: 'https://placehold.co/100x100.png',
+    purpose: 'Family Member',
+    date: '2024-08-14',
+    status: 'Pending',
+    address: '123 Main Street, Anytown, USA 12345',
+  },
+  {
+    id: 'REQ-003',
+    name: 'Charlie Brown',
+    avatar: 'https://placehold.co/100x100.png',
+    purpose: 'Guest (Short-term)',
+    date: '2024-08-12',
+    status: 'Pending',
+    address: '456 Oak Avenue, Springfield, USA 67890',
+  },
+    {
+    id: 'REQ-004',
+    name: 'David Smith',
+    avatar: 'https://placehold.co/100x100.png',
+    purpose: 'Tenant',
+    date: '2024-07-20',
+    status: 'Approved',
+    address: '123 Main Street, Anytown, USA 12345',
+    houseNumber: 'Apt 3C',
+    doorPicture: 'https://placehold.co/400x300.png',
+  },
+  {
+    id: 'REQ-005',
+    name: 'Eve Davis',
+    avatar: 'https://placehold.co/100x100.png',
+    purpose: 'Family Member',
+    date: '2024-07-18',
+    status: 'Rejected',
+    address: '123 Main Street, Anytown, USA 12345',
+  },
+];
+
+export type AccessRequest = typeof initialRequests[0];

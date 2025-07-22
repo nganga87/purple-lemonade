@@ -29,73 +29,7 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, PlusCircle, UserCheck, UserX, Edit, Trash2 } from 'lucide-react';
 import { OnboardingDialog, Client } from './onboarding-dialog';
 import { useToast } from '@/hooks/use-toast';
-
-const initialClients: Client[] = [
-  {
-    id: 'cli_1',
-    companyName: 'Global Logistics',
-    status: 'Active',
-    plan: 'Enterprise',
-    contactName: 'Dana Smith',
-    contactEmail: 'd.smith@globallogistics.com',
-    countryOfRegistration: 'US',
-    countriesOfOperation: ['US', 'CA', 'MX'],
-    registrationNumber: 'GLO-12345',
-    taxId: 'US123456789',
-    billingAddressNftId: '0x7A1B2c3D4e5F6a7B8c9d0E1f2A3b4C5d6E7f8A9B',
-    bankName: 'Global Bank',
-    bankAccountNumber: '...1234',
-    onboardedSince: '2024-05-10',
-  },
-  {
-    id: 'cli_2',
-    companyName: 'E-Shop Now',
-    status: 'Active',
-    plan: 'Standard',
-    contactName: 'Mike Johnson',
-    contactEmail: 'manager@eshopnow.com',
-    countryOfRegistration: 'GB',
-    countriesOfOperation: ['GB', 'FR', 'DE'],
-    registrationNumber: 'ESN-98765',
-    taxId: 'GB987654321',
-    billingAddressNftId: '0x1A2B3c4D5e6F7a8B9c0d1E2f3A4b5C6d7E8f9A0C',
-    bankName: 'Commerce Bank',
-    bankAccountNumber: '...5678',
-    onboardedSince: '2024-06-22',
-  },
-  {
-    id: 'cli_3',
-    companyName: 'Quick Couriers',
-    status: 'Pending Review',
-    plan: 'Standard',
-    contactName: 'Maria Garcia',
-    contactEmail: 'maria.g@qcouriers.com',
-    countryOfRegistration: 'ES',
-    countriesOfOperation: ['ES', 'PT'],
-    registrationNumber: 'QC-55555',
-    taxId: 'ES555555555',
-    billingAddressNftId: '0x9D8C7B6A5F4E3D2C1B0A9F8E7D6C5B4A3F2E1D0C',
-    bankName: 'Rapid Bank',
-    bankAccountNumber: '...9012',
-    onboardedSince: '2024-08-01',
-  },
-   {
-    id: 'cli_4',
-    companyName: 'Invalid Ventures',
-    status: 'Rejected',
-    plan: 'Standard',
-    contactName: 'John Doe',
-    contactEmail: 'john.d@invalid.com',
-    countryOfRegistration: 'US',
-    countriesOfOperation: ['US'],
-    registrationNumber: 'INV-00000',
-    taxId: 'IV000000000',
-    billingAddressNftId: '0x4F5E6D7C8B9A0F1E2D3C4B5A6F7E8D9C0A1B2C3D',
-    bankName: 'Questionable Bank',
-    bankAccountNumber: '...0000',
-    onboardedSince: '2024-08-05',
-  },
-];
+import { initialClients } from './clients';
 
 export function ClientTable() {
   const [clients, setClients] = useState<Client[]>(initialClients);
