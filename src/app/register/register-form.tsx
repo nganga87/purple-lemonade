@@ -158,7 +158,6 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const addressName = watch('addressName');
   const titleDeedNumber = watch('titleDeedNumber');
   const idNumber = watch('idNumber');
-  const terms = watch('terms');
 
   useEffect(() => {
     try {
@@ -622,7 +621,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                   <FormField
                     control={form.control}
                     name="doorPhoto"
-                    render={({ field }) => (
+                    render={() => (
                       <FormItem>
                         <FormLabel>9. Door Photo</FormLabel>
                         <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>

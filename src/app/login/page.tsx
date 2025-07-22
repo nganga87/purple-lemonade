@@ -1,8 +1,7 @@
-import { ArrowRight, KeyRound, Mail, Lock } from 'lucide-react';
+import { KeyRound, Mail, Lock } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 

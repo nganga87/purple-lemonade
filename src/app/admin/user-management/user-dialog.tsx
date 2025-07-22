@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, ShieldCheck, Fingerprint, Users } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, Fingerprint } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
