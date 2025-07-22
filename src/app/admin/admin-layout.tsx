@@ -44,7 +44,7 @@ import { Separator } from '@/components/ui/separator';
 
 type AdminLayoutProps = {
     children: React.ReactNode;
-    active: 'dashboard' | 'audit' | 'users' | 'clients' | 'monetization' | 'incident-response';
+    active: 'dashboard' | 'audit' | 'users' | 'clients' | 'monetization' | 'incident-response' | 'platform-settings';
 }
 
 export function AdminLayout({ children, active }: AdminLayoutProps) {
@@ -54,7 +54,8 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
     users: 'User Management',
     clients: 'B2B Clients',
     monetization: 'Monetization',
-    'incident-response': 'Incident Response'
+    'incident-response': 'Incident Response',
+    'platform-settings': 'Platform Settings'
   };
 
   return (
@@ -123,10 +124,12 @@ export function AdminLayout({ children, active }: AdminLayoutProps) {
              <Separator className="my-1" />
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <Settings />
-                  Platform Settings
-                </SidebarMenuButton>
+                <Link href="/admin/platform-settings">
+                    <SidebarMenuButton isActive={active === 'platform-settings'}>
+                      <Settings />
+                      Platform Settings
+                    </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
                <SidebarMenuItem>
                 <Link href="/admin/login">
