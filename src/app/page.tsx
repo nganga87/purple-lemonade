@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, KeyRound, Mail, Search, Copy } from 'lucide-react';
+import { ArrowRight, KeyRound, Mail, Search, Copy, CheckCircle } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function LandingPage() {
   const [nftId, setNftId] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -39,6 +41,23 @@ export default function LandingPage() {
         title: 'Paste Failed',
         description: 'Could not read from clipboard. Please check browser permissions.',
       });
+    }
+  };
+  
+  const handleEmailSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailSubmitted(true);
+      toast({
+        title: "Verification Email Sent",
+        description: `A confirmation link has been sent to ${email}.`,
+      });
+    } else {
+        toast({
+            variant: 'destructive',
+            title: 'Invalid Email',
+            description: 'Please enter a valid email address.',
+        });
     }
   };
 
@@ -74,29 +93,46 @@ export default function LandingPage() {
             </p>
             <div className="w-full max-w-md space-y-6">
                <Card className="bg-secondary/50">
-                <CardHeader>
-                    <CardTitle className="font-headline">Create Your Address</CardTitle>
-                    <CardDescription>Get started now by creating your own secure Digital Address.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid gap-2">
-                        <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                            type="email"
-                            placeholder="Enter your email address"
-                            className="pl-10"
-                            required
-                        />
+                  {!emailSubmitted ? (
+                    <>
+                      <CardHeader>
+                          <CardTitle className="font-headline">Create Your Address</CardTitle>
+                          <CardDescription>Get started now by creating your own secure Digital Address.</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                          <form onSubmit={handleEmailSubmit} className="grid gap-2">
+                              <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                              <Input
+                                  type="email"
+                                  placeholder="Enter your email address"
+                                  className="pl-10"
+                                  value={email}
+                                  onChange={(e) => setEmail(e.target.value)}
+                                  required
+                              />
+                              </div>
+                              <Button type="submit" className="w-full">
+                                  Verify My Email
+                                  <ArrowRight className="ml-2 h-4 w-4" />
+                              </Button>
+                          </form>
+                      </CardContent>
+                    </>
+                  ) : (
+                    <CardContent className="pt-6">
+                        <div className="flex flex-col items-center text-center">
+                            <CheckCircle className="h-12 w-12 text-green-500 mb-4"/>
+                            <h3 className="text-xl font-headline font-semibold">Check your email</h3>
+                            <p className="text-muted-foreground mt-2">
+                                We've sent a secure login link to <span className="font-semibold text-primary">{email}</span>. Click the link to continue the registration process.
+                            </p>
+                             <Button variant="outline" className="mt-4" onClick={() => toast({ title: "Email Resent", description: `A new link has been sent to ${email}.`})}>
+                                Resend Email
+                             </Button>
                         </div>
-                        <Link href="/register">
-                        <Button className="w-full">
-                            Create My Digital Address
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                        </Link>
-                    </div>
-                </CardContent>
+                    </CardContent>
+                  )}
               </Card>
 
               <Card>
