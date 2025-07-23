@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -21,18 +21,18 @@ import {
   LayoutDashboard,
   MapPin,
   PlusCircle,
-  CheckCircle2,
   Settings,
   Bell,
   UserCircle,
   LogOut,
   Wallet,
-  Activity,
   QrCode,
   Copy,
   Users,
   Mail,
   CandlestickChart,
+  Download,
+  ChevronDown,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   DropdownMenu,
@@ -55,6 +56,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Logo } from '@/components/icons';
+import { useToast } from '@/hooks/use-toast';
+
 
 const activityItems = [
   {
@@ -85,9 +88,46 @@ const activityItems = [
     status: 'Completed',
     icon: <Image src="https://placehold.co/32x32.png" alt="Uber Eats logo" width={32} height={32} className="rounded-full" data-ai-hint="food delivery" />,
   },
+  {
+    type: 'KYC Check',
+    vendor: 'Coinbase',
+    date: '2024-07-25',
+    status: 'Confirmed',
+    icon: <Image src="https://placehold.co/32x32.png" alt="Coinbase logo" width={32} height={32} className="rounded-full" data-ai-hint="crypto logo" />,
+  },
+  {
+    type: 'Delivery',
+    vendor: 'FedEx',
+    date: '2024-07-24',
+    status: 'Completed',
+    icon: <Image src="https://placehold.co/32x32.png" alt="FedEx logo" width={32} height={32} className="rounded-full" data-ai-hint="delivery truck" />,
+  },
+  {
+    type: 'Utility Bill',
+    vendor: 'Water Dept.',
+    date: '2024-07-22',
+    status: 'Paid',
+    icon: <Image src="https://placehold.co/32x32.png" alt="Water dept logo" width={32} height={32} className="rounded-full" data-ai-hint="water drop" />,
+  },
 ];
 
+const INITIAL_VISIBLE_ACTIVITIES = 5;
+
 export default function DashboardPage() {
+  const [visibleActivities, setVisibleActivities] = useState(INITIAL_VISIBLE_ACTIVITIES);
+  const { toast } = useToast();
+
+  const showMoreActivities = () => {
+    setVisibleActivities(activityItems.length);
+  };
+  
+  const handleExport = () => {
+    toast({
+      title: "Export Started",
+      description: "Your activity statement will be sent to your email shortly.",
+    });
+  };
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
@@ -256,16 +296,16 @@ export default function DashboardPage() {
               </Card>
 
               <div className="grid lg:grid-cols-2 gap-8">
-                <Card className="shadow-lg">
+                <Card className="shadow-lg flex flex-col">
                   <CardHeader>
                     <CardTitle className="font-headline">Recent Activity</CardTitle>
                     <CardDescription>
                       Latest transactions and verifications for your address.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="flex-1">
                     <div className="space-y-4">
-                      {activityItems.map((item, index) => (
+                      {activityItems.slice(0, visibleActivities).map((item, index) => (
                         <React.Fragment key={index}>
                           <div className="flex items-center gap-4">
                             <div className="flex items-center justify-center h-10 w-10 rounded-full bg-secondary">
@@ -280,9 +320,9 @@ export default function DashboardPage() {
                               </p>
                             </div>
                             <Badge
-                              variant={item.status === 'Completed' || item.status === 'Confirmed' ? 'default' : 'secondary'}
+                              variant={item.status === 'Completed' || item.status === 'Confirmed' || item.status === 'Paid' ? 'default' : 'secondary'}
                               className={
-                                item.status === 'Completed' || item.status === 'Confirmed'
+                                item.status === 'Completed' || item.status === 'Confirmed' || item.status === 'Paid'
                                   ? 'bg-accent/20 text-accent-foreground'
                                   : 'bg-yellow-100 text-yellow-800'
                               }
@@ -290,11 +330,25 @@ export default function DashboardPage() {
                               {item.status}
                             </Badge>
                           </div>
-                          {index < activityItems.length - 1 && <Separator />}
+                          {index < activityItems.slice(0, visibleActivities).length - 1 && <Separator />}
                         </React.Fragment>
                       ))}
                     </div>
                   </CardContent>
+                  {activityItems.length > INITIAL_VISIBLE_ACTIVITIES && (
+                    <CardFooter className="flex justify-center gap-2">
+                       {visibleActivities < activityItems.length && (
+                        <Button variant="outline" onClick={showMoreActivities}>
+                            <ChevronDown className="mr-2 h-4 w-4" />
+                            Show All
+                        </Button>
+                        )}
+                        <Button variant="secondary" onClick={handleExport}>
+                           <Download className="mr-2 h-4 w-4" />
+                           Export to Email
+                        </Button>
+                    </CardFooter>
+                  )}
                 </Card>
 
                 <div className="space-y-8">
