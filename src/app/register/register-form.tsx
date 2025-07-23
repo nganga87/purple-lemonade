@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -106,8 +107,9 @@ const generateMockAddress = (seed: string): string => {
         hash = ((hash << 5) - hash) + char;
         hash |= 0; // Convert to 32bit integer
     }
-    const randomHex = (hash & 0xFFFFFF).toString(16).toUpperCase();
-    return `0x${randomHex}${'A'.repeat(40 - 6 - randomHex.length)}${randomHex}`.slice(0, 42);
+    const randomHex = (hash >>> 0).toString(16).toUpperCase().padStart(8, '0');
+    const remaining = [...Array(42 - 2 - 3 - 8)].map(() => Math.floor(Math.random() * 16).toString(16).toUpperCase()).join('');
+    return `0xADD${randomHex}${remaining}`;
 };
 
 interface RegisterFormProps {
