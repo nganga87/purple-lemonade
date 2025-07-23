@@ -167,6 +167,9 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
     });
   };
 
+  const isEditingSelfAsSuperAdmin = user?.role === 'super-admin' && user?.email === 'nicholas@digitaladdress.com';
+
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-2xl">
@@ -226,7 +229,7 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Role</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isEditingSelfAsSuperAdmin}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a role..." />
@@ -243,6 +246,7 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                             ))}
                           </SelectContent>
                         </Select>
+                        {isEditingSelfAsSuperAdmin && <FormDescription>Super Admin role cannot be changed.</FormDescription>}
                         <FormMessage />
                       </FormItem>
                     )}
