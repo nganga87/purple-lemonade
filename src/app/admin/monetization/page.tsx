@@ -2,9 +2,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AdminLayout } from '../admin-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { DollarSign, ArrowUpRight, Edit, MoreHorizontal, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History, Users, PlusCircle, Trash2, Globe, ShieldAlert } from 'lucide-react';
+import { DollarSign, ArrowUpRight, Edit, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History, Users, PlusCircle, Trash2 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +18,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { pricingPlans } from '../pricing-data';
+import { AppLayout } from '@/components/layout/app-layout';
 
 
 const revenueData = [
@@ -160,7 +160,7 @@ export default function MonetizationPage() {
 
 
   return (
-    <AdminLayout active="monetization">
+    <AppLayout nav="admin">
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
@@ -413,6 +413,6 @@ export default function MonetizationPage() {
             </CardContent>
         </Card>
       </main>
-    </AdminLayout>
+    </AppLayout>
   );
 }

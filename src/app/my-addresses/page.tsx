@@ -5,41 +5,18 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  Sidebar,
-  SidebarProvider,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarInset,
-  SidebarTrigger,
-  SidebarMenuBadge,
-} from '@/components/ui/sidebar';
-import {
-  LayoutDashboard,
   MapPin,
   PlusCircle,
-  Settings,
-  Bell,
-  UserCircle,
-  LogOut,
-  Wallet,
   QrCode,
   Copy,
   MoreVertical,
   Edit,
   Trash2,
-  Users,
-  CandlestickChart,
   Check,
-  ArchiveRestore,
   ShieldAlert,
   FileText,
   Link as LinkIcon,
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -53,10 +30,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import {
   Select,
@@ -85,7 +60,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Badge } from '@/components/ui/badge';
-import { Logo } from '@/components/icons';
 import { EditAddressForm } from './edit-address-form';
 import { deleteAddress } from './delete-address';
 import { useToast } from '@/hooks/use-toast';
@@ -93,6 +67,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { addresses as initialAddresses, type Address } from '@/lib/addresses';
+import { AppLayout } from '@/components/layout/app-layout';
 
 export default function MyAddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
@@ -240,127 +215,8 @@ export default function MyAddressesPage() {
   };
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
-        <Sidebar>
-          <SidebarHeader>
-            <Link href="/" className="flex items-center gap-2 p-2">
-              <Logo className="w-8 h-8 text-primary" />
-              <h1 className="text-xl font-headline font-semibold">Digital Address</h1>
-            </Link>
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                 <Link href="/dashboard">
-                  <SidebarMenuButton>
-                    <LayoutDashboard />
-                    Dashboard
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                 <Link href="/my-addresses">
-                    <SidebarMenuButton isActive>
-                    <MapPin />
-                    My Addresses
-                    </SidebarMenuButton>
-                 </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href="/register">
-                  <SidebarMenuButton>
-                    <PlusCircle />
-                    Register New Address
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href="/access-requests">
-                  <SidebarMenuButton>
-                    <Users />
-                    Access Requests
-                    <SidebarMenuBadge>3</SidebarMenuBadge>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href="/exchange">
-                    <SidebarMenuButton>
-                    <CandlestickChart />
-                    Address Marketplace
-                    </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton href="#">
-                  <Settings />
-                  Settings
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
-
+    <AppLayout>
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <SidebarInset className="flex-1 flex flex-col">
-            <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-4 md:px-6">
-              <div className="flex items-center gap-4">
-                <SidebarTrigger className="md:hidden" />
-                <h1 className="text-2xl font-headline font-semibold">My Addresses</h1>
-              </div>
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Bell className="h-5 w-5" />
-                  <span className="sr-only">Notifications</span>
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="rounded-full">
-                      <Avatar>
-                        <AvatarImage src="https://placehold.co/100x100.png" alt="User avatar" data-ai-hint="user avatar"/>
-                        <AvatarFallback>JD</AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">John Doe</p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          john.doe@example.com
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                      <DropdownMenuItem>
-                        <UserCircle className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Wallet className="mr-2 h-4 w-4" />
-                        <span>Wallet</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </header>
-
             <main className="flex-1 p-4 md:p-6 lg:p-8">
               <div className="grid gap-8">
                   <div className='flex justify-between items-start md:items-center flex-col md:flex-row gap-4'>
@@ -468,7 +324,7 @@ export default function MyAddressesPage() {
                                         <div className="p-4 rounded-lg bg-destructive/10 text-destructive border border-destructive/20">
                                             <h4 className="font-bold flex items-center gap-2"><ShieldAlert />Incident Reported</h4>
                                             <p className="text-sm mt-1">This address is locked pending re-validation due to a reported incident (e.g., natural disaster). No transfers are permitted.</p>
-                                            <Button size="sm" className="mt-2"><ArchiveRestore className="mr-2 h-4 w-4"/>Start Re-validation</Button>
+                                            <Button size="sm" className="mt-2"><Link href="/admin/incident-response" className="flex items-center"><FileText className="mr-2 h-4 w-4"/>View Incident Report</Link></Button>
                                         </div>
                                     )}
                                     <div className="space-y-1">
@@ -567,9 +423,7 @@ export default function MyAddressesPage() {
                 />
               </DialogContent>
             )}
-          </SidebarInset>
         </Dialog>
-      </div>
-    </SidebarProvider>
+    </AppLayout>
   );
 }

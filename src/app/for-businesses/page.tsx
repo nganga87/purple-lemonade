@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Globe, ArrowLeftRight, TrendingUp, ShieldCheck } from 'lucide-react';
+import { Globe, ArrowLeftRight, TrendingUp, ShieldCheck, CheckCircle } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

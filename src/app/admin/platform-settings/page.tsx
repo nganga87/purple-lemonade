@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AdminLayout } from '../admin-layout';
 import {
   Card,
   CardContent,
@@ -15,7 +14,6 @@ import {
   ShieldCheck,
   KeyRound,
   Globe,
-  Bell,
   Save,
   Link as LinkIcon,
 } from 'lucide-react';
@@ -24,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { AppLayout } from '@/components/layout/app-layout';
 
 export default function PlatformSettingsPage() {
   const { toast } = useToast();
@@ -44,7 +43,7 @@ export default function PlatformSettingsPage() {
   };
 
   return (
-    <AdminLayout active="platform-settings">
+    <AppLayout nav="admin">
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {/* General Settings Card */}
@@ -231,6 +230,6 @@ export default function PlatformSettingsPage() {
           </Card>
         </div>
       </main>
-    </AdminLayout>
+    </AppLayout>
   );
 }

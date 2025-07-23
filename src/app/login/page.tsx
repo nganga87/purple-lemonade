@@ -1,4 +1,5 @@
-import { KeyRound, Mail, Lock } from 'lucide-react';
+
+import { Mail, Lock } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

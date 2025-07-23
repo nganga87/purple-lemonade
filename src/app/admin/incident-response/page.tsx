@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AdminLayout } from '../admin-layout';
 import {
   Card,
   CardContent,
@@ -29,6 +28,7 @@ import {
 import { incidents, type Incident } from './incidents';
 import { RecoveryWizard } from './recovery-wizard';
 import { useToast } from '@/hooks/use-toast';
+import { AppLayout } from '@/components/layout/app-layout';
 
 export default function IncidentResponsePage() {
   const [allIncidents, setAllIncidents] = useState<Incident[]>(incidents);
@@ -67,7 +67,7 @@ export default function IncidentResponsePage() {
   };
 
   return (
-    <AdminLayout active="incident-response">
+    <AppLayout nav="admin">
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
@@ -188,6 +188,6 @@ export default function IncidentResponsePage() {
           onSave={handleSaveAndClose}
         />
       )}
-    </AdminLayout>
+    </AppLayout>
   );
 }

@@ -2,7 +2,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import {
   DollarSign,
   Users,
@@ -35,33 +34,13 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
-import { AdminLayout } from '../admin-layout';
+import { adminUsers, b2bClients, revenueData } from './data';
+import { AppLayout } from '@/components/layout/app-layout';
 
-
-const revenueData = [
-  { name: 'Jan', revenue: 4000 },
-  { name: 'Feb', revenue: 3000 },
-  { name: 'Mar', revenue: 5000 },
-  { name: 'Apr', revenue: 4500 },
-  { name: 'May', revenue: 6000 },
-  { name: 'Jun', revenue: 5500 },
-];
-
-const adminUsers = [
-    { name: 'Alice Johnson', email: 'alice.j@digitaladdress.com', role: 'Super Admin', status: 'Active' },
-    { name: 'Bob Williams', email: 'bob.w@digitaladdress.com', role: 'Admin Assistant', status: 'Active' },
-    { name: 'Charlie Brown', email: 'charlie.b@digitaladdress.com', role: 'Admin Assistant', status: 'Inactive' },
-]
-
-const b2bClients = [
-    { company: 'Global Logistics', contact: 'd.smith@globallogistics.com', plan: 'Enterprise', since: '2024-05-10'},
-    { company: 'E-Shop Now', contact: 'manager@eshopnow.com', plan: 'Standard', since: '2024-06-22'},
-    { company: 'Finance Corp', contact: 'compliance@financecorp.com', plan: 'Enterprise', since: '2024-07-01'},
-]
 
 export default function AdminDashboardPage() {
   return (
-    <AdminLayout active="dashboard">
+    <AppLayout nav="admin">
         <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card>
@@ -185,6 +164,6 @@ export default function AdminDashboardPage() {
             </CardContent>
          </Card>
         </main>
-    </AdminLayout>
+    </AppLayout>
   );
 }

@@ -28,11 +28,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Globe, CheckCircle2, History, MoreHorizontal, Search, Loader2 } from 'lucide-react';
-import { AdminLayout } from '../admin-layout';
 import { countries } from '@/lib/countries';
 import { Input } from '@/components/ui/input';
 import { findAddressByClue, type FindAddressByClueOutput } from '@/ai/flows/find-address-by-clue';
 import { useToast } from '@/hooks/use-toast';
+import { AppLayout } from '@/components/layout/app-layout';
 
 const allValidationActivities = [
   { id: 'VAL-001', address: '123 Main St, Anytown, US', date: '2024-08-15', status: 'Verified', validator: 'ValidatorCorp' },
@@ -100,7 +100,7 @@ export default function AddressAuditPage() {
   }
 
   return (
-    <AdminLayout active="audit">
+    <AppLayout nav="admin">
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
@@ -246,6 +246,6 @@ export default function AddressAuditPage() {
           </CardContent>
         </Card>
       </main>
-    </AdminLayout>
+    </AppLayout>
   );
 }

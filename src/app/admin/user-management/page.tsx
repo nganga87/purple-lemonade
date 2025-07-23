@@ -2,15 +2,15 @@
 'use client';
 
 import React from 'react';
-import { AdminLayout } from '../admin-layout';
 import { UserTable } from './user-table';
+import { AppLayout } from '@/components/layout/app-layout';
 
 export default function UserManagementPage() {
   return (
-    <AdminLayout active="users">
+    <AppLayout nav="admin">
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <UserTable />
       </main>
-    </AdminLayout>
+    </AppLayout>
   );
 }

@@ -68,5 +68,4 @@ declare module 'lucide-react' {
   export const Trash2: Icon;
   export const Search: Icon;
   export const Link: Icon;
-  export const Download: Icon;
 }
