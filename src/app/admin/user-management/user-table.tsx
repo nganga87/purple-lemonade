@@ -91,7 +91,7 @@ export function UserTable() {
         return 'bg-orange-100 text-orange-800';
       case 'Inactive':
       default:
-        return '';
+        return 'secondary';
     }
   }
 

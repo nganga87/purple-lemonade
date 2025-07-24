@@ -7,7 +7,7 @@ export const initialUsers: AdminUser[] = [
     email: 'nicholas@digitaladdress.com',
     role: 'super-admin',
     status: 'Active',
-    permissions: ['dashboard', 'user-management', 'b2b-clients', 'address-audit', 'monetization', 'platform-settings'],
+    permissions: ['dashboard', 'user-management', 'b2b-clients', 'address-audit', 'monetization', 'incident-response', 'platform-settings'],
   },
   {
     id: 'usr_2',
