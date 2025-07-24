@@ -143,10 +143,12 @@ export default function FeedbackPage() {
           <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
               <DialogTitle className="font-headline">{selectedFeedback?.subject}</DialogTitle>
-              <DialogDescription>
-                From: {selectedFeedback?.user.name} ({selectedFeedback?.user.email})
-                <Badge variant="secondary" className="ml-2">{selectedFeedback?.user.accountTier}</Badge>
-              </DialogDescription>
+              <div className="flex items-center gap-2">
+                <DialogDescription>
+                  From: {selectedFeedback?.user.name} ({selectedFeedback?.user.email})
+                </DialogDescription>
+                <Badge variant="secondary">{selectedFeedback?.user.accountTier}</Badge>
+              </div>
             </DialogHeader>
             <div className="py-4 space-y-6 max-h-[60vh] overflow-y-auto px-1 pr-4">
               <div>
