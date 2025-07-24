@@ -24,6 +24,7 @@ import {
   Wallet,
   Settings,
   ArrowLeft,
+  HelpCircle,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -166,6 +167,12 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
                     <DropdownMenuItem>
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/support">
+                          <HelpCircle className="mr-2 h-4 w-4" />
+                          <span>Support & Feedback</span>
+                        </Link>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
