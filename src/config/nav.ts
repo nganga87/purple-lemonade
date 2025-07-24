@@ -10,7 +10,8 @@ import {
   Briefcase,
   ShieldCheck,
   DollarSign,
-  ShieldAlert
+  ShieldAlert,
+  Mail,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import React from 'react';
@@ -80,6 +81,11 @@ export const adminNav: NavItem[] = [
     title: 'Address Audit',
     href: '/admin/address-audit',
     icon: ShieldCheck,
+  },
+  {
+    title: 'User Feedback',
+    href: '/admin/feedback',
+    icon: Mail,
   },
   {
     title: 'Monetization',
