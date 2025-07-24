@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import type { Address } from './page';
+import type { Address } from '@/lib/addresses';
 import { updateAddress } from './update-address';
 
 const formSchema = z.object({

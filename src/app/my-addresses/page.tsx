@@ -16,6 +16,7 @@ import {
   ShieldAlert,
   FileText,
   Link as LinkIcon,
+  Fingerprint,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -134,7 +135,7 @@ export default function MyAddressesPage() {
     }
   };
 
-  const handleCopy = (text: string, type: 'Address' | 'NFT ID' | 'GPS') => {
+  const handleCopy = (text: string, type: 'Address' | 'NFT ID' | 'GPS' | 'Personal ID') => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedItem(type);
       toast({
@@ -189,12 +190,12 @@ export default function MyAddressesPage() {
     return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
   }
 
-  const handleCopyQr = async () => {
-    if (!selectedAddress) return;
+  const handleCopyQr = async (data: string) => {
+    if (!data) return;
     try {
-      const imageUrl = getQrCodeUrl(selectedAddress.nftId, 256);
-      const data = await fetch(imageUrl);
-      const blob = await data.blob();
+      const imageUrl = getQrCodeUrl(data, 256);
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
       await navigator.clipboard.write([
         new ClipboardItem({
           [blob.type]: blob,
@@ -329,62 +330,93 @@ export default function MyAddressesPage() {
                                     )}
                                     <div className="space-y-1">
                                         <div className="flex items-center justify-between">
-                                          <h3 className="font-semibold">Address NFT ID</h3>
+                                          <h3 className="font-semibold flex items-center gap-2"><Fingerprint className="text-muted-foreground"/> Digital Personal ID</h3>
+                                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopy(selectedAddress.personalId, 'Personal ID')}>
+                                            {copiedItem === 'Personal ID' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                                          </Button>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
+                                          <p className="truncate font-mono">{selectedAddress.personalId}</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <div className="flex items-center justify-between">
+                                          <h3 className="font-semibold flex items-center gap-2"><LinkIcon className="text-muted-foreground"/> Address NFT ID</h3>
                                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleCopy(selectedAddress.nftId, 'NFT ID')}>
                                             {copiedItem === 'NFT ID' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                                           </Button>
                                         </div>
                                         <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
-                                        <p className="truncate">{selectedAddress.nftId}</p>
+                                          <p className="truncate font-mono">{selectedAddress.nftId}</p>
                                         </div>
                                     </div>
                                     <div className="space-y-1">
-                                            <h3 className="font-semibold">GPS Coordinates</h3>
+                                            <h3 className="font-semibold flex items-center gap-2"><MapPin className="text-muted-foreground"/> GPS Coordinates</h3>
                                             <p className="text-muted-foreground">{selectedAddress.gps}</p>
-                                        </div>
-                                        <Button variant="outline" size="sm" onClick={handleGetDirections} disabled={!selectedAddress.gps}>
-                                          <LinkIcon className="mr-2 h-4 w-4"/>
-                                          Get Directions
-                                        </Button>
+                                    </div>
+                                    <Button variant="outline" size="sm" onClick={handleGetDirections} disabled={!selectedAddress.gps}>
+                                        <LinkIcon className="mr-2 h-4 w-4"/>
+                                        Get Directions
+                                    </Button>
                                     </div>
                                     <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
-                                    <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
-                                      <DialogTrigger asChild>
-                                        <div className="flex flex-col items-center cursor-pointer">
-                                          <div className="p-2 bg-white rounded-lg shadow-md">
-                                              <Image src={getQrCodeUrl(selectedAddress.nftId, 120)} alt="QR Code" width={120} height={120} data-ai-hint="qr code"/>
-                                          </div>
-                                          <Button variant="outline" size="sm" className="mt-4">
-                                              <QrCode className="mr-2 h-4 w-4" />
-                                              Show QR
-                                          </Button>
-                                        </div>
-                                      </DialogTrigger>
-                                      <DialogContent className="sm:max-w-md">
-                                          <DialogHeader>
-                                          <DialogTitle>Scan QR Code</DialogTitle>
-                                          <DialogDescription>
-                                              Scan this code for quick access to the address details.
-                                          </DialogDescription>
-                                          </DialogHeader>
-                                          <div className="flex flex-col items-center justify-center p-4">
-                                              <div className="p-4 bg-white rounded-lg shadow-md">
-                                                  <Image src={getQrCodeUrl(selectedAddress.nftId, 256)} alt="QR Code" width={256} height={256} data-ai-hint="qr code" />
+                                      <Dialog open={isQrDialogOpen} onOpenChange={setIsQrDialogOpen}>
+                                        <DialogTrigger asChild>
+                                           <div className="p-2 bg-white rounded-lg shadow-md cursor-pointer">
+                                                <Image src={getQrCodeUrl(selectedAddress.nftId, 120)} alt="QR Code" width={120} height={120} data-ai-hint="qr code"/>
+                                           </div>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-md">
+                                          <Tabs defaultValue="address" className="w-full">
+                                            <DialogHeader>
+                                              <DialogTitle>Shareable Codes</DialogTitle>
+                                              <DialogDescription>
+                                                Select a code to share, then scan or copy it.
+                                              </DialogDescription>
+                                              <TabsList className="grid w-full grid-cols-2 mt-2">
+                                                <TabsTrigger value="address">Address NFT</TabsTrigger>
+                                                <TabsTrigger value="personal">Personal ID</TabsTrigger>
+                                              </TabsList>
+                                            </DialogHeader>
+                                            <TabsContent value="address">
+                                               <div className="flex flex-col items-center justify-center p-4">
+                                                <div className="p-4 bg-white rounded-lg shadow-md">
+                                                    <Image src={getQrCodeUrl(selectedAddress.nftId, 256)} alt="Address QR Code" width={256} height={256} data-ai-hint="qr code" />
+                                                </div>
+                                                <div className="text-center mt-4">
+                                                    <p className="text-xs font-mono text-muted-foreground mt-2">{selectedAddress.nftId}</p>
+                                                </div>
                                               </div>
-                                              <div className="text-center mt-4">
-                                                  <p className="font-semibold">{selectedAddress.name}</p>
-                                                  <p className="text-sm text-muted-foreground">{selectedAddress.address}</p>
-                                                  <p className="text-xs font-mono text-muted-foreground mt-2">{selectedAddress.nftId}</p>
+                                              <DialogFooter>
+                                                <Button onClick={() => handleCopyQr(selectedAddress.nftId)} className="w-full">
+                                                  <Copy className="mr-2 h-4 w-4" />
+                                                  Copy QR Image
+                                                </Button>
+                                              </DialogFooter>
+                                            </TabsContent>
+                                            <TabsContent value="personal">
+                                              <div className="flex flex-col items-center justify-center p-4">
+                                                <div className="p-4 bg-white rounded-lg shadow-md">
+                                                    <Image src={getQrCodeUrl(selectedAddress.personalId, 256)} alt="Personal ID QR Code" width={256} height={256} data-ai-hint="qr code" />
+                                                </div>
+                                                <div className="text-center mt-4">
+                                                    <p className="text-xs font-mono text-muted-foreground mt-2">{selectedAddress.personalId}</p>
+                                                </div>
                                               </div>
-                                          </div>
-                                           <DialogFooter>
-                                            <Button onClick={handleCopyQr} className="w-full">
-                                              <Copy className="mr-2 h-4 w-4" />
-                                              Copy Image
-                                            </Button>
-                                          </DialogFooter>
-                                      </DialogContent>
-                                    </Dialog>
+                                              <DialogFooter>
+                                                <Button onClick={() => handleCopyQr(selectedAddress.personalId)} className="w-full">
+                                                  <Copy className="mr-2 h-4 w-4" />
+                                                  Copy QR Image
+                                                </Button>
+                                              </DialogFooter>
+                                            </TabsContent>
+                                          </Tabs>
+                                        </DialogContent>
+                                      </Dialog>
+                                      <Button variant="outline" size="sm" className="mt-4" onClick={() => setIsQrDialogOpen(true)}>
+                                        <QrCode className="mr-2 h-4 w-4" />
+                                        Show Codes
+                                      </Button>
                                     </div>
                                 </CardContent>
                             </TabsContent>
@@ -427,3 +459,4 @@ export default function MyAddressesPage() {
     </AppLayout>
   );
 }
+
