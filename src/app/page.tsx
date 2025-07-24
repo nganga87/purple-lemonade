@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState } from 'react';
@@ -84,7 +85,7 @@ export default function LandingPage() {
         <section className="container grid lg:grid-cols-2 gap-12 lg:gap-20 items-center py-12 md:py-24 lg:py-32">
           <div className="flex flex-col items-start gap-8">
             <h1 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Your Place, Your Pin, Your Proof.
+              Your Identity, Your Address. Verified.
             </h1>
             <p className="max-w-[600px] text-muted-foreground md:text-xl">
               Digital Address provides a revolutionary way to manage and verify
