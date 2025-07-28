@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -45,7 +44,7 @@ export function ClientTable() {
     } else {
       // Add new client
       const newClient = { ...client, id: `cli_${Date.now()}` };
-      setClients([newClient, ...clients]);
+      setClients(prevClients => [newClient, ...prevClients]);
       toast({ title: 'Client Added', description: `${client.companyName} is now pending review.` });
     }
     setEditingClient(null);
