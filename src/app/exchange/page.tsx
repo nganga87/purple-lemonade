@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -25,6 +24,9 @@ import {
   ShoppingCart,
   ShieldAlert,
   Loader2,
+  Printer,
+  Copy,
+  Mail,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -202,6 +204,41 @@ export default function ExchangePage() {
     setReportResult(null);
     setIsReportDialogOpen(true);
   };
+
+  const handlePrintReport = () => {
+      window.print();
+  }
+
+  const handleCopyReport = () => {
+      if (!reportResult) return;
+      const reportText = `
+        AI Due Diligence Report
+        Address: ${selectedListingForReport?.name}
+        NFT ID: ${selectedListingForReport?.nftId}
+
+        Overall Assessment: ${reportResult.overallAssessment}
+
+        Risk Assessment: ${reportResult.riskAssessment.level}
+        ${reportResult.riskAssessment.findings.map(f => `- ${f}`).join('\n')}
+
+        Verification History:
+        ${reportResult.verificationHistory.map(h => `- ${h}`).join('\n')}
+
+        Commercial Usage:
+        ${reportResult.commercialUsage.map(c => `- ${c}`).join('\n')}
+
+        Listing Summary: ${reportResult.listingSummary}
+      `;
+      navigator.clipboard.writeText(reportText.trim());
+      toast({title: "Report Copied", description: "The report text has been copied to your clipboard."});
+  }
+
+  const handleEmailReport = () => {
+      if(!reportResult || !selectedListingForReport) return;
+      const subject = `AI Due Diligence Report for ${selectedListingForReport.name}`;
+      const body = `Please find the AI Due Diligence Report for the address: ${selectedListingForReport.address} (NFT: ${selectedListingForReport.nftId}) below.`;
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -484,13 +521,20 @@ export default function ExchangePage() {
                         </div>
                     </div>
                 )}
-                <DialogFooter>
-                  {!reportResult ? (
-                    <Button onClick={handleGenerateReport} disabled={isGeneratingReport}>
-                      {isGeneratingReport ? <> <Loader2 className="mr-2 h-4 w-4 animate-spin"/>Generating...</> : "Generate Report"}
-                    </Button>
-                   ) : (
-                    <Button onClick={() => setIsReportDialogOpen(false)}>Close</Button>
+                <DialogFooter className="gap-2 sm:justify-between">
+                    <div>
+                        {!reportResult && (
+                            <Button onClick={handleGenerateReport} disabled={isGeneratingReport}>
+                            {isGeneratingReport ? <> <Loader2 className="mr-2 h-4 w-4 animate-spin"/>Generating...</> : "Generate Report"}
+                            </Button>
+                        )}
+                    </div>
+                   {reportResult && (
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={handlePrintReport}><Printer className="mr-2"/>Print</Button>
+                      <Button variant="outline" onClick={handleCopyReport}><Copy className="mr-2"/>Copy Report</Button>
+                      <Button variant="outline" onClick={handleEmailReport}><Mail className="mr-2"/>Email Report</Button>
+                    </div>
                    )}
                 </DialogFooter>
             </DialogContent>
