@@ -153,13 +153,14 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   });
 
   const { watch, setValue, reset, getValues, formState: { isValid } } = form;
-  const countryCode = watch('country');
-  const gpsCoordinates = watch('gpsCoordinates');
-  const physicalAddress = watch('physicalAddress');
-  const doorPhoto = watch('doorPhoto');
-  const addressName = watch('addressName');
-  const titleDeedNumber = watch('titleDeedNumber');
-  const idNumber = watch('idNumber');
+  const watchedValues = watch();
+  const countryCode = watchedValues.country;
+  const gpsCoordinates = watchedValues.gpsCoordinates;
+  const physicalAddress = watchedValues.physicalAddress;
+  const doorPhoto = watchedValues.doorPhoto;
+  const addressName = watchedValues.addressName;
+  const titleDeedNumber = watchedValues.titleDeedNumber;
+  const idNumber = watchedValues.idNumber;
 
   useEffect(() => {
     try {
@@ -178,6 +179,18 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       console.error("Failed to load saved form data:", e);
     }
   }, [reset, toast]);
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      try {
+        const { doorPhoto, ...dataToSave } = value;
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
+      } catch (e) {
+        console.error("Failed to save form data:", e);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   useEffect(() => {
     if (countryCode) {
