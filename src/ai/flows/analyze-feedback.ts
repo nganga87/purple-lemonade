@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -19,14 +18,14 @@ const AnalyzeFeedbackInputSchema = z.object({
   userContext: z.object({
       name: z.string(),
       email: z.string(),
-      accountTier: z.enum(['Free', 'Standard', 'Pro', 'Enterprise']),
+      accountTier: z.enum(['Free', 'Standard', 'Pro', 'Enterprise', 'N/A']),
   }).describe("Context about the user submitting the feedback."),
 });
 export type AnalyzeFeedbackInput = z.infer<typeof AnalyzeFeedbackInputSchema>;
 
 const AnalyzeFeedbackOutputSchema = z.object({
   summary: z.string().describe("A concise, one-sentence summary of the user's issue."),
-  autoCategory: z.enum(['Bug Report', 'Feature Request', 'Account Issue', 'Billing', 'General Inquiry', 'Validation Problem']).describe("The AI's refined categorization of the issue based on the message content."),
+  autoCategory: z.enum(['Bug Report', 'Feature Request', 'Account Issue', 'Billing', 'General Inquiry', 'Validation Problem', 'Sales Inquiry']).describe("The AI's refined categorization of the issue based on the message content."),
   priority: z.enum(['Low', 'Medium', 'High', 'Critical']).describe("The suggested priority level for this ticket."),
   suggestedAction: z.string().describe("A concrete, actionable next step for the admin team to take."),
 });
@@ -51,14 +50,14 @@ You will receive a piece of user feedback, including the user's own category cho
 Your analysis must be sharp and action-oriented. Follow these steps:
 
 1.  **Summarize the Core Issue:** Read the user's message and distill it into a single, clear sentence.
-2.  **Refine the Category:** The user's category is a starting point, but you must use the message content to determine the most accurate category from the available options. For example, if a user selects "General Feedback" but describes something broken, you should re-categorize it as "Bug Report".
+2.  **Refine the Category:** The user's category is a starting point, but you must use the message content to determine the most accurate category from the available options. If the user indicates they are interested in buying, it is a 'Sales Inquiry'. For example, if a user selects "General Feedback" but describes something broken, you should re-categorize it as "Bug Report".
 3.  **Assess Priority:** Determine the urgency.
     -   **Critical:** Platform-wide outage, security vulnerability, user cannot access their account at all.
-    -   **High:** Major feature is broken, payment/billing issues, validation is failing for a paying customer.
+    -   **High:** Major feature is broken, payment/billing issues, validation is failing for a paying customer. A 'Sales Inquiry' is always High priority.
     -   **Medium:** Minor feature issue, UI bug, single user experiencing a non-critical problem.
     -   **Low:** General feedback, feature request, cosmetic issue.
     Consider the user's account tier. Issues from 'Pro' or 'Enterprise' users should generally have a higher priority.
-4.  **Suggest a Next Action:** Provide a clear, direct instruction for the support team. Examples: "Escalate to engineering team with bug reproduction steps.", "Forward to billing department to investigate transaction ID.", "Add this idea to the feature request board for consideration.", "Send the user the 'How to Reset Your Password' guide."
+4.  **Suggest a Next Action:** Provide a clear, direct instruction for the support team. Examples: "Escalate to engineering team with bug reproduction steps.", "Forward to billing department to investigate transaction ID.", "Add this idea to the feature request board for consideration.", "Send the user the 'How to Reset Your Password' guide.". For a Sales Inquiry, the action should be "Forward to B2B Onboarding Team and send invitation email."
 
 **User Information:**
 - Name: {{{userContext.name}}}

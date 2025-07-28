@@ -1,18 +1,29 @@
-
 export type Feedback = {
     id: string;
-    category: 'Bug Report' | 'Feature Request' | 'Account Issue' | 'General Feedback';
+    category: 'Bug Report' | 'Feature Request' | 'Account Issue' | 'General Feedback' | 'Sales Inquiry';
     subject: string;
     message: string;
     date: string;
     user: {
         name: string;
         email: string;
-        accountTier: 'Free' | 'Standard' | 'Pro' | 'Enterprise';
+        accountTier: 'Free' | 'Standard' | 'Pro' | 'Enterprise' | 'N/A';
     }
 }
 
 export const initialFeedback: Feedback[] = [
+    {
+        id: 'FB-006',
+        category: 'Sales Inquiry',
+        subject: 'Sales Inquiry for Digital Address',
+        message: 'Hello, My name is Maria from Quick Couriers. We are interested in your Enterprise plan and would like to schedule a demo. Please let us know your availability. Thanks, Maria',
+        date: '2024-08-19',
+        user: {
+            name: 'Maria Garcia',
+            email: 'maria.g@qcouriers.com',
+            accountTier: 'N/A'
+        }
+    },
     {
         id: 'FB-001',
         category: 'Bug Report',

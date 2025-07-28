@@ -60,7 +60,9 @@ export default function ForBusinessesPage() {
                         Integrate our API to verify addresses, prevent fraud, and streamline logistics with the most reliable location data available anywhere.
                     </p>
                      <div className="mt-8 flex justify-center gap-4">
-                        <Button size="lg">Contact Sales</Button>
+                        <Button size="lg" asChild>
+                           <a href="mailto:sales@digitaladdress.com?subject=Sales%20Inquiry%20for%20Digital%20Address">Contact Sales</a>
+                        </Button>
                         <Button size="lg" variant="outline" asChild>
                             <Link href="/docs">View Documentation</Link>
                         </Button>
