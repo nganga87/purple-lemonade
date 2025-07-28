@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -34,7 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud, CheckCircle, QrCode, Fingerprint } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud, CheckCircle, QrCode, Fingerprint, Copy } from 'lucide-react';
 import Image from 'next/image';
 import { generateSubAddress } from './utils';
 import { addresses as userProperties } from '@/lib/addresses';
@@ -77,6 +76,10 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
       apartmentNumber: '',
     },
   });
+  
+  const getQrCodeUrl = (data: string, size: number) => {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -113,6 +116,15 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
     form.reset();
     setPhotoPreview(null);
   }
+  
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: `ID Copied!`,
+        description: `The sub-address ID has been copied to your clipboard.`,
+      });
+    });
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -294,10 +306,14 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
                 <div className="p-4 rounded-lg bg-secondary text-center space-y-2">
                     <p className="text-sm text-muted-foreground">Tenant's Sub-Digital Address</p>
                     <p className="font-mono text-sm break-all">{result.subAddressId}</p>
+                     <Button variant="outline" size="sm" onClick={() => handleCopy(result.subAddressId)}>
+                        <Copy className="mr-2 h-4 w-4"/>
+                        Copy ID
+                    </Button>
                 </div>
                 <div className="flex flex-col items-center justify-center bg-secondary rounded-lg p-4">
                     <div className="p-2 bg-white rounded-lg shadow-md">
-                      <Image src="https://placehold.co/160x160.png" alt="QR Code" width={160} height={160} data-ai-hint="qr code"/>
+                      <Image src={getQrCodeUrl(result.subAddressId, 160)} alt="QR Code" width={160} height={160} data-ai-hint="qr code"/>
                     </div>
                     <p className="mt-2 text-sm text-muted-foreground">Scan QR code for verification</p>
                 </div>
