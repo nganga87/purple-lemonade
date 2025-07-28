@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -152,8 +151,8 @@ export default function ForBusinessesPage() {
                  </p>
                  <div className="mt-8">
                     <Button size="lg" asChild>
-                        <Link href="/admin/monetization">
-                            View Pricing & Plans
+                        <Link href="/pricing">
+                            View Pricing &amp; Plans
                         </Link>
                     </Button>
                 </div>
