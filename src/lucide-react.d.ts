@@ -70,4 +70,6 @@ declare module 'lucide-react' {
   export const HelpCircle: Icon;
   export const MessageSquare: Icon;
   export const Printer: Icon;
+  export const Truck: Icon;
+  export const Banknote: Icon;
 }
