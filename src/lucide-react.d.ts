@@ -73,4 +73,7 @@ declare module 'lucide-react' {
   export const Truck: Icon;
   export const Banknote: Icon;
   export const BarChart2: Icon;
+  export const EyeOff: Icon;
+  export const Download: Icon;
+  export const CreditCard: Icon;
 }
