@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -60,7 +61,6 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
   const photo = watch('validatorDoorPhoto');
 
   const requestCamera = async () => {
-    if (cameraStatus !== 'idle' && cameraStatus !== 'denied') return;
     let stream: MediaStream | null = null;
     if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         setCameraStatus('loading');
@@ -110,12 +110,21 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
             toast({ title: "Photo Captured", description: "The captured image is now ready for submission."});
         }
       }, 'image/jpeg');
+      
+       // Stop the camera stream after capturing
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+        setCameraStatus('idle');
+      }
     }
   }, [setFileInForm, toast]);
   
   const handleRetake = () => {
     setDoorPhotoPreview(null);
     setValue('validatorDoorPhoto', new File([], ''), { shouldValidate: true });
+    requestCamera();
   }
 
   const handleOpenMap = () => {
@@ -149,7 +158,7 @@ export default function ValidateRequestPage({ params }: { params: { requestId: s
         title: "Validation Submitted",
         description: "Your validation has been recorded.",
       });
-    } catch (err) => {
+    } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
       toast({

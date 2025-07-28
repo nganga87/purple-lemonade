@@ -200,7 +200,6 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   }, [gpsCoordinates, countryCode]);
 
   const requestCamera = async () => {
-    if (cameraStatus !== 'idle' && cameraStatus !== 'denied') return;
     let stream: MediaStream | null = null;
     if (typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       setCameraStatus('loading');
@@ -305,12 +304,21 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
         setCapturedImage(signedImage);
       }
       
+      // Stop the camera stream after capturing
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+        setCameraStatus('idle');
+      }
+
       setIsCapturing(false);
     }
   }, [processAndSetImage]);
 
   const handleRetake = () => {
     setCapturedImage(null);
+    requestCamera();
   };
 
   const handleConfirmCapture = () => {
