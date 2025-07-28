@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -25,6 +24,7 @@ import {
   Settings,
   ArrowLeft,
   HelpCircle,
+  ChevronDown,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -136,9 +136,9 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <Avatar>
-                      <AvatarImage src="https://placehold.co/100x100.png" alt="User avatar" data-ai-hint="person avatar"/>
+                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="https://placehold.co/100x100.png" alt={user.name} data-ai-hint="person avatar"/>
                       <AvatarFallback>{user.fallback}</AvatarFallback>
                     </Avatar>
                   </Button>
