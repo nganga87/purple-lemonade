@@ -71,4 +71,3 @@ declare module 'lucide-react' {
   export const HelpCircle: Icon;
   export const MessageSquare: Icon;
 }
-`,
