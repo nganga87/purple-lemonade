@@ -151,9 +151,11 @@ export default function BusinessLayout({ children }: BusinessLayoutProps) {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                   <DropdownMenuItem>
+                   <DropdownMenuItem asChild>
+                     <Link href="/">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Log out</span>
+                      </Link>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
