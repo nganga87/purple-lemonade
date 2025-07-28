@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import React, { useState } from 'react';
@@ -14,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 const existingEmails = ['john.doe@example.com', 'admin@digitaladdress.com'];
-const businessEmails = ['sales@globallogistics.com'];
+const businessEmails = ['sales@globallogistics.com', 'company@digitaladdress.com'];
 
 
 export default function LandingPage() {
