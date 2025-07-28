@@ -72,4 +72,5 @@ declare module 'lucide-react' {
   export const Printer: Icon;
   export const Truck: Icon;
   export const Banknote: Icon;
+  export const BarChart2: Icon;
 }

@@ -14,6 +14,8 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
 const existingEmails = ['john.doe@example.com', 'admin@digitaladdress.com'];
+const businessEmails = ['sales@globallogistics.com'];
+
 
 export default function LandingPage() {
   const [nftId, setNftId] = useState('');
@@ -50,13 +52,17 @@ export default function LandingPage() {
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      if (existingEmails.includes(email)) {
+      if (businessEmails.includes(email)) {
+         toast({
+            title: "Business Login Successful",
+            description: `Redirecting to your business dashboard...`,
+        });
+        setTimeout(() => router.push('/business/dashboard'), 2000);
+      } else if (existingEmails.includes(email)) {
         toast({
             title: "Login Link Sent",
             description: `A secure login link has been sent to ${email}.`,
         });
-        // In a real app, you might redirect to a "check your email" page
-        // For demo, we can just log them in after a delay
         setTimeout(() => router.push('/dashboard'), 2000);
 
       } else {

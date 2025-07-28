@@ -12,6 +12,11 @@ import {
   DollarSign,
   ShieldAlert,
   Mail,
+  HelpCircle,
+  MessageSquare,
+  FileText,
+  KeyRound,
+  BarChart2,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import React from 'react';
@@ -85,7 +90,7 @@ export const adminNav: NavItem[] = [
   {
     title: 'User Feedback',
     href: '/admin/feedback',
-    icon: Mail,
+    icon: MessageSquare,
   },
   {
     title: 'Monetization',
@@ -109,5 +114,33 @@ export const adminNav: NavItem[] = [
     icon: LogOut,
     isFooter: true,
     isBottomSeparator: true,
+  },
+];
+
+export const businessNav: NavItem[] = [
+  {
+    title: 'Dashboard',
+    href: '/business/dashboard',
+    icon: LayoutDashboard,
+  },
+  {
+    title: 'API Usage',
+    href: '/business/api-usage',
+    icon: BarChart2,
+  },
+  {
+    title: 'API Keys',
+    href: '/business/api-keys',
+    icon: KeyRound,
+  },
+  {
+    title: 'Billing',
+    href: '/business/billing',
+    icon: DollarSign,
+  },
+  {
+    title: 'Documentation',
+    href: '/docs',
+    icon: FileText,
   },
 ];
