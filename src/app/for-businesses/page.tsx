@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -150,8 +151,10 @@ export default function ForBusinessesPage() {
                     Join the growing network of businesses that rely on Digital Address for location certainty. Explore our plans or get in touch with our team to find the right solution for you.
                  </p>
                  <div className="mt-8">
-                    <Button size="lg">
-                        View Pricing & Plans
+                    <Button size="lg" asChild>
+                        <Link href="/admin/monetization">
+                            View Pricing & Plans
+                        </Link>
                     </Button>
                 </div>
             </div>
