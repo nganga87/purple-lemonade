@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -136,11 +137,13 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button variant="ghost" className="relative h-auto rounded-md px-2 py-1 flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="https://placehold.co/100x100.png" alt={user.name} data-ai-hint="person avatar"/>
+                      <AvatarImage src="https://placehold.co/100x100.png" alt="User avatar" data-ai-hint="person avatar"/>
                       <AvatarFallback>{user.fallback}</AvatarFallback>
                     </Avatar>
+                     <span className="hidden md:inline-block">{user.name}</span>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:inline-block"/>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -156,7 +159,7 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
                       <UserCircle className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
+                      <span>{isUserAdmin ? 'Admin Profile' : 'Profile'}</span>
                     </DropdownMenuItem>
                     {!isUserAdmin && (
                       <DropdownMenuItem>

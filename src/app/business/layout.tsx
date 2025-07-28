@@ -115,11 +115,13 @@ export default function BusinessLayout({ children }: BusinessLayoutProps) {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                   <Button variant="ghost" className="relative h-auto rounded-md px-2 py-1 flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src="https://placehold.co/100x100.png" alt={user.name} data-ai-hint="company logo"/>
                       <AvatarFallback>{user.fallback}</AvatarFallback>
                     </Avatar>
+                    <span className="hidden md:inline-block">{user.name}</span>
+                    <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:inline-block"/>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -149,10 +151,10 @@ export default function BusinessLayout({ children }: BusinessLayoutProps) {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
+                   <DropdownMenuItem>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
