@@ -1,4 +1,3 @@
-
 declare module 'lucide-react' {
   import { SVGProps } from 'react';
 

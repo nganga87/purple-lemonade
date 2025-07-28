@@ -33,10 +33,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud, CheckCircle, QrCode, Fingerprint, Copy } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Home, User, UploadCloud, CheckCircle, QrCode, Fingerprint, Copy, X } from 'lucide-react';
 import Image from 'next/image';
 import { generateSubAddress } from './utils';
 import { addresses as userProperties } from '@/lib/addresses';
+import { AlertDialogCancel } from '@/components/ui/alert-dialog';
 
 
 const formSchema = z.object({
@@ -293,6 +294,10 @@ export function AddTenantForm({ onBack }: AddTenantFormProps) {
       {result && (
         <AlertDialog open={!!result} onOpenChange={() => handleDialogClose()}>
           <AlertDialogContent>
+             <AlertDialogCancel className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground p-1 h-auto">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </AlertDialogCancel>
             <AlertDialogHeader>
               <div className="flex justify-center">
                  <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
