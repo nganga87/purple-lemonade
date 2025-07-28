@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -56,7 +55,9 @@ export default function ForBusinessesPage() {
                     </p>
                      <div className="mt-8 flex justify-center gap-4">
                         <Button size="lg">Contact Sales</Button>
-                        <Button size="lg" variant="outline">View Documentation</Button>
+                        <Button size="lg" variant="outline" asChild>
+                            <Link href="/docs">View Documentation</Link>
+                        </Button>
                     </div>
                 </div>
             </div>
