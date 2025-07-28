@@ -13,6 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
+const existingEmails = ['john.doe@example.com', 'admin@digitaladdress.com'];
+
 export default function LandingPage() {
   const [nftId, setNftId] = useState('');
   const [email, setEmail] = useState('');
@@ -48,11 +50,23 @@ export default function LandingPage() {
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (existingEmails.includes(email)) {
+        toast({
+            title: "Login Link Sent",
+            description: `A secure login link has been sent to ${email}.`,
+        });
+        // In a real app, you might redirect to a "check your email" page
+        // For demo, we can just log them in after a delay
+        setTimeout(() => router.push('/dashboard'), 2000);
+
+      } else {
+        toast({
+            title: "Create Your Account",
+            description: "This email is not registered. Please create an account.",
+        });
+        router.push('/register');
+      }
       setEmailSubmitted(true);
-      toast({
-        title: "Verification Email Sent",
-        description: `A confirmation link has been sent to ${email}.`,
-      });
     } else {
         toast({
             variant: 'destructive',
@@ -94,46 +108,29 @@ export default function LandingPage() {
             </p>
             <div className="w-full max-w-md space-y-6">
                <Card className="bg-secondary/50">
-                  {!emailSubmitted ? (
-                    <>
-                      <CardHeader>
-                          <CardTitle className="font-headline">Create Your Address</CardTitle>
-                          <CardDescription>Get started now by creating your own secure Digital Address.</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                          <form onSubmit={handleEmailSubmit} className="grid gap-2">
-                              <div className="relative">
-                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                              <Input
-                                  type="email"
-                                  placeholder="Enter your email address"
-                                  className="pl-10"
-                                  value={email}
-                                  onChange={(e) => setEmail(e.target.value)}
-                                  required
-                              />
-                              </div>
-                              <Button type="submit" className="w-full">
-                                  Verify My Email
-                                  <ArrowRight className="ml-2 h-4 w-4" />
-                              </Button>
-                          </form>
-                      </CardContent>
-                    </>
-                  ) : (
-                    <CardContent className="pt-6">
-                        <div className="flex flex-col items-center text-center">
-                            <CheckCircle className="h-12 w-12 text-green-500 mb-4"/>
-                            <h3 className="text-xl font-headline font-semibold">Check your email</h3>
-                            <p className="text-muted-foreground mt-2">
-                                We've sent a secure login link to <span className="font-semibold text-primary">{email}</span>. Click the link to continue the registration process.
-                            </p>
-                             <Button variant="outline" className="mt-4" onClick={() => toast({ title: "Email Resent", description: `A new link has been sent to ${email}.`})}>
-                                Resend Email
-                             </Button>
-                        </div>
-                    </CardContent>
-                  )}
+                  <CardHeader>
+                      <CardTitle className="font-headline">Get Started</CardTitle>
+                      <CardDescription>Enter your email to log in or create your secure Digital Address.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      <form onSubmit={handleEmailSubmit} className="grid gap-2">
+                          <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <Input
+                              type="email"
+                              placeholder="Enter your email address"
+                              className="pl-10"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                          />
+                          </div>
+                          <Button type="submit" className="w-full">
+                              Continue with Email
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                      </form>
+                  </CardContent>
               </Card>
 
               <Card>

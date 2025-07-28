@@ -19,7 +19,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Welcome Back</CardTitle>
-          <CardDescription>Log in to manage your digital addresses.</CardDescription>
+          <CardDescription>Enter your email to receive a secure login link.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-4">
@@ -30,15 +30,8 @@ export default function LoginPage() {
                 <Input id="email" type="email" placeholder="you@example.com" className="pl-10" required />
               </div>
             </div>
-            <div className="grid gap-2">
-               <label htmlFor="password">Password</label>
-               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="password" type="password" placeholder="••••••••" className="pl-10" required />
-              </div>
-            </div>
             <Button asChild type="submit" className="w-full mt-2">
-              <Link href="/dashboard">Log In</Link>
+              <Link href="/dashboard">Send Login Link</Link>
             </Button>
           </form>
         </CardContent>
