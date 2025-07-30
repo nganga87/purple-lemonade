@@ -171,7 +171,7 @@ export default function LandingPage() {
           </div>
           <div className="relative w-full h-full min-h-[400px]">
              <Image
-              src="https://storage.googleapis.com/project-1-1288514-public/Image.png"
+              src="https://storage.googleapis.com/project-1-1288514-public/Image%20(1).png"
               alt="An abstract image of a digital network of interconnected cubes, representing blockchain technology and data."
               fill
               className="rounded-xl shadow-2xl object-contain"
