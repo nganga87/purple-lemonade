@@ -194,8 +194,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <Link href="/for-businesses" className="hover:text-primary">For Businesses</Link>
             <Link href="/admin/login" className="hover:text-primary">Admin</Link>
-            <Link href="/terms" className="hover:text-primary">Terms of Service</Link>
-            <Link href="/privacy" className="hover:text-primary">Privacy Policy</Link>
+            <Link href="/" className="hover:text-primary">Terms of Service</Link>
+            <Link href="/" className="hover:text-primary">Privacy Policy</Link>
           </div>
         </div>
       </footer>
