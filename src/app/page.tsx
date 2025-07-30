@@ -174,10 +174,10 @@ export default function LandingPage() {
           </div>
           <div className="relative w-full h-full min-h-[400px]">
              <Image
-              src="https://storage.googleapis.com/project-1-1288514-public/Image%20(4).png"
+              src="https://storage.googleapis.com/project-1-1288514-public/Image%20(5).png"
               alt="A digital, glowing globe with network connections, representing a global, secure address system."
               fill
-              className="rounded-xl shadow-2xl object-contain"
+              className="rounded-xl shadow-2xl object-cover"
             />
             <div className="absolute -bottom-8 -right-8 w-48 rounded-lg bg-card p-4 shadow-lg border">
                 <KeyRound className="h-8 w-8 text-accent mb-2"/>
