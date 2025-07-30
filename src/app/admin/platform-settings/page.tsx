@@ -28,9 +28,9 @@ export default function PlatformSettingsPage() {
   const { toast } = useToast();
   
   // State for Domain & DNS settings
-  const [domainRegistrar, setDomainRegistrar] = useState('Namecheap');
+  const [domainRegistrar, setDomainRegistrar] = useState('Squarespace');
   const [domainExpiry, setDomainExpiry] = useState('2025-10-26');
-  const [dnsProvider, setDnsProvider] = useState('Cloudflare');
+  const [dnsProvider, setDnsProvider] = useState('Squarespace');
   const [paymentMethod, setPaymentMethod] = useState('Corporate Visa **** 1234');
 
   const handleSaveDomainSettings = () => {
