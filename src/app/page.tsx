@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -173,7 +172,7 @@ export default function LandingPage() {
           <div className="relative w-full h-full min-h-[400px]">
              <Image
               src="https://storage.googleapis.com/project-1-1288514-public/Image-2.png"
-              alt="A glowing shield icon with a keyhole, representing digital security and verified identity, surrounded by a network of connected data points."
+              alt="An abstract image of a digital network of interconnected cubes, representing blockchain technology and data."
               fill
               className="rounded-xl shadow-2xl object-cover"
             />
