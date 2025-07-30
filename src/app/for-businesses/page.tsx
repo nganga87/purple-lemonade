@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -41,11 +42,11 @@ export default function ForBusinessesPage() {
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/login">
-              <Button variant="ghost">Log In</Button>
+              <Button variant="ghost">Client Log In</Button>
             </Link>
-            <Link href="/register">
-              <Button>Sign Up</Button>
-            </Link>
+            <Button asChild>
+               <a href="mailto:sales@digitaladdress.com?subject=Sales%20Inquiry%20for%20Digital%20Address">Contact Sales</a>
+            </Button>
           </div>
         </div>
       </header>
