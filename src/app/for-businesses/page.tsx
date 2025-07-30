@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -197,8 +198,8 @@ export default function ForBusinessesPage() {
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Digital Address. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <Link href="/" className="hover:text-primary">Terms of Service</Link>
-            <Link href="/" className="hover:text-primary">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-primary">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-primary">Privacy Policy</Link>
           </div>
         </div>
       </footer>
