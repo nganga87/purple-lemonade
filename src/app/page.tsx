@@ -172,11 +172,11 @@ export default function LandingPage() {
           </div>
           <div className="relative w-full h-full min-h-[400px]">
              <Image
-              src="https://placehold.co/600x400.png"
-              alt="Hero image showing a modern house with a digital lock"
+              src="https://storage.googleapis.com/static.invertase.io/assets/images/studio/digital-address/bg-light-1.png"
+              alt="Digital representation of a secure, interconnected globe"
               fill
               className="rounded-xl shadow-2xl object-cover"
-              data-ai-hint="modern house digital"
+              data-ai-hint="digital globe network"
             />
             <div className="absolute -bottom-8 -right-8 w-48 rounded-lg bg-card p-4 shadow-lg border">
                 <KeyRound className="h-8 w-8 text-accent mb-2"/>
@@ -194,8 +194,8 @@ export default function LandingPage() {
           <div className="flex items-center gap-4">
             <Link href="/for-businesses" className="hover:text-primary">For Businesses</Link>
             <Link href="/admin/login" className="hover:text-primary">Admin</Link>
-            <Link href="/" className="hover:text-primary">Terms of Service</Link>
-            <Link href="/" className="hover:text-primary">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-primary">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-primary">Privacy Policy</Link>
           </div>
         </div>
       </footer>
