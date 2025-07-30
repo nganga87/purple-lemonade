@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
   async headers() {
@@ -49,4 +55,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
