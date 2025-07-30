@@ -819,7 +819,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                 <CardFooter className="flex justify-between items-center">
                    <Button type="button" variant="outline" onClick={handleSave} disabled={isLoading}>
                     <Save className="mr-2 h-4 w-4" />
-                    Save for Later
+                    Save Draft
                   </Button>
                   <Button type="submit" disabled={isLoading || !isValid}>
                     {isLoading ? (
