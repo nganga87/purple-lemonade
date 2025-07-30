@@ -173,10 +173,10 @@ export default function LandingPage() {
           <div className="relative w-full h-full min-h-[400px]">
              <Image
               src="https://placehold.co/600x400.png"
-              alt="Hero image showing a modern house with a digital lock"
+              alt="A modern, tech-enabled home representing a secure digital address"
               fill
               className="rounded-xl shadow-2xl object-cover"
-              data-ai-hint="modern house digital"
+              data-ai-hint="digital home"
             />
             <div className="absolute -bottom-8 -right-8 w-48 rounded-lg bg-card p-4 shadow-lg border">
                 <KeyRound className="h-8 w-8 text-accent mb-2"/>
