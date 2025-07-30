@@ -171,10 +171,10 @@ export default function LandingPage() {
           </div>
           <div className="relative w-full h-full min-h-[400px]">
              <Image
-              src="https://storage.googleapis.com/project-1-1288514-public/Image-2.png"
+              src="https://storage.googleapis.com/project-1-1288514-public/Image.png"
               alt="An abstract image of a digital network of interconnected cubes, representing blockchain technology and data."
               fill
-              className="rounded-xl shadow-2xl object-cover"
+              className="rounded-xl shadow-2xl object-contain"
             />
             <div className="absolute -bottom-8 -right-8 w-48 rounded-lg bg-card p-4 shadow-lg border">
                 <KeyRound className="h-8 w-8 text-accent mb-2"/>
