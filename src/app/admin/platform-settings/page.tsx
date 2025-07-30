@@ -135,7 +135,7 @@ export default function PlatformSettingsPage() {
                 <KeyRound className="h-5 w-5" /> API Keys & Integrations
               </CardTitle>
               <CardDescription>
-                Manage third-party service API keys and blockchain settings.
+                Manage third-party service API keys and blockchain settings. Use test keys for beta/staging environments.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6">
@@ -143,11 +143,11 @@ export default function PlatformSettingsPage() {
                   <h4 className="font-semibold text-muted-foreground">Service Keys</h4>
                   <div className="space-y-2">
                     <Label htmlFor="google-maps-api-key">Google Maps API Key</Label>
-                    <Input id="google-maps-api-key" type="password" defaultValue="AIzaSyD7o4zlD9W1TCf99Thecm6vShntv7cGYuU"/>
+                    <Input id="google-maps-api-key" type="password" defaultValue="AIzaSy_YOUR_TEST_KEY_HERE"/>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="stripe-api-key">Stripe API Key</Label>
-                    <Input id="stripe-api-key" type="password" defaultValue="sk_live_..."/>
+                    <Label htmlFor="stripe-api-key">Stripe API Key (Test)</Label>
+                    <Input id="stripe-api-key" type="password" defaultValue="sk_test_4eC39HqLyjWDarjtT1zdp7dc"/>
                   </div>
                </div>
                <div className="space-y-4">
@@ -158,7 +158,7 @@ export default function PlatformSettingsPage() {
                   </div>
                    <div className="space-y-2">
                     <Label htmlFor="rpc-endpoint">RPC Endpoint URL</Label>
-                    <Input id="rpc-endpoint" defaultValue="https://mainnet.infura.io/v3/..."/>
+                    <Input id="rpc-endpoint" defaultValue="https://sepolia.infura.io/v3/..."/>
                   </div>
                </div>
             </CardContent>
