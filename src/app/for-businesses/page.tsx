@@ -72,7 +72,7 @@ export default function ForBusinessesPage() {
         </section>
 
         <section className="py-16 md:py-24">
-            <div className="container space-y-16">
+            <div className="container space-y-24">
                  <div className="mx-auto max-w-2xl text-center">
                     <h2 className="font-headline text-3xl font-bold tracking-tighter">A Single Source of Truth for Physical Location</h2>
                     <p className="mt-4 text-muted-foreground md:text-lg">
@@ -139,6 +139,37 @@ export default function ForBusinessesPage() {
                     </div>
                      <div className="md:order-1">
                         <Image src="https://placehold.co/600x400.png" alt="Secure financial transaction" width={600} height={400} className="rounded-lg shadow-lg" data-ai-hint="security shield"/>
+                    </div>
+                </div>
+                
+                 {/* Marketplace Section */}
+                 <div id="marketplace-benefits" className="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <Image src="https://placehold.co/600x400.png" alt="Digital marketplace for addresses" width={600} height={400} className="rounded-lg shadow-lg" data-ai-hint="digital marketplace"/>
+                    </div>
+                    <div className="space-y-4">
+                         <div className="inline-flex items-center gap-2 rounded-full bg-purple-100 px-3 py-1 text-sm font-semibold text-purple-800">
+                           <Banknote className="h-5 w-5"/>
+                           <span>For Real Estate & Asset Management</span>
+                         </div>
+                         <h3 className="font-headline text-2xl font-bold tracking-tighter">Unlock the Value of Physical Locations</h3>
+                         <p className="text-muted-foreground">
+                            The AddressChain marketplace transforms physical properties into liquid digital assets. Buy, sell, or lease verified addresses with unprecedented transparency and efficiency.
+                         </p>
+                         <ul className="space-y-2 text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                                <CheckCircle className="h-5 w-5 text-purple-500 mt-1 flex-shrink-0" />
+                                <span>Acquire strategic commercial or residential addresses for market expansion or investment.</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <CheckCircle className="h-5 w-5 text-purple-500 mt-1 flex-shrink-0" />
+                                <span>Monetize unused or underutilized property assets by listing them on a global exchange.</span>
+                            </li>
+                             <li className="flex items-start gap-2">
+                                <CheckCircle className="h-5 w-5 text-purple-500 mt-1 flex-shrink-0" />
+                                <span>Perform AI-powered due diligence on any listed property to assess its history, usage, and risk profile before acquisition.</span>
+                            </li>
+                         </ul>
                     </div>
                 </div>
 
