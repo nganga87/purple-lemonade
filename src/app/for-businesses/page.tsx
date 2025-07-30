@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -22,7 +21,7 @@ export default function ForBusinessesPage() {
           </Link>
           <nav className="hidden items-center gap-6 text-sm md:flex">
              <Link
-              href="/exchange"
+              href="#marketplace-benefits"
               className="font-medium text-foreground/60 transition-colors hover:text-foreground/80"
             >
               Marketplace
