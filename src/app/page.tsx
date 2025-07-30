@@ -103,9 +103,6 @@ export default function LandingPage() {
       <main className="flex-1">
         <section 
           className="container grid lg:grid-cols-2 gap-12 lg:gap-20 items-center py-12 md:py-24 lg:py-32"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke-width='2' stroke='hsl(210 70% 50% / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e")`
-          }}
         >
           <div className="flex flex-col items-start gap-8">
             <h1 className="font-headline text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
@@ -177,8 +174,8 @@ export default function LandingPage() {
           </div>
           <div className="relative w-full h-full min-h-[400px]">
              <Image
-              src="https://storage.googleapis.com/project-1-1288514-public/Image%20(3).png"
-              alt="An abstract image of a digital network of interconnected cubes, representing blockchain technology and data."
+              src="https://storage.googleapis.com/project-1-1288514-public/Image%20(4).png"
+              alt="A digital, glowing globe with network connections, representing a global, secure address system."
               fill
               className="rounded-xl shadow-2xl object-contain"
             />
