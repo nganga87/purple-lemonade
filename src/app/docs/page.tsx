@@ -1,19 +1,44 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Copy, Check } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 function CodeBlock({ children, className }: { children: React.ReactNode, className?: string }) {
+    const { toast } = useToast();
+    const [hasCopied, setHasCopied] = useState(false);
+
+    const onCopy = () => {
+        if (typeof children === 'string') {
+            navigator.clipboard.writeText(children);
+            setHasCopied(true);
+            toast({ title: 'Copied!', description: 'The code snippet has been copied to your clipboard.' });
+            setTimeout(() => setHasCopied(false), 2000);
+        }
+    };
+
     return (
-        <pre className={`bg-secondary p-4 rounded-md text-sm text-secondary-foreground overflow-x-auto ${className}`}>
-            <code>
-                {children}
-            </code>
-        </pre>
+        <div className="relative group">
+            <pre className={`bg-secondary p-4 rounded-md text-sm text-secondary-foreground overflow-x-auto ${className}`}>
+                <code>
+                    {children}
+                </code>
+            </pre>
+            <Button
+                size="icon"
+                variant="ghost"
+                className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={onCopy}
+            >
+                {hasCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                <span className="sr-only">Copy code</span>
+            </Button>
+        </div>
     )
 }
 
