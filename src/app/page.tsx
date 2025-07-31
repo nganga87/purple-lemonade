@@ -50,27 +50,31 @@ export default function LandingPage() {
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      if (businessEmails.includes(email)) {
-         toast({
-            title: "Business Login Successful",
-            description: `Redirecting to your business dashboard...`,
-        });
-        setTimeout(() => router.push('/business/dashboard'), 2000);
-      } else if (existingEmails.includes(email)) {
-        toast({
-            title: "Login Link Sent",
-            description: `A secure login link has been sent to ${email}.`,
-        });
-        setTimeout(() => router.push('/dashboard'), 2000);
+        
+      const isBusiness = businessEmails.includes(email);
+      const isExisting = existingEmails.includes(email);
 
-      } else {
-        toast({
-            title: "Create Your Account",
-            description: "This email is not registered. Please create an account.",
-        });
-        router.push('/register');
+      let title = "Check your email";
+      let description = `A secure link to access your account has been sent to ${email}.`;
+      let destination = '/dashboard';
+
+      if (isBusiness) {
+        title = "Business Login Sent";
+        destination = '/business/dashboard';
+      } else if (!isExisting) {
+        description = `A secure link to create your account has been sent to ${email}.`;
+        // The destination remains the dashboard, as the magic link would handle the signup flow
+        // and then redirect to the dashboard.
       }
+      
+      toast({
+          title,
+          description,
+      });
+
       setEmailSubmitted(true);
+      setTimeout(() => router.push(destination), 2000);
+
     } else {
         toast({
             variant: 'destructive',
