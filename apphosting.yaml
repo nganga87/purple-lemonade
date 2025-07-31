@@ -5,6 +5,11 @@ runConfig:
   concurrency: 100
   cpu: 2
   memoryMiB: 1024
+  vpcAccess:
+    egress: PRIVATE_RANGES_ONLY
+    networkInterfaces:
+      - network: my-network-id
+        subnetwork: my-subnetwork-id
 
 # Environment variables and secrets
 env:
