@@ -8,8 +8,12 @@ runConfig:
 
 # Environment variables and secrets
 env:
-  - variable: STORAGE_BUCKET
+-   variable: STORAGE_BUCKET
     value: mybucket.firebasestorage.app
     availability:
-      - BUILD
-      - RUNTIME
+    -   BUILD
+    -   RUNTIME
+
+outputFiles:
+  serverApp:
+    include: [dist, server.js]
