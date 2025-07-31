@@ -95,7 +95,25 @@ const generateAddressReportFlow = ai.defineFlow(
     outputSchema: GenerateAddressReportOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
-    return output!;
+    try {
+      const { output } = await prompt(input);
+      if (!output) {
+          throw new Error("AI failed to generate a report.");
+      }
+      return output;
+    } catch (error) {
+        console.error("Error in generateAddressReportFlow:", error);
+        // Return a structured error-like response that matches the schema
+        return {
+            listingSummary: "Error generating report.",
+            commercialUsage: [],
+            verificationHistory: [],
+            riskAssessment: {
+                level: "High",
+                findings: ["Failed to analyze address data due to an internal error."],
+            },
+            overallAssessment: "Could not complete the assessment. Please try again later.",
+        };
+    }
   }
 );
