@@ -81,7 +81,7 @@ export default function SignUpPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="name@digitaladdress.com"
                   className="pl-10"
                   required
                   value={email}
