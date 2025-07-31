@@ -58,6 +58,8 @@ const userSchema = z.object({
   gender: z.string().optional(),
   permissions: z.array(z.string()).optional(),
   biometricHash: z.string().optional(),
+  securityQuestions: z.array(z.string()).optional(),
+  securityAnswers: z.array(z.string()).optional(),
 });
 
 export type AdminUser = z.infer<typeof userSchema>;
@@ -86,6 +88,8 @@ const defaultValues: Omit<AdminUser, 'id'> = {
   permissions: [],
   biometricHash: '',
   password: '',
+  securityQuestions: [],
+  securityAnswers: [],
 };
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {

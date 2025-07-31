@@ -47,7 +47,6 @@ export default function SignUpPage() {
         const existingUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
         const existingUsers: AdminUser[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
 
-        // Check if user already exists
         if (existingUsers.some(user => user.email === values.email)) {
             toast({
                 variant: "destructive",
@@ -63,23 +62,23 @@ export default function SignUpPage() {
             name: values.name,
             email: values.email,
             password: values.password,
-            role: 'support-agent', // Default role for new sign-ups
+            role: 'support-agent',
             status: 'Pending Approval',
             permissions: [],
+            securityQuestions: [],
+            securityAnswers: [],
         };
 
         const updatedUsers = [newUser, ...existingUsers];
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUsers));
-        localStorage.setItem('loggedInUserName', values.name);
         
         toast({
           title: "Account Created!",
-          description: "Redirecting you to the portal...",
+          description: "Next, please set up your security questions.",
         });
 
-        // Simulate network delay then redirect
         setTimeout(() => {
-          router.push('/register');
+          router.push(`/signup/security-questions?userId=${newUser.id}`);
         }, 1000);
 
       } catch (error) {
