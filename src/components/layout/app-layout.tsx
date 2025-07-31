@@ -68,7 +68,7 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
 
   const user = isUserAdmin
     ? { name: 'Nicholas C.', email: 'nicholas@digitaladdress.com', fallback: 'NC' }
-    : { name: userName, email: `${userName.toLowerCase().replace(' ', '.')}@example.com`, fallback: userInitial };
+    : { name: userName, email: `${userName.toLowerCase().replace(/\s/g, '')}@digitaladdress.com`, fallback: userInitial };
 
   const getPageTitle = () => {
     for (const section of navItems) {
