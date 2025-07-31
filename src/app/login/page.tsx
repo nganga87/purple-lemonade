@@ -1,3 +1,5 @@
+'use client';
+
 import { Mail, Lock } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
@@ -32,7 +34,7 @@ export default function LoginPage() {
              <div className="grid gap-2">
                <div className="flex items-center justify-between">
                 <label htmlFor="password">Password</label>
-                 <Link href="/forgot-password" passHref>
+                 <Link href="/reset-password" passHref>
                     <Button variant="link" className="px-0 text-xs h-auto">Forgot Password?</Button>
                 </Link>
                </div>
