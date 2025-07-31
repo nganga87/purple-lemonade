@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, KeyRound, Mail, Search, Copy } from 'lucide-react';
+import { ArrowRight, KeyRound, Mail, Search, Copy, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,14 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
-const existingEmails = ['john.doe@example.com', 'admin@digitaladdress.com'];
-const businessEmails = ['sales@globallogistics.com', 'company@digitaladdress.com'];
-
-
 export default function LandingPage() {
   const [nftId, setNftId] = useState('');
   const [email, setEmail] = useState('');
-  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -47,40 +44,46 @@ export default function LandingPage() {
     }
   };
   
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        
-      const isBusiness = businessEmails.includes(email);
-      const isExisting = existingEmails.includes(email);
-
-      let title = "Check your email";
-      let description = `A secure link to access your account has been sent to ${email}.`;
-      let destination = '/dashboard';
-
-      if (isBusiness) {
-        title = "Business Login Sent";
-        destination = '/business/dashboard';
-      } else if (!isExisting) {
-        description = `A secure link to create your account has been sent to ${email}.`;
-        // The destination remains the dashboard, as the magic link would handle the signup flow
-        // and then redirect to the dashboard.
-      }
-      
-      toast({
-          title,
-          description,
-      });
-
-      setEmailSubmitted(true);
-      setTimeout(() => router.push(destination), 2000);
-
-    } else {
-        toast({
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+       toast({
             variant: 'destructive',
             title: 'Invalid Email',
             description: 'Please enter a valid email address.',
         });
+        return;
+    }
+    
+    setIsLoading(true);
+
+    try {
+        const response = await fetch('/api/auth/send-magic-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Something went wrong.');
+        }
+        
+        toast({
+            title: "Check your email",
+            description: `A secure link to access your account has been sent to ${email}.`,
+        });
+
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred."
+        toast({
+            variant: 'destructive',
+            title: 'Failed to Send Link',
+            description: errorMessage,
+        });
+    } finally {
+        setIsLoading(false);
     }
   };
 
@@ -133,9 +136,10 @@ export default function LandingPage() {
                               required
                           />
                           </div>
-                          <Button type="submit" className="w-full">
-                              Continue with Email
-                              <ArrowRight className="ml-2 h-4 w-4" />
+                          <Button type="submit" className="w-full" disabled={isLoading}>
+                              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
+                              {isLoading ? 'Sending...' : 'Continue with Email'}
+                              {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
                           </Button>
                       </form>
                   </CardContent>
