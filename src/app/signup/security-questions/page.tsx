@@ -60,6 +60,7 @@ export default function SecurityQuestionsPage() {
       question2: '',
       answer2: '',
       question3: '',
+      answer3: '',
     },
   });
 
