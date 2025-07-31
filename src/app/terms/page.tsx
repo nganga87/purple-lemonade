@@ -1,12 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 export default function TermsPage() {
+  const [currentYear, setCurrentYear] = useState('');
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear().toString());
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col bg-background font-body">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,7 +36,7 @@ export default function TermsPage() {
         <div className="space-y-8">
             <div className="space-y-2">
                  <h1 className="font-headline text-4xl font-bold tracking-tight">Terms and Conditions</h1>
-                <p className="text-lg text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
+                <p className="text-lg text-muted-foreground">Last updated: {currentYear ? new Date().toLocaleDateString() : '...'}</p>
             </div>
 
             <Card>
@@ -81,7 +87,7 @@ export default function TermsPage() {
 
       <footer className="border-t">
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Digital Address. All rights reserved.</p>
+          <p>&copy; {currentYear} Digital Address. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/terms" className="hover:text-primary">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-primary">Privacy Policy</Link>

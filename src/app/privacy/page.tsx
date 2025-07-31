@@ -7,10 +7,10 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function PrivacyPage() {
-  const [lastUpdated, setLastUpdated] = useState('');
+  const [currentYear, setCurrentYear] = useState('');
 
   useEffect(() => {
-    setLastUpdated(new Date().toLocaleDateString());
+    setCurrentYear(new Date().getFullYear().toString());
   }, []);
 
   return (
@@ -36,7 +36,7 @@ export default function PrivacyPage() {
         <div className="space-y-8">
             <div className="space-y-2">
                  <h1 className="font-headline text-4xl font-bold tracking-tight">Privacy Policy</h1>
-                <p className="text-lg text-muted-foreground">Last updated: {lastUpdated}</p>
+                <p className="text-lg text-muted-foreground">Last updated: {currentYear ? new Date().toLocaleDateString() : '...'}</p>
             </div>
 
             <Card>
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
 
       <footer className="border-t">
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} Digital Address. All rights reserved.</p>
+          <p>&copy; {currentYear} Digital Address. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="/terms" className="hover:text-primary">Terms of Service</Link>
             <Link href="/privacy" className="hover:text-primary">Privacy Policy</Link>
