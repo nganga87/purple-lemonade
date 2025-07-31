@@ -53,9 +53,18 @@ export default function ResetPasswordPage() {
     const { toast } = useToast();
     const router = useRouter();
 
-    const emailForm = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
-    const securityForm = useForm<SecurityFormValues>({ resolver: zodResolver(securitySchema) });
-    const passwordForm = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
+    const emailForm = useForm<EmailFormValues>({ 
+      resolver: zodResolver(emailSchema),
+      defaultValues: { email: '' },
+    });
+    const securityForm = useForm<SecurityFormValues>({ 
+      resolver: zodResolver(securitySchema),
+      defaultValues: { question1: '', question2: '', question3: '' },
+    });
+    const passwordForm = useForm<PasswordFormValues>({ 
+      resolver: zodResolver(passwordSchema),
+      defaultValues: { password: '', confirmPassword: '' },
+    });
 
     const handleEmailSubmit = (values: EmailFormValues) => {
         setIsLoading(true);
