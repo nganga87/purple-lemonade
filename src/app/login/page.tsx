@@ -30,7 +30,12 @@ export default function LoginPage() {
               </div>
             </div>
              <div className="grid gap-2">
-              <label htmlFor="password">Password</label>
+               <div className="flex items-center justify-between">
+                <label htmlFor="password">Password</label>
+                 <Link href="/forgot-password" passHref>
+                    <Button variant="link" className="px-0 text-xs h-auto">Forgot Password?</Button>
+                </Link>
+               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input id="password" type="password" placeholder="••••••••" className="pl-10" required />

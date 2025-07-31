@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -31,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, Fingerprint } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, Fingerprint, Lock } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -46,6 +45,7 @@ const userSchema = z.object({
   name: z.string().min(1, 'Full name is required.'),
   email: z.string().email('Please enter a valid email.'),
   role: z.string().min(1, 'Please select a role.'),
+  password: z.string().optional(),
   status: z.enum(['Active', 'Inactive', 'Pending Approval', 'Suspended']).default('Pending Approval'),
   jobTitle: z.string().optional(),
   bio: z.string().optional(),
@@ -85,6 +85,7 @@ const defaultValues: Omit<AdminUser, 'id'> = {
   dateOfBirth: '',
   permissions: [],
   biometricHash: '',
+  password: '',
 };
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
@@ -219,6 +220,23 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                             <Input type="email" placeholder="user@digitaladdress.com" {...field} className="pl-10" />
                           </div>
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Set Password</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input type="password" placeholder="Leave blank to keep unchanged" {...field} className="pl-10" />
+                          </div>
+                        </FormControl>
+                         <FormDescription>Set a new password for the user, or leave it blank.</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

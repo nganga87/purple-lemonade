@@ -9,25 +9,43 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
 import type { AdminUser } from '../admin/user-management/user-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
+const signupSchema = z.object({
+  name: z.string().min(1, "Full name is required."),
+  email: z.string().email("Please enter a valid email."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type SignupFormValues = z.infer<typeof signupSchema>;
+
 export default function SignUpPage() {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const { toast } = useToast();
 
-  const handleSignUp = (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
+  });
+
+  const onSubmit = (values: SignupFormValues) => {
     if (typeof window !== 'undefined') {
-      if (name) {
-        localStorage.setItem('loggedInUserName', name);
-      }
+      localStorage.setItem('loggedInUserName', values.name);
       
       const newUser: Omit<AdminUser, 'id'> = {
-          name: name,
-          email: email,
-          role: 'support-agent', // Default role for new sign-ups
+          name: values.name,
+          email: values.email,
+          role: 'support-agent', // Default role
           status: 'Pending Approval',
           permissions: [],
       };
@@ -41,6 +59,10 @@ export default function SignUpPage() {
         console.error("Failed to update user list in storage:", error);
       }
     }
+    toast({
+      title: "Account Created!",
+      description: "You can now register your first address.",
+    });
     router.push('/register');
   };
   
@@ -59,47 +81,77 @@ export default function SignUpPage() {
           <CardDescription>Join the future of address verification.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4" onSubmit={handleSignUp}>
-            <div className="grid gap-2">
-              <label htmlFor="name">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input 
-                  id="name" 
-                  placeholder="John Doe" 
-                  className="pl-10" 
-                  required 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="email">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@digitaladdress.com"
-                  className="pl-10"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <label htmlFor="password">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="password" type="password" placeholder="••••••••" className="pl-10" required />
-              </div>
-            </div>
-            <Button type="submit" className="w-full mt-2">
-              Create Account
-            </Button>
-          </form>
+          <Form {...form}>
+            <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+               <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                       <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input placeholder="John Doe" className="pl-10" {...field} />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                     <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          <Input type="email" placeholder="name@digitaladdress.com" className="pl-10" {...field} />
+                        </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                       <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                       <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full mt-2">
+                Create Account
+              </Button>
+            </form>
+          </Form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4 text-center">
             <p className="text-sm text-muted-foreground">
