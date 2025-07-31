@@ -49,17 +49,36 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
   const pathname = usePathname();
-  const [userName, setUserName] = useState('stephen mwang');
-  const [userInitial, setUserInitial] = useState('SM');
+  const [userName, setUserName] = useState('John Doe');
+  const [userInitial, setUserInitial] = useState('JD');
 
-  useEffect(() => {
+  const updateUserInfo = () => {
     if (typeof window !== 'undefined') {
       const storedName = localStorage.getItem('loggedInUserName');
       if (storedName) {
         setUserName(storedName);
-        setUserInitial(storedName.split(' ').map(n => n[0]).join(''));
+        const initials = storedName
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase();
+        setUserInitial(initials);
       }
     }
+  };
+
+  useEffect(() => {
+    updateUserInfo();
+
+    const handleStorageChange = () => {
+      updateUserInfo();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
 
