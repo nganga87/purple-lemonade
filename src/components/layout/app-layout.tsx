@@ -49,8 +49,8 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
   const pathname = usePathname();
-  const [userName, setUserName] = useState('User');
-  const [userInitial, setUserInitial] = useState('U');
+  const [userName, setUserName] = useState('stephen mwang');
+  const [userInitial, setUserInitial] = useState('SM');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -68,7 +68,7 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
 
   const user = isUserAdmin
     ? { name: 'Nicholas C.', email: 'nicholas@digitaladdress.com', fallback: 'NC' }
-    : { name: userName, email: `${userName.toLowerCase().replace(/\s/g, '')}@digitaladdress.com`, fallback: userInitial };
+    : { name: userName, email: `${userName.toLowerCase().replace(/\s/g, '.')}@digitaladdress.com`, fallback: userInitial };
 
   const getPageTitle = () => {
     for (const section of navItems) {
