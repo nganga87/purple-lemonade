@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Edit, Trash2, KeyRound } from 'lucide-react';
 import { UserDialog, type AdminUser } from './user-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { roles } from './roles';
@@ -175,6 +175,10 @@ export function UserTable() {
                        <DropdownMenuItem onClick={() => handleEdit(user)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit User
+                        </DropdownMenuItem>
+                       <DropdownMenuItem onClick={() => handleEdit(user)}>
+                            <KeyRound className="mr-2 h-4 w-4" />
+                            Reset Password
                         </DropdownMenuItem>
                        <DropdownMenuSub>
                           <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
