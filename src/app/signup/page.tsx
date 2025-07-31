@@ -1,6 +1,6 @@
 'use client';
 
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 export default function SignUpPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -39,31 +40,58 @@ export default function SignUpPage() {
   });
 
   const onSubmit = (values: SignupFormValues) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('loggedInUserName', values.name);
-      
-      const newUser: Omit<AdminUser, 'id'> = {
-          name: values.name,
-          email: values.email,
-          role: 'support-agent', // Default role
-          status: 'Pending Approval',
-          permissions: [],
-      };
+    setIsLoading(true);
 
+    if (typeof window !== 'undefined') {
       try {
         const existingUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
         const existingUsers: AdminUser[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
-        const updatedUsers = [{ ...newUser, id: `usr_${Date.now()}`}, ...existingUsers];
+
+        // Check if user already exists
+        if (existingUsers.some(user => user.email === values.email)) {
+            toast({
+                variant: "destructive",
+                title: "Account already exists",
+                description: "An account with this email address already exists. Please log in.",
+            });
+            setIsLoading(false);
+            return;
+        }
+
+        const newUser: AdminUser = {
+            id: `usr_${Date.now()}`,
+            name: values.name,
+            email: values.email,
+            password: values.password,
+            role: 'support-agent', // Default role for new sign-ups
+            status: 'Pending Approval',
+            permissions: [],
+        };
+
+        const updatedUsers = [newUser, ...existingUsers];
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUsers));
+        localStorage.setItem('loggedInUserName', values.name);
+        
+        toast({
+          title: "Account Created!",
+          description: "Redirecting you to the portal...",
+        });
+
+        // Simulate network delay then redirect
+        setTimeout(() => {
+          router.push('/register');
+        }, 1000);
+
       } catch (error) {
         console.error("Failed to update user list in storage:", error);
+        toast({
+            variant: "destructive",
+            title: "Sign-up failed",
+            description: "An unexpected error occurred. Please try again later.",
+        });
+        setIsLoading(false);
       }
     }
-    toast({
-      title: "Account Created!",
-      description: "You can now register your first address.",
-    });
-    router.push('/register');
   };
   
   return (
@@ -147,7 +175,8 @@ export default function SignUpPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full mt-2">
+              <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Account
               </Button>
             </form>
