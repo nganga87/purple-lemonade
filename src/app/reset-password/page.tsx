@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,16 +13,18 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from '@/components/ui/separator';
+import type { AdminUser } from '../admin/user-management/user-dialog';
+
+const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 const emailSchema = z.object({
   email: z.string().email("Please enter a valid email."),
 });
 
 const securitySchema = z.object({
-  question1: z.string().min(1, "Answer is required."),
-  question2: z.string().min(1, "Answer is required."),
-  question3: z.string().min(1, "Answer is required."),
+  answer1: z.string().min(1, "Answer is required."),
+  answer2: z.string().min(1, "Answer is required."),
+  answer3: z.string().min(1, "Answer is required."),
 });
 
 const passwordSchema = z.object({
@@ -37,21 +39,11 @@ type EmailFormValues = z.infer<typeof emailSchema>;
 type SecurityFormValues = z.infer<typeof securitySchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
-const mockSecurityQuestions = {
-    'john.doe@example.com': ["What was your first pet's name?", "What city were you born in?", "What is your mother's maiden name?"],
-    'robertsnalo@digitaladdress.com': ["What was your first pet's name?", "What city were you born in?", "What is your mother's maiden name?"],
-    'default': ["Security question 1?", "Security question 2?", "Security question 3?"],
-};
-
-const mockUserAnswers = {
-    'john.doe@example.com': ["buddy", "anytown", "smith"],
-    'robertsnalo@digitaladdress.com': ["buddy", "nairobi", "muthoni"],
-};
 
 export default function ResetPasswordPage() {
     const [step, setStep] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
-    const [userEmail, setUserEmail] = useState('');
+    const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
     const { toast } = useToast();
     const router = useRouter();
 
@@ -61,7 +53,7 @@ export default function ResetPasswordPage() {
     });
     const securityForm = useForm<SecurityFormValues>({ 
       resolver: zodResolver(securitySchema),
-      defaultValues: { question1: '', question2: '', question3: '' },
+      defaultValues: { answer1: '', answer2: '', answer3: '' },
     });
     const passwordForm = useForm<PasswordFormValues>({ 
       resolver: zodResolver(passwordSchema),
@@ -70,22 +62,42 @@ export default function ResetPasswordPage() {
 
     const handleEmailSubmit = (values: EmailFormValues) => {
         setIsLoading(true);
-        // Simulate checking if user exists
         setTimeout(() => {
-            setUserEmail(values.email);
-            setStep(2);
+            try {
+                const usersRaw = localStorage.getItem(USER_STORAGE_KEY);
+                const users: AdminUser[] = usersRaw ? JSON.parse(usersRaw) : [];
+                const foundUser = users.find(u => u.email === values.email);
+                
+                if (foundUser) {
+                    if (foundUser.securityQuestions && foundUser.securityQuestions.length === 3) {
+                      setCurrentUser(foundUser);
+                      setStep(2);
+                    } else {
+                       toast({ variant: "destructive", title: "No Security Questions", description: "This account has no security questions set up. Please contact support." });
+                    }
+                } else {
+                    toast({ variant: "destructive", title: "User Not Found", description: "No account found with that email address." });
+                }
+            } catch (e) {
+                 toast({ variant: "destructive", title: "Error", description: "Could not process your request." });
+            }
             setIsLoading(false);
         }, 1000);
     };
 
     const handleSecuritySubmit = (values: SecurityFormValues) => {
         setIsLoading(true);
-        const correctAnswers = mockUserAnswers[userEmail as keyof typeof mockUserAnswers] || [];
-        const userAnswers = Object.values(values);
+        if (!currentUser?.securityAnswers) {
+            toast({ variant: "destructive", title: "Error", description: "Security answers not found for this user." });
+            setIsLoading(false);
+            return;
+        }
 
-        // Simulate checking answers
+        const correctAnswers = currentUser.securityAnswers;
+        const userAnswers = Object.values(values).map(a => a.toLowerCase());
+
         setTimeout(() => {
-             if (JSON.stringify(userAnswers.map(a => a.toLowerCase())) === JSON.stringify(correctAnswers)) {
+             if (JSON.stringify(userAnswers) === JSON.stringify(correctAnswers)) {
                 toast({ title: "Security Questions Passed", description: "You can now reset your password." });
                 setStep(3);
             } else {
@@ -97,15 +109,30 @@ export default function ResetPasswordPage() {
 
     const handlePasswordSubmit = (values: PasswordFormValues) => {
         setIsLoading(true);
-        // Simulate password change
+        if (!currentUser) return;
+
         setTimeout(() => {
-            toast({ title: "Password Reset Successful", description: "You can now log in with your new password." });
-            setStep(4);
-            setIsLoading(false);
+          try {
+            const usersRaw = localStorage.getItem(USER_STORAGE_KEY);
+            let users: AdminUser[] = usersRaw ? JSON.parse(usersRaw) : [];
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+
+            if (userIndex !== -1) {
+              users[userIndex].password = values.password;
+              localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+              toast({ title: "Password Reset Successful", description: "You can now log in with your new password." });
+              setStep(4);
+            } else {
+              toast({ variant: 'destructive', title: "Error", description: "Could not find user to update."});
+            }
+          } catch(e) {
+            toast({ variant: 'destructive', title: "Error", description: "Failed to save new password."});
+          }
+          setIsLoading(false);
         }, 1000);
     };
 
-    const securityQuestions = mockSecurityQuestions[userEmail as keyof typeof mockSecurityQuestions] || mockSecurityQuestions.default;
+    const securityQuestions = currentUser?.securityQuestions || [];
     
     const renderStep = () => {
         switch (step) {
@@ -141,23 +168,23 @@ export default function ResetPasswordPage() {
                      <Form {...securityForm}>
                         <form onSubmit={securityForm.handleSubmit(handleSecuritySubmit)} className="grid gap-4">
                             <div className="p-2 bg-secondary rounded-md text-center text-sm">
-                                <p className="font-semibold">{userEmail}</p>
+                                <p>Answering questions for: <span className="font-semibold">{currentUser?.email}</span></p>
                             </div>
-                            <FormField control={securityForm.control} name="question1" render={({ field }) => (
+                            <FormField control={securityForm.control} name="answer1" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{securityQuestions[0]}</FormLabel>
                                     <FormControl><Input placeholder="Your answer" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                             <FormField control={securityForm.control} name="question2" render={({ field }) => (
+                             <FormField control={securityForm.control} name="answer2" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{securityQuestions[1]}</FormLabel>
                                     <FormControl><Input placeholder="Your answer" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
-                             <FormField control={securityForm.control} name="question3" render={({ field }) => (
+                             <FormField control={securityForm.control} name="answer3" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{securityQuestions[2]}</FormLabel>
                                     <FormControl><Input placeholder="Your answer" {...field} /></FormControl>
