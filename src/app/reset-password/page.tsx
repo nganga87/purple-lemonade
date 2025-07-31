@@ -39,11 +39,13 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 const mockSecurityQuestions = {
     'john.doe@example.com': ["What was your first pet's name?", "What city were you born in?", "What is your mother's maiden name?"],
+    'robertsnalo@digitaladdress.com': ["What was your first pet's name?", "What city were you born in?", "What is your mother's maiden name?"],
     'default': ["Security question 1?", "Security question 2?", "Security question 3?"],
 };
 
 const mockUserAnswers = {
     'john.doe@example.com': ["buddy", "anytown", "smith"],
+    'robertsnalo@digitaladdress.com': ["buddy", "nairobi", "muthoni"],
 };
 
 export default function ResetPasswordPage() {
@@ -138,24 +140,27 @@ export default function ResetPasswordPage() {
                  return (
                      <Form {...securityForm}>
                         <form onSubmit={securityForm.handleSubmit(handleSecuritySubmit)} className="grid gap-4">
+                            <div className="p-2 bg-secondary rounded-md text-center text-sm">
+                                <p className="font-semibold">{userEmail}</p>
+                            </div>
                             <FormField control={securityForm.control} name="question1" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{securityQuestions[0]}</FormLabel>
-                                    <FormControl><Input {...field} /></FormControl>
+                                    <FormControl><Input placeholder="Your answer" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
                              <FormField control={securityForm.control} name="question2" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{securityQuestions[1]}</FormLabel>
-                                    <FormControl><Input {...field} /></FormControl>
+                                    <FormControl><Input placeholder="Your answer" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
                              <FormField control={securityForm.control} name="question3" render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>{securityQuestions[2]}</FormLabel>
-                                    <FormControl><Input {...field} /></FormControl>
+                                    <FormControl><Input placeholder="Your answer" {...field} /></FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )} />
