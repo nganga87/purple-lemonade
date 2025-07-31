@@ -9,7 +9,7 @@ import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
@@ -97,7 +97,7 @@ export default function ResetPasswordPage() {
         const userAnswers = Object.values(values).map(a => a.toLowerCase());
 
         setTimeout(() => {
-             if (JSON.stringify(userAnswers) === JSON.stringify(correctAnswers)) {
+             if (JSON.stringify(userAnswers) === JSON.stringify(correctAnswers.map(a => a.toLowerCase()))) {
                 toast({ title: "Security Questions Passed", description: "You can now reset your password." });
                 setStep(3);
             } else {
