@@ -1,12 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function PrivacyPage() {
+  const [lastUpdated, setLastUpdated] = useState('');
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleDateString());
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col bg-background font-body">
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,7 +36,7 @@ export default function PrivacyPage() {
         <div className="space-y-8">
             <div className="space-y-2">
                  <h1 className="font-headline text-4xl font-bold tracking-tight">Privacy Policy</h1>
-                <p className="text-lg text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
+                <p className="text-lg text-muted-foreground">Last updated: {lastUpdated}</p>
             </div>
 
             <Card>
