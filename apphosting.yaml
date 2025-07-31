@@ -10,3 +10,6 @@ runConfig:
 env:
   - variable: STORAGE_BUCKET
     value: mybucket.firebasestorage.app
+    availability:
+      - BUILD
+      - RUNTIME
