@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -49,7 +48,7 @@ export function UserTable() {
       toast({ title: 'User Updated', description: `${user.name}'s details have been updated.` });
     } else {
       const newUser = { ...user, id: `usr_${Date.now()}` };
-      setUsers([newUser, ...users]);
+      setUsers(prevUsers => [newUser, ...prevUsers]);
       toast({ title: 'User Added', description: `${user.name} has been added to the system.` });
     }
     setEditingUser(null);
