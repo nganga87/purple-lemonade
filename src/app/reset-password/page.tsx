@@ -62,6 +62,12 @@ export default function ResetPasswordPage() {
       defaultValues: { password: '', confirmPassword: '' },
     });
 
+    useEffect(() => {
+        if (step === 3) {
+            passwordForm.reset({ password: '', confirmPassword: '' });
+        }
+    }, [step, passwordForm]);
+
     const handleEmailSubmit = (values: EmailFormValues) => {
         setIsLoading(true);
         setTimeout(() => {
