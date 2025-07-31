@@ -1,11 +1,26 @@
+'use client';
+
 import { Mail, Lock, User } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const [name, setName] = useState('');
+
+  const handleSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined' && name) {
+      localStorage.setItem('loggedInUserName', name);
+    }
+    router.push('/register');
+  };
+  
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background font-body p-4">
       <div className="absolute top-4 left-4">
@@ -21,12 +36,19 @@ export default function SignUpPage() {
           <CardDescription>Join the future of address verification.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="grid gap-4">
+          <form className="grid gap-4" onSubmit={handleSignUp}>
             <div className="grid gap-2">
               <label htmlFor="name">Full Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="name" placeholder="John Doe" className="pl-10" required />
+                <Input 
+                  id="name" 
+                  placeholder="John Doe" 
+                  className="pl-10" 
+                  required 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
             </div>
             <div className="grid gap-2">
@@ -43,8 +65,8 @@ export default function SignUpPage() {
                 <Input id="password" type="password" placeholder="••••••••" className="pl-10" required />
               </div>
             </div>
-            <Button asChild type="submit" className="w-full mt-2">
-              <Link href="/register">Create Account</Link>
+            <Button type="submit" className="w-full mt-2">
+              Create Account
             </Button>
           </form>
         </CardContent>

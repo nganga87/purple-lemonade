@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -49,12 +49,26 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
   const pathname = usePathname();
+  const [userName, setUserName] = useState('User');
+  const [userInitial, setUserInitial] = useState('U');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedName = localStorage.getItem('loggedInUserName');
+      if (storedName) {
+        setUserName(storedName);
+        setUserInitial(storedName.split(' ').map(n => n[0]).join(''));
+      }
+    }
+  }, []);
+
+
   const navItems = nav === 'admin' ? adminNav : mainNav;
   const isUserAdmin = nav === 'admin';
 
   const user = isUserAdmin
     ? { name: 'Nicholas C.', email: 'nicholas@digitaladdress.com', fallback: 'NC' }
-    : { name: 'Nganga Ndungu', email: 'nganga.ndungu@example.com', fallback: 'NN' };
+    : { name: userName, email: `${userName.toLowerCase().replace(' ', '.')}@example.com`, fallback: userInitial };
 
   const getPageTitle = () => {
     for (const section of navItems) {
