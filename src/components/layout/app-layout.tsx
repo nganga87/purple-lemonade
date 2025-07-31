@@ -70,8 +70,10 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
   useEffect(() => {
     updateUserInfo();
 
-    const handleStorageChange = () => {
-      updateUserInfo();
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'loggedInUserName') {
+        updateUserInfo();
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
