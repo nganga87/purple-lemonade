@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -35,22 +35,49 @@ import { useToast } from '@/hooks/use-toast';
 import { roles } from './roles';
 import { initialUsers } from './users';
 
+const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 export function UserTable() {
-  const [users, setUsers] = useState<AdminUser[]>(initialUsers);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
   const { toast } = useToast();
+  
+  useEffect(() => {
+    try {
+      const savedUsers = localStorage.getItem(USER_STORAGE_KEY);
+      if (savedUsers) {
+        setUsers(JSON.parse(savedUsers));
+      } else {
+        setUsers(initialUsers);
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(initialUsers));
+      }
+    } catch (e) {
+      console.error("Failed to load users from storage:", e);
+      setUsers(initialUsers);
+    }
+  }, []);
+
+  const updateUsers = (newUsers: AdminUser[]) => {
+    setUsers(newUsers);
+    try {
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUsers));
+    } catch (e) {
+      console.error("Failed to save users to storage:", e);
+    }
+  };
 
   const handleSaveUser = (user: AdminUser) => {
+    let newUsers;
     if (editingUser) {
-      setUsers(users.map(u => u.id === user.id ? user : u));
+      newUsers = users.map(u => u.id === user.id ? user : u);
       toast({ title: 'User Updated', description: `${user.name}'s details have been updated.` });
     } else {
       const newUser = { ...user, id: `usr_${Date.now()}` };
-      setUsers(prevUsers => [newUser, ...prevUsers]);
+      newUsers = [newUser, ...users];
       toast({ title: 'User Added', description: `${user.name} has been added to the system.` });
     }
+    updateUsers(newUsers);
     setEditingUser(null);
   };
   
@@ -66,12 +93,14 @@ export function UserTable() {
   
   const handleDelete = (userId: string) => {
       const userName = users.find(u => u.id === userId)?.name;
-      setUsers(users.filter(u => u.id !== userId));
+      const newUsers = users.filter(u => u.id !== userId);
+      updateUsers(newUsers);
       toast({ variant: 'destructive', title: `User Deleted`, description: `${userName} has been removed from the system.` });
   }
 
   const handleSetStatus = (userId: string, status: AdminUser['status']) => {
-      setUsers(users.map(u => u.id === userId ? {...u, status} : u));
+      const newUsers = users.map(u => u.id === userId ? {...u, status} : u);
+      updateUsers(newUsers);
       const userName = users.find(u => u.id === userId)?.name;
       toast({ title: `Status Updated`, description: `${userName}'s status has been set to ${status}.` });
   }

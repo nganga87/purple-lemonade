@@ -8,15 +8,38 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useState } from 'react';
+import type { AdminUser } from '../admin/user-management/user-dialog';
+
+const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 export default function SignUpPage() {
   const router = useRouter();
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
-    if (typeof window !== 'undefined' && name) {
-      localStorage.setItem('loggedInUserName', name);
+    if (typeof window !== 'undefined') {
+      if (name) {
+        localStorage.setItem('loggedInUserName', name);
+      }
+      
+      const newUser: Omit<AdminUser, 'id'> = {
+          name: name,
+          email: email,
+          role: 'support-agent', // Default role for new sign-ups
+          status: 'Pending Approval',
+          permissions: [],
+      };
+
+      try {
+        const existingUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
+        const existingUsers: AdminUser[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+        const updatedUsers = [{ ...newUser, id: `usr_${Date.now()}`}, ...existingUsers];
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUsers));
+      } catch (error) {
+        console.error("Failed to update user list in storage:", error);
+      }
     }
     router.push('/register');
   };
@@ -55,7 +78,15 @@ export default function SignUpPage() {
               <label htmlFor="email">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="you@example.com" className="pl-10" required />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  className="pl-10"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
             </div>
             <div className="grid gap-2">
