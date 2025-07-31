@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, KeyRound, Mail, Search, Copy, Loader2 } from 'lucide-react';
+import { KeyRound, Search, Copy } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,8 +14,6 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function LandingPage() {
   const [nftId, setNftId] = useState('');
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -43,49 +41,6 @@ export default function LandingPage() {
       });
     }
   };
-  
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-       toast({
-            variant: 'destructive',
-            title: 'Invalid Email',
-            description: 'Please enter a valid email address.',
-        });
-        return;
-    }
-    
-    setIsLoading(true);
-
-    try {
-        const response = await fetch('/api/auth/send-magic-link', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || 'Something went wrong.');
-        }
-        
-        toast({
-            title: "Check your email",
-            description: `A secure link to access your account has been sent to ${email}.`,
-        });
-
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred."
-        toast({
-            variant: 'destructive',
-            title: 'Failed to Send Link',
-            description: errorMessage,
-        });
-    } finally {
-        setIsLoading(false);
-    }
-  };
 
   return (
     <div className="flex min-h-screen flex-col bg-background font-body">
@@ -99,7 +54,7 @@ export default function LandingPage() {
             <Link href="/login">
               <Button variant="ghost">Log In</Button>
             </Link>
-            <Link href="/register">
+            <Link href="/signup">
               <Button>Sign Up</Button>
             </Link>
           </div>
@@ -117,34 +72,15 @@ export default function LandingPage() {
               physical addresses using the power of AI and blockchain technology.
               Prevent fraud, streamline deliveries, and own your address like never before.
             </p>
+             <div className="flex gap-4">
+                <Button size="lg" asChild>
+                    <Link href="/signup">Get Started for Free</Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                    <Link href="/for-businesses">For Businesses</Link>
+                </Button>
+            </div>
             <div className="w-full max-w-md space-y-6">
-               <Card className="bg-secondary/50">
-                  <CardHeader>
-                      <CardTitle className="font-headline">Get Started</CardTitle>
-                      <CardDescription>Enter your email to log in or create your secure Digital Address.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                      <form onSubmit={handleEmailSubmit} className="grid gap-2">
-                          <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input
-                              type="email"
-                              placeholder="Enter your email address"
-                              className="pl-10"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              required
-                          />
-                          </div>
-                          <Button type="submit" className="w-full" disabled={isLoading}>
-                              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
-                              {isLoading ? 'Sending...' : 'Continue with Email'}
-                              {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
-                          </Button>
-                      </form>
-                  </CardContent>
-              </Card>
-
               <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Find a Digital Address</CardTitle>
