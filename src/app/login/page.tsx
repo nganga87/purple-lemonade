@@ -1,74 +1,37 @@
+
 'use client';
 
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Loader2 } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import type { AdminUser } from '../admin/user-management/user-dialog';
-
-const USER_STORAGE_KEY = 'addressChainAdminUsers';
-
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email."),
-  password: z.string().min(1, "Password is required."),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
-  });
-
-  const onSubmit = (values: LoginFormValues) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    if (typeof window !== 'undefined') {
-      try {
-        const usersRaw = localStorage.getItem(USER_STORAGE_KEY);
-        const users: AdminUser[] = usersRaw ? JSON.parse(usersRaw) : [];
-        
-        const foundUser = users.find(
-          user => user.email === values.email && user.password === values.password
-        );
 
-        setTimeout(() => {
-          if (foundUser) {
-            localStorage.setItem('loggedInUserName', foundUser.name);
-            toast({
-              title: "Login Successful",
-              description: `Welcome back, ${foundUser.name}!`,
-            });
-            router.push('/dashboard');
-          } else {
-            toast({
-              variant: 'destructive',
-              title: "Login Failed",
-              description: "Invalid email or password. Please try again.",
-            });
-          }
-          setIsLoading(false);
-        }, 1000);
-
-      } catch (error) {
-        console.error("Failed to process login:", error);
-        toast({ variant: 'destructive', title: "An Error Occurred" });
+    // Simulate API call to send login link
+    setTimeout(() => {
+        toast({
+            title: "Login Link Sent",
+            description: `If an account exists for ${email}, a login link has been sent.`,
+        });
         setIsLoading(false);
-      }
-    }
+        // In a real app, you wouldn't redirect here, but wait for the user to click the link.
+        // For demo purposes, we'll redirect to the dashboard.
+        router.push('/dashboard');
+    }, 1500);
   };
 
   return (
@@ -83,54 +46,30 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Welcome Back</CardTitle>
-          <CardDescription>Enter your credentials to access your account.</CardDescription>
+          <CardDescription>Enter your email to receive a secure login link.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-               <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                     <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input type="email" placeholder="you@example.com" className="pl-10" {...field} />
-                        </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-               <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link href="/reset-password" passHref>
-                          <Button variant="link" className="px-0 text-xs h-auto">Forgot Password?</Button>
-                      </Link>
-                    </div>
-                     <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input type="password" placeholder="••••••••" className="pl-10" {...field} />
-                        </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full mt-2" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Log In
-              </Button>
-            </form>
-          </Form>
+          <form className="grid gap-4" onSubmit={handleSubmit}>
+            <div className="grid gap-2">
+              <label htmlFor="email">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="you@example.com" 
+                  className="pl-10" 
+                  required 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+            <Button type="submit" className="w-full mt-2" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send Login Link
+            </Button>
+          </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-4 text-center">
             <p className="text-sm text-muted-foreground">
