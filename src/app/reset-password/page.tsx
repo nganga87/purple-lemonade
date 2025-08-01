@@ -22,6 +22,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import type { AdminUser } from '../admin/user-management/user-dialog';
+
+const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 const emailSchema = z.object({
   email: z.string().email('Please enter a valid email.'),
@@ -43,35 +46,27 @@ type EmailFormValues = z.infer<typeof emailSchema>;
 type SecurityFormValues = z.infer<typeof securitySchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
-const mockSecurityQuestion = "What was the name of your first pet?";
-
 export default function ResetPasswordPage() {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<{ question: string, answer: string } | null>(null);
   const { toast } = useToast();
   const router = useRouter();
 
   const emailForm = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
-    defaultValues: {
-      email: '',
-    }
+    defaultValues: { email: '' }
   });
   
   const securityForm = useForm<SecurityFormValues>({
     resolver: zodResolver(securitySchema),
-    defaultValues: {
-      answer: '',
-    },
+    defaultValues: { answer: '' },
   });
   
   const passwordForm = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
-    defaultValues: {
-        newPassword: '',
-        confirmNewPassword: '',
-    }
+    defaultValues: { newPassword: '', confirmNewPassword: '' },
   });
 
   useEffect(() => {
@@ -80,22 +75,36 @@ export default function ResetPasswordPage() {
     }
   }, [step, passwordForm]);
 
-
   const handleEmailSubmit = (values: EmailFormValues) => {
     setIsLoading(true);
-    // Simulate checking if email exists and has security questions
     setTimeout(() => {
-      setEmail(values.email);
-      setStep(2);
+      try {
+        const storedUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
+        const users: AdminUser[] = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
+        const user = users.find(u => u.email === values.email);
+
+        if (user && user.securityQuestions && user.securityQuestions.length > 0) {
+          setCurrentUser(user);
+          const questionIndex = Math.floor(Math.random() * user.securityQuestions.length);
+          setCurrentQuestion({
+            question: user.securityQuestions[questionIndex],
+            answer: user.securityAnswers![questionIndex],
+          });
+          setStep(2);
+        } else {
+          toast({ variant: 'destructive', title: 'Not Found', description: 'No user found with that email or security questions are not set up.' });
+        }
+      } catch (error) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not process your request.' });
+      }
       setIsLoading(false);
     }, 1000);
   };
   
   const handleSecuritySubmit = (values: SecurityFormValues) => {
     setIsLoading(true);
-    // Simulate checking the security answer
     setTimeout(() => {
-      if(values.answer.toLowerCase() === 'buddy') {
+      if (values.answer.toLowerCase() === currentQuestion?.answer) {
           setStep(3);
       } else {
           toast({ variant: 'destructive', title: 'Incorrect Answer', description: 'The security answer is not correct.'})
@@ -106,11 +115,23 @@ export default function ResetPasswordPage() {
   
   const handlePasswordSubmit = (values: PasswordFormValues) => {
     setIsLoading(true);
-    // Simulate resetting password
     setTimeout(() => {
-        toast({ title: "Password Reset Successful", description: "You can now log in with your new password." });
-        setStep(4);
-        setIsLoading(false);
+      try {
+        const storedUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
+        let users: AdminUser[] = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
+        const userIndex = users.findIndex(u => u.id === currentUser?.id);
+        if (userIndex !== -1) {
+          users[userIndex].password = values.newPassword;
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+          toast({ title: "Password Reset Successful", description: "You can now log in with your new password." });
+          setStep(4);
+        } else {
+          throw new Error("User not found during password update.");
+        }
+      } catch (e) {
+        toast({ variant: 'destructive', title: 'Error', description: 'Failed to update password.' });
+      }
+      setIsLoading(false);
     }, 1000);
   };
 
@@ -168,7 +189,7 @@ export default function ResetPasswordPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="p-4 rounded-md bg-secondary border">
-                            <p className="text-sm font-medium">{mockSecurityQuestion}</p>
+                            <p className="text-sm font-medium">{currentQuestion?.question}</p>
                         </div>
                         <FormField
                             control={securityForm.control}

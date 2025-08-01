@@ -1,3 +1,4 @@
+
 declare module 'lucide-react' {
   import { SVGProps } from 'react';
 
@@ -76,4 +77,5 @@ declare module 'lucide-react' {
   export const EyeOff: Icon;
   export const Download: Icon;
   export const CreditCard: Icon;
+  export const ShieldQuestion: Icon;
 }

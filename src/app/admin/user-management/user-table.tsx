@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -22,25 +23,27 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, PlusCircle, Edit, Trash2, KeyRound } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, Edit, Trash2, KeyRound, ShieldQuestion } from 'lucide-react';
 import { UserDialog, type AdminUser } from './user-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { roles } from './roles';
 import { initialUsers } from './users';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 export function UserTable() {
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
+  const [isSecurityDialogOpen, setIsSecurityDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  const [selectedUserForSecurity, setSelectedUserForSecurity] = useState<AdminUser | null>(null);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -83,12 +86,12 @@ export function UserTable() {
   
   const handleEdit = (user: AdminUser) => {
       setEditingUser(user);
-      setIsDialogOpen(true);
+      setIsUserDialogOpen(true);
   };
   
   const handleAddNew = () => {
     setEditingUser(null);
-    setIsDialogOpen(true);
+    setIsUserDialogOpen(true);
   };
   
   const handleDelete = (userId: string) => {
@@ -103,6 +106,11 @@ export function UserTable() {
       updateUsers(newUsers);
       const userName = users.find(u => u.id === userId)?.name;
       toast({ title: `Status Updated`, description: `${userName}'s status has been set to ${status}.` });
+  }
+
+  const handleViewSecurityQuestions = (user: AdminUser) => {
+      setSelectedUserForSecurity(user);
+      setIsSecurityDialogOpen(true);
   }
 
   const getRoleName = (roleId: string) => {
@@ -124,6 +132,7 @@ export function UserTable() {
   }
 
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
@@ -180,6 +189,10 @@ export function UserTable() {
                             <KeyRound className="mr-2 h-4 w-4" />
                             Reset Password
                         </DropdownMenuItem>
+                         <DropdownMenuItem onClick={() => handleViewSecurityQuestions(user)}>
+                            <ShieldQuestion className="mr-2 h-4 w-4" />
+                            View Security
+                        </DropdownMenuItem>
                        <DropdownMenuSub>
                           <DropdownMenuSubTrigger>Change Status</DropdownMenuSubTrigger>
                           <DropdownMenuSubContent>
@@ -210,12 +223,40 @@ export function UserTable() {
           </TableBody>
         </Table>
       </CardContent>
-       <UserDialog 
-            isOpen={isDialogOpen} 
-            setIsOpen={setIsDialogOpen}
-            onSave={handleSaveUser}
-            user={editingUser}
-        />
     </Card>
+
+    <UserDialog 
+      isOpen={isUserDialogOpen} 
+      setIsOpen={setIsUserDialogOpen}
+      onSave={handleSaveUser}
+      user={editingUser}
+    />
+    
+    <Dialog open={isSecurityDialogOpen} onOpenChange={setIsSecurityDialogOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Security Questions for {selectedUserForSecurity?.name}</DialogTitle>
+          <DialogDescription>
+            These are the questions the user selected for account recovery.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="py-4 space-y-4">
+            {(selectedUserForSecurity?.securityQuestions?.length ?? 0) > 0 ? (
+                 selectedUserForSecurity?.securityQuestions?.map((question, index) => (
+                    <div key={index} className="space-y-1">
+                        <p className="font-semibold text-sm">{`Question ${index + 1}: ${question}`}</p>
+                        <p className="text-muted-foreground text-sm p-2 bg-secondary rounded-md">{`Answer: ••••••••`}</p>
+                    </div>
+                ))
+            ) : (
+                <p className="text-muted-foreground text-center py-4">No security questions set for this user.</p>
+            )}
+        </div>
+        <DialogFooter>
+          <Button onClick={() => setIsSecurityDialogOpen(false)}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
