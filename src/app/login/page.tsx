@@ -1,8 +1,7 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { Mail, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,21 +15,31 @@ export default function LoginPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call to send login link
+    // Simulate API call to check credentials
     setTimeout(() => {
+      // In a real app, you would check credentials against your backend
+      if (email === "john.doe@example.com" && password === "password") {
         toast({
-            title: "Login Link Sent",
-            description: `If an account exists for ${email}, a login link has been sent.`,
+            title: "Login Successful",
+            description: `Welcome back!`,
+        });
+        localStorage.setItem('loggedInUserName', 'John Doe');
+        router.push('/dashboard');
+      } else {
+         toast({
+            variant: "destructive",
+            title: "Login Failed",
+            description: "Invalid email or password. Please try again.",
         });
         setIsLoading(false);
-        // In a real app, you wouldn't redirect here, but wait for the user to click the link.
-        // For demo purposes, we'll redirect to the dashboard.
-        router.push('/dashboard');
+      }
     }, 1500);
   };
 
@@ -46,7 +55,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="font-headline text-2xl">Welcome Back</CardTitle>
-          <CardDescription>Enter your email to receive a secure login link.</CardDescription>
+          <CardDescription>Enter your email and password to access your account.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-4" onSubmit={handleSubmit}>
@@ -65,9 +74,32 @@ export default function LoginPage() {
                 />
               </div>
             </div>
+             <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password">Password</label>
+                <Link href="/reset-password">
+                    <span className="text-sm text-primary hover:underline">Forgot password?</span>
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input 
+                    id="password" 
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••" 
+                    className="pl-10 pr-10"
+                    required 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff className="h-4 w-4"/> : <Eye className="h-4 w-4"/>}
+                </Button>
+              </div>
+            </div>
             <Button type="submit" className="w-full mt-2" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Send Login Link
+              Log In
             </Button>
           </form>
         </CardContent>

@@ -44,55 +44,15 @@ export default function SignUpPage() {
   const onSubmit = (values: SignupFormValues) => {
     setIsLoading(true);
 
-    if (typeof window !== 'undefined') {
-      try {
-        const existingUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
-        const existingUsers: AdminUser[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
-
-        if (existingUsers.some(user => user.email === values.email)) {
-            toast({
-                variant: "destructive",
-                title: "Account already exists",
-                description: "An account with this email address already exists. Please log in.",
-            });
-            setIsLoading(false);
-            return;
-        }
-
-        const newUser: AdminUser = {
-            id: `usr_${Date.now()}`,
-            name: values.name,
-            email: values.email,
-            password: values.password,
-            role: 'support-agent',
-            status: 'Pending Approval',
-            permissions: [],
-            securityQuestions: [],
-            securityAnswers: [],
-        };
-
-        const updatedUsers = [newUser, ...existingUsers];
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(updatedUsers));
-        
+    // Simulate user creation
+    setTimeout(() => {
         toast({
           title: "Account Created!",
-          description: "Next, please set up your security questions.",
-        });
-
-        setTimeout(() => {
-          router.push(`/signup/security-questions?userId=${newUser.id}`);
-        }, 1000);
-
-      } catch (error) {
-        console.error("Failed to update user list in storage:", error);
-        toast({
-            variant: "destructive",
-            title: "Sign-up failed",
-            description: "An unexpected error occurred. Please try again later.",
+          description: "You can now log in with your credentials.",
         });
         setIsLoading(false);
-      }
-    }
+        router.push('/login');
+    }, 1500)
   };
   
   return (

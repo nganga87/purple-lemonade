@@ -48,18 +48,9 @@ export default function LandingPage() {
     e.preventDefault();
     if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       if (existingEmails.includes(email)) {
-        toast({
-            title: "Login Link Sent",
-            description: `A secure login link has been sent to ${email}.`,
-        });
-        setTimeout(() => router.push('/dashboard'), 2000);
-
+        router.push('/login');
       } else {
-        toast({
-            title: "Create Your Account",
-            description: "This email is not registered. Please create an account.",
-        });
-        router.push('/register');
+        router.push('/signup');
       }
     } else {
         toast({
