@@ -11,11 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
-const existingEmails = ['john.doe@example.com', 'admin@digitaladdress.com'];
 
 export default function LandingPage() {
   const [nftId, setNftId] = useState('');
-  const [email, setEmail] = useState('');
   const router = useRouter();
   const { toast } = useToast();
 
@@ -41,23 +39,6 @@ export default function LandingPage() {
         title: 'Paste Failed',
         description: 'Could not read from clipboard. Please check browser permissions.',
       });
-    }
-  };
-  
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      if (existingEmails.includes(email)) {
-        router.push('/login');
-      } else {
-        router.push('/signup');
-      }
-    } else {
-        toast({
-            variant: 'destructive',
-            title: 'Invalid Email',
-            description: 'Please enter a valid email address.',
-        });
     }
   };
 
@@ -92,31 +73,14 @@ export default function LandingPage() {
               Prevent fraud, streamline deliveries, and own your address like never before.
             </p>
             <div className="w-full max-w-md space-y-6">
-               <Card className="bg-secondary/50">
-                  <CardHeader>
-                      <CardTitle className="font-headline">Get Started</CardTitle>
-                      <CardDescription>Enter your email to log in or create your secure Digital Address.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                      <form onSubmit={handleEmailSubmit} className="grid gap-2">
-                          <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input
-                              type="email"
-                              placeholder="Enter your email address"
-                              className="pl-10"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              required
-                          />
-                          </div>
-                          <Button type="submit" className="w-full">
-                              Continue with Email
-                              <ArrowRight className="ml-2 h-4 w-4" />
-                          </Button>
-                      </form>
-                  </CardContent>
-              </Card>
+               <div className="flex items-center gap-4">
+                  <Button size="lg" asChild>
+                    <Link href="/signup">Get Started for Free</Link>
+                  </Button>
+                  <Button size="lg" variant="outline" asChild>
+                    <Link href="/for-businesses">For Businesses</Link>
+                  </Button>
+                </div>
 
               <Card>
                 <CardHeader>
@@ -158,11 +122,6 @@ export default function LandingPage() {
               className="rounded-xl shadow-2xl object-cover"
               data-ai-hint="digital globe network"
             />
-            <div className="absolute -bottom-8 -right-8 w-48 rounded-lg bg-card p-4 shadow-lg border">
-                <KeyRound className="h-8 w-8 text-accent mb-2"/>
-                <h3 className="font-headline font-semibold">Address NFT</h3>
-                <p className="text-sm text-muted-foreground">Your address, secured as a unique digital asset on the blockchain.</p>
-            </div>
           </div>
         </section>
 
