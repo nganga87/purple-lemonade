@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -25,12 +26,12 @@ export default function LoginPage() {
     // Simulate API call to check credentials
     setTimeout(() => {
       // In a real app, you would check credentials against your backend
-      if (email === "john.doe@example.com" && password === "password") {
+      if (email === "robertsnalo@digitaladdress.com" && password === "password") {
         toast({
             title: "Login Successful",
             description: `Welcome back!`,
         });
-        localStorage.setItem('loggedInUserName', 'John Doe');
+        localStorage.setItem('loggedInUserName', 'Robert Snalo');
         router.push('/dashboard');
       } else {
          toast({
