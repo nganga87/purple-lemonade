@@ -10,6 +10,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import type { AdminUser } from '../admin/user-management/user-dialog';
+
+const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,25 +26,40 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call to check credentials
     setTimeout(() => {
-      // In a real app, you would check credentials against your backend
-      if (email === "robertsnalo@digitaladdress.com" && password === "password") {
-        toast({
+      try {
+        const storedUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
+        const storedUsers: AdminUser[] = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
+        
+        const user = storedUsers.find(
+          u => u.email === email && u.password === password
+        );
+
+        if (user) {
+          toast({
             title: "Login Successful",
-            description: `Welcome back!`,
-        });
-        localStorage.setItem('loggedInUserName', 'Robert Snalo');
-        router.push('/dashboard');
-      } else {
-         toast({
+            description: `Welcome back, ${user.name}!`,
+          });
+          localStorage.setItem('loggedInUserName', user.name || 'User');
+          router.push('/dashboard');
+        } else {
+          toast({
             variant: "destructive",
             title: "Login Failed",
             description: "Invalid email or password. Please try again.",
+          });
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        toast({
+          variant: "destructive",
+          title: "An Error Occurred",
+          description: "Could not process login. Please try again later.",
         });
         setIsLoading(false);
       }
-    }, 1500);
+    }, 1000);
   };
 
   return (

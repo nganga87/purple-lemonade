@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
@@ -44,15 +45,42 @@ export default function SignUpPage() {
   const onSubmit = (values: SignupFormValues) => {
     setIsLoading(true);
 
-    // Simulate user creation
     setTimeout(() => {
+      try {
+        const existingUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
+        let users: AdminUser[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
+
+        if (users.some(u => u.email === values.email)) {
+          toast({ variant: 'destructive', title: 'Account Exists', description: 'An account with this email already exists. Please log in.'});
+          setIsLoading(false);
+          return;
+        }
+
+        const newUser: AdminUser = {
+          id: `usr_${Date.now()}`,
+          name: values.name,
+          email: values.email,
+          password: values.password,
+          role: 'user', // Assign a default role
+          status: 'Active',
+        };
+
+        users.push(newUser);
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+
         toast({
           title: "Account Created!",
-          description: "You can now log in with your credentials.",
+          description: "You're all set! Redirecting you to set up security questions.",
         });
+        
+        router.push(`/signup/security-questions?userId=${newUser.id}`);
+
+      } catch (error) {
+        console.error("Signup error:", error);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not create your account.'});
         setIsLoading(false);
-        router.push('/login');
-    }, 1500)
+      }
+    }, 1000);
   };
   
   return (
