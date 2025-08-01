@@ -1,8 +1,16 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 # https://firebase.google.com/docs/app-hosting/configure
+
 runConfig:
+  # This is the command that starts your application.
+  # For a Next.js app, this is 'npm run start'.
   entrypoint: npm run start
+  # Sets the maximum number of container instances that can be running at once.
   maxInstances: 10
+
+# Environment variables that can be used by your application.
+# The values of these variables are not visible to other users of the
+# Firebase console.
 env:
   - variable: GEMINI_API_KEY
     secret: GEMINI_API_KEY
