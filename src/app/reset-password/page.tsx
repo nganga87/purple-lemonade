@@ -58,6 +58,9 @@ export default function ResetPasswordPage() {
   
   const securityForm = useForm<SecurityFormValues>({
     resolver: zodResolver(securitySchema),
+    defaultValues: {
+      answer: '',
+    },
   });
   
   const passwordForm = useForm<PasswordFormValues>({
