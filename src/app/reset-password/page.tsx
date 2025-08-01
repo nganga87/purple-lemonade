@@ -54,6 +54,9 @@ export default function ResetPasswordPage() {
 
   const emailForm = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
+    defaultValues: {
+      email: '',
+    }
   });
   
   const securityForm = useForm<SecurityFormValues>({
