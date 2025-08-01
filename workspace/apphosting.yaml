@@ -3,6 +3,8 @@
 
 # Settings for Cloud Run
 runConfig:
+  # The command to start the app.
+  entrypoint: npm run start
   # The maximum number of container instances that can be running at the same time.
   maxInstances: 10
 
