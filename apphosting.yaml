@@ -1,24 +1,16 @@
-# Settings for Cloud Run
+# Settings to manage and configure a Firebase App Hosting backend.
+# https://firebase.google.com/docs/app-hosting/configure
+
 runConfig:
-  minInstances: 2
-  maxInstances: 100
-  concurrency: 100
-  cpu: 2
-  memoryMiB: 1024
-  vpcAccess:
-    egress: PRIVATE_RANGES_ONLY
-    networkInterfaces:
-      - network: my-network-id
-        subnetwork: my-subnetwork-id
+  # Increase this value if you'd like to automatically spin up
+  # more instances in response to increased traffic.
+  maxInstances: 10
 
-# Environment variables and secrets
+# Environment variables that can be used by your application.
+# The values of these variables are not visible to other users of the
+# Firebase console.
 env:
--   variable: STORAGE_BUCKET
-    value: mybucket.firebasestorage.app
+  - variable: GEMINI_API_KEY
     availability:
-    -   BUILD
-    -   RUNTIME
-
-outputFiles:
-  serverApp:
-    include: [dist, server.js]
+      - BUILD
+      - RUNTIME
