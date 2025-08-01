@@ -18,8 +18,6 @@ env:
     availability:
     -   BUILD
     -   RUNTIME
--   variable: API_KEY
-    secret: myApiKeySecret
 
 outputFiles:
   serverApp:
