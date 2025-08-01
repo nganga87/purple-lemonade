@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -61,6 +62,10 @@ export default function ResetPasswordPage() {
   
   const passwordForm = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
+    defaultValues: {
+        newPassword: '',
+        confirmNewPassword: '',
+    }
   });
 
   useEffect(() => {
