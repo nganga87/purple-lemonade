@@ -18,3 +18,7 @@ build:
   env:
     - variable: GOOGLE_BUILDABLE
       value: .
+
+# Specifies the Node.js version to use.
+buildConfig:
+  nodejsVersion: 20
