@@ -1,6 +1,6 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 runConfig:
-  entrypoint: npm run start
+  entrypoint: npm run build && npm run start
   maxInstances: 10
 env:
   - variable: GEMINI_API_KEY
