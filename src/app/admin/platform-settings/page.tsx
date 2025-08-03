@@ -16,6 +16,9 @@ import {
   Globe,
   Save,
   Link as LinkIcon,
+  Bug,
+  PlusCircle,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +26,20 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { AppLayout } from '@/components/layout/app-layout';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+
+type DebugToken = {
+    id: string;
+    token: string;
+    status: 'Active' | 'Revoked';
+    createdDate: string;
+};
+
+const initialDebugTokens: DebugToken[] = [
+    { id: 'dt_1', token: 'debug_xxxxxxxxxxxx_1234', status: 'Active', createdDate: '2024-08-20' },
+    { id: 'dt_2', token: 'debug_xxxxxxxxxxxx_5678', status: 'Revoked', createdDate: '2024-07-15' },
+];
 
 export default function PlatformSettingsPage() {
   const { toast } = useToast();
@@ -32,6 +49,8 @@ export default function PlatformSettingsPage() {
   const [domainExpiry, setDomainExpiry] = useState('2025-10-26');
   const [dnsProvider, setDnsProvider] = useState('Squarespace');
   const [paymentMethod, setPaymentMethod] = useState('Corporate Visa **** 1234');
+  const [debugTokens, setDebugTokens] = useState<DebugToken[]>(initialDebugTokens);
+
 
   const handleSaveDomainSettings = () => {
     // In a real app, you would send this data to a secure backend.
@@ -41,6 +60,29 @@ export default function PlatformSettingsPage() {
       description: 'Domain & DNS settings have been updated.',
     });
   };
+  
+  const handleGenerateToken = () => {
+    const newToken: DebugToken = {
+        id: `dt_${Date.now()}`,
+        token: `debug_${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 6)}`,
+        status: 'Active',
+        createdDate: new Date().toISOString().split('T')[0],
+    };
+    setDebugTokens(prev => [newToken, ...prev]);
+    toast({
+        title: 'Debug Token Generated',
+        description: `New token ${newToken.token} has been created.`,
+    });
+  }
+  
+  const handleRevokeToken = (tokenId: string) => {
+      setDebugTokens(prev => prev.map(t => t.id === tokenId ? {...t, status: 'Revoked'} : t));
+      toast({
+        variant: 'destructive',
+        title: 'Token Revoked',
+        description: `The selected debug token has been revoked.`,
+    });
+  }
 
   return (
     <AppLayout nav="admin">
@@ -225,6 +267,57 @@ export default function PlatformSettingsPage() {
             <CardFooter>
               <Button onClick={handleSaveDomainSettings}>
                 <Save className="mr-2 h-4 w-4" /> Save Domain Settings
+              </Button>
+            </CardFooter>
+          </Card>
+          
+          {/* Developer Settings Card */}
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bug className="h-5 w-5" /> Developer Settings
+              </CardTitle>
+              <CardDescription>
+                Manage debug tokens for development and testing purposes.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <h4 className="font-semibold text-muted-foreground">Debug Tokens</h4>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Token</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Created</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {debugTokens.map(token => (
+                        <TableRow key={token.id}>
+                            <TableCell className="font-mono">{token.token}</TableCell>
+                            <TableCell>
+                                <Badge variant={token.status === 'Active' ? 'default' : 'destructive'} className={token.status === 'Active' ? 'bg-green-100 text-green-800' : ''}>
+                                    {token.status}
+                                </Badge>
+                            </TableCell>
+                            <TableCell>{token.createdDate}</TableCell>
+                            <TableCell className="text-right">
+                                <Button variant="ghost" size="icon" onClick={() => handleRevokeToken(token.id)} disabled={token.status === 'Revoked'}>
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" onClick={handleGenerateToken}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Generate New Token
               </Button>
             </CardFooter>
           </Card>
