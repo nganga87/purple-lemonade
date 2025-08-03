@@ -1,11 +1,5 @@
-
 {
   "projects": {
     "default": "addresschain"
-  },
-  "backends": {
-    "addresschain-backend": {
-      "project": "addresschain"
-    }
   }
 }
