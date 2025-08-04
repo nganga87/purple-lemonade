@@ -17,6 +17,7 @@ import {
   FileText,
   KeyRound,
   BarChart2,
+  Phone,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import React from 'react';
@@ -101,6 +102,11 @@ export const adminNav: NavItem[] = [
     title: 'Incident Response',
     href: '/admin/incident-response',
     icon: ShieldAlert,
+  },
+  {
+    title: 'USSD Gateway',
+    href: '/admin/ussd-gateway',
+    icon: Phone,
   },
   {
     title: 'Platform Settings',
