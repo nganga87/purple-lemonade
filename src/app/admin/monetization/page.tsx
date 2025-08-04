@@ -36,7 +36,7 @@ const initialRevenueStreams = [
     { id: 'api_lookup', name: 'API Lookup Fee', description: 'Flat rate fee for each API address lookup request.', value: 0.10, type: 'flat', isActive: true, icon: FileText },
     { id: 'transfer', name: 'NFT Transfer Fee', description: 'Commission on wallet-to-wallet address NFT transfers.', value: 0.1, type: 'percentage', isActive: true, icon: ArrowLeftRight },
     { id: 'minting', name: 'Address Minting Fee', description: 'One-time fee charged for creating a new digital address NFT.', value: 5.00, type: 'flat', isActive: true, icon: History },
-    { id: 'handshake', name: 'Handshake Delivery Fee', description: 'Service fee for verified, in-person "handshake" deliveries.', value: 1.00, type: 'flat', isActive: false, icon: Users },
+    { id: 'handshake', name: 'Handshake Delivery Fee', description: 'Service fee for verified, in-person "handshake" deliveries.', value: 1.00, type: 'flat', isActive: true, icon: Users },
 ];
 
 const initialTaxRules = [
