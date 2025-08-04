@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -153,6 +152,7 @@ export function UserTable() {
           <TableHeader>
             <TableRow>
               <TableHead>User</TableHead>
+              <TableHead>Phone Number</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -165,6 +165,7 @@ export function UserTable() {
                     <div className="font-medium">{user.name}</div>
                     <div className="text-sm text-muted-foreground">{user.email}</div>
                 </TableCell>
+                <TableCell className="text-muted-foreground">{user.phone || 'N/A'}</TableCell>
                 <TableCell>
                     <Badge variant="outline">{getRoleName(user.role)}</Badge>
                 </TableCell>

@@ -44,12 +44,12 @@ const userSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(1, 'Full name is required.'),
   email: z.string().email('Please enter a valid email.'),
+  phone: z.string().optional(),
   role: z.string().min(1, 'Please select a role.'),
   password: z.string().optional(),
   status: z.enum(['Active', 'Inactive', 'Pending Approval', 'Suspended']).default('Pending Approval'),
   jobTitle: z.string().optional(),
   bio: z.string().optional(),
-  phone: z.string().optional(),
   additionalPhone: z.string().optional(),
   homeAddress: z.string().startsWith('0x', { message: 'Must be a valid Digital Address NFT ID.' }).optional().or(z.literal('')),
   workAddress: z.string().startsWith('0x', { message: 'Must be a valid Digital Address NFT ID.' }).optional().or(z.literal('')),
@@ -74,11 +74,11 @@ interface UserDialogProps {
 const defaultValues: Omit<AdminUser, 'id'> = {
   name: '',
   email: '',
+  phone: '',
   role: 'support-agent',
   status: 'Pending Approval' as const,
   jobTitle: '',
   bio: '',
-  phone: '',
   additionalPhone: '',
   homeAddress: '',
   workAddress: '',
@@ -212,22 +212,40 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input type="email" placeholder="user@digitaladdress.com" {...field} className="pl-10" />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                   <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input type="email" placeholder="user@digitaladdress.com" {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                       <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                <Input type="tel" placeholder="+1 (555) 123-4567" {...field} className="pl-10" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                   </div>
                   <FormField
                     control={form.control}
                     name="password"
@@ -372,22 +390,6 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                       )}
                     />
                    </div>
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                            <Input type="tel" placeholder="+1 (555) 123-4567" {...field} className="pl-10" />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   <FormField
                     control={form.control}
                     name="additionalPhone"
