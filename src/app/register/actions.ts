@@ -38,6 +38,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     const cryptoAddress = formData.get('cryptoAddress') as string | null;
     const countryCode = formData.get('countryCode') as string | null;
     const physicalAddress = formData.get('physicalAddress') as string | null;
+    const idNumber = formData.get('idNumber') as string | null;
 
     if (!doorPhoto || doorPhoto.size === 0) {
       return { isValid: false, validationDetails: 'Door photo is missing or empty.', error: 'Door photo is missing or empty.' };
@@ -67,6 +68,9 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
       cryptoAddress,
       countryCode,
       physicalAddress,
+      idNumber: idNumber || undefined,
+      // In a real app, you'd collect and pass the phone number.
+      // For now, we'll leave it out as it's not on the form.
     };
 
     // The AI validation here is a preliminary check.
@@ -100,5 +104,3 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     };
   }
 }
-
-    

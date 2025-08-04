@@ -35,6 +35,8 @@ const ValidateDoorPhotoInputSchema = z.object({
    physicalAddress: z
     .string()
     .describe('The full physical address provided by the user.'),
+  idNumber: z.string().optional().describe('The government-issued ID number of the user (e.g., Passport, National ID).'),
+  phoneNumber: z.string().optional().describe("The user's primary phone number."),
 });
 export type ValidateDoorPhotoInput = z.infer<typeof ValidateDoorPhotoInputSchema>;
 
@@ -60,7 +62,7 @@ const prompt = ai.definePrompt({
   name: 'validateDoorPhotoPrompt',
   input: {schema: ValidateDoorPhotoInputSchema},
   output: {schema: ValidateDoorPhotoOutputSchema},
-  prompt: `You are a Physical-to-Digital Asset Verifier. Your primary function is to establish a trusted link between a digital asset (an address NFT) and a physical location within a specific national jurisdiction. The user's door photo is the critical "ground truth" evidence.
+  prompt: `You are a Physical-to-Digital Asset Verifier. Your primary function is to establish a trusted link between a digital asset (an address NFT) and a physical location. You will perform a tiered verification based on the provided identity documents.
 
 You will receive:
 1.  A door photo with an embedded digital signature (crypto address, timestamp, and physical address).
@@ -69,30 +71,40 @@ You will receive:
 4.  The user's crypto wallet address.
 5.  The two-letter country code for the address ('{{{countryCode}}}').
 6.  The physical address text provided by the user.
+7.  An optional ID Number: {{{idNumber}}}.
+8.  An optional Phone Number: {{{phoneNumber}}}.
 
 Your validation process must follow these steps strictly:
 
-**Step 1: Signature & Authenticity Check**
+**Step 1: Determine Verification Tier**
+-   **Level 1 (Highest Trust):** Both ID Number and Phone Number are provided.
+-   **Level 2 (High Trust):** Only ID Number is provided.
+-   **Level 3 (Standard Trust):** Only Phone Number is provided.
+-   **Level 4 (Basic Trust):** Neither is provided.
+State the determined verification level in your final validation details.
+
+**Step 2: Signature & Authenticity Check**
 -   Verify that the crypto address in the prompt ('{{{cryptoAddress}}}') EXACTLY matches the one visible in the door photo's digital signature.
 -   Verify that the physical address in the prompt ('{{{physicalAddress}}}') is reasonably represented in the signature.
--   Analyze the door photo for any signs of digital manipulation (e.g., edited text, doctored backgrounds, inconsistent lighting on the signature). If tampering is suspected, the validation fails.
--   Confirm that the crypto address appears to be correctly formatted and plausibly linked to the provided country code and GPS coordinates.
+-   Analyze the door photo for any signs of digital manipulation. If tampering is suspected, the validation fails immediately.
 
-**Step 2: Ground-Truth Correlation**
--   Analyze the satellite image to understand the context of the property (e.g., is it a standalone house, an apartment building, a commercial storefront?). The visual style should be consistent with the architecture of the specified country ('{{{countryCode}}}').
--   Critically examine the door photo. Analyze the entryway's features: door style (wood, metal, glass), color, surrounding wall materials (brick, siding, concrete), presence of windows, a porch, stairs, etc.
--   Correlate the two images. Do the features in the door photo plausibly belong to the building seen in the satellite image? For example, a residential-style door photo should correspond to a house or apartment building in the satellite view, not a large warehouse. The validation fails if there is a major architectural inconsistency.
+**Step 3: Ground-Truth Correlation**
+-   Analyze the satellite image to understand the context of the property (e.g., standalone house, apartment building). The visual style should be consistent with the architecture of the specified country ('{{{countryCode}}}').
+-   Critically examine the door photo. Analyze the entryway's features: door style, color, surrounding materials, windows, etc.
+-   Correlate the two images. Do the features in the door photo plausibly belong to the building seen in the satellite image? A major architectural inconsistency is a validation failure.
 
-**Step 3: Final Decision**
--   Based on the successful completion of all prior steps, determine if the door photo is a valid and authentic representation of an entrance at the specified property and country.
--   Provide a concise summary of your findings in the validation details.
+**Step 4: Final Decision**
+-   Based on the successful completion of all prior steps, determine if the door photo is a valid and authentic representation of an entrance at the specified property.
+-   Provide a concise summary of your findings in the validation details, explicitly mentioning the determined Verification Tier.
 
 Door Photo: {{media url=doorPhotoDataUri}}
 GPS Coordinates: {{{gpsCoordinates}}}
 Satellite Image: {{media url=satelliteImageDataUri}}
 User's Crypto Address: {{{cryptoAddress}}}
 User's Physical Address: {{{physicalAddress}}}
-Country Code: {{{countryCode}}}`,
+Country Code: {{{countryCode}}}
+ID Number: {{{idNumber}}}
+Phone Number: {{{phoneNumber}}}`,
 });
 
 const validateDoorPhotoFlow = ai.defineFlow(
