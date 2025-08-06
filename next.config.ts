@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/.git/:path*',
+        source: '/:path*.git/:path*',
         destination: '/',
         permanent: true,
       },
