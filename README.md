@@ -1,4 +1,4 @@
-# AddressChain Studio
+# AddressChain
 
 AddressChain Studio is © 2025 Nicholas Nganga (Reg. RZ77885). Licensed under the MIT License.
 
