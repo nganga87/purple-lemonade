@@ -70,13 +70,5 @@ declare module 'lucide-react' {
   export const Link: Icon;
   export const HelpCircle: Icon;
   export const MessageSquare: Icon;
-  export const Printer: Icon;
-  export const Truck: Icon;
-  export const Banknote: Icon;
-  export const BarChart2: Icon;
-  export const EyeOff: Icon;
-  export const Download: Icon;
-  export const CreditCard: Icon;
-  export const ShieldQuestion: Icon;
   export const Bug: Icon;
 }
