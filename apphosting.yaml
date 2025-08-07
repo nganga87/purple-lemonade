@@ -4,7 +4,7 @@
 # Defines the commands to build and run the application.
 runConfig:
   # The command that starts your application.
-  entrypoint: npm run build && npm run start
+  entrypoint: npm run start
   # Sets the maximum number of container instances that can be running at once.
   maxInstances: 10
 
