@@ -31,8 +31,11 @@ const emailSchema = z.object({
 });
 
 const securitySchema = z.object({
-  answer: z.string().min(1, 'An answer is required.'),
+  answer1: z.string().min(1, 'An answer is required for the first question.'),
+  answer2: z.string().min(1, 'An answer is required for the second question.'),
+  answer3: z.string().min(1, 'An answer is required for the third question.'),
 });
+
 
 const passwordSchema = z.object({
   newPassword: z.string().min(8, 'Password must be at least 8 characters.'),
@@ -50,7 +53,7 @@ export default function ResetPasswordPage() {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState<AdminUser | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<{ question: string, answer: string } | null>(null);
+  const [currentQuestions, setCurrentQuestions] = useState<{ question: string; answer: string }[]>([]);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -61,7 +64,7 @@ export default function ResetPasswordPage() {
   
   const securityForm = useForm<SecurityFormValues>({
     resolver: zodResolver(securitySchema),
-    defaultValues: { answer: '' },
+    defaultValues: { answer1: '', answer2: '', answer3: '' },
   });
   
   const passwordForm = useForm<PasswordFormValues>({
@@ -83,13 +86,12 @@ export default function ResetPasswordPage() {
         const users: AdminUser[] = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
         const user = users.find(u => u.email === values.email);
 
-        if (user && user.securityQuestions && user.securityQuestions.length > 0) {
+        if (user && user.securityQuestions && user.securityQuestions.length === 3) {
           setCurrentUser(user);
-          const questionIndex = Math.floor(Math.random() * user.securityQuestions.length);
-          setCurrentQuestion({
-            question: user.securityQuestions[questionIndex],
-            answer: user.securityAnswers![questionIndex],
-          });
+          setCurrentQuestions(user.securityQuestions.map((q, i) => ({
+            question: q,
+            answer: user.securityAnswers![i],
+          })));
           setStep(2);
         } else {
           toast({ variant: 'destructive', title: 'Not Found', description: 'No user found with that email or security questions are not set up.' });
@@ -104,10 +106,14 @@ export default function ResetPasswordPage() {
   const handleSecuritySubmit = (values: SecurityFormValues) => {
     setIsLoading(true);
     setTimeout(() => {
-      if (values.answer.toLowerCase() === currentQuestion?.answer) {
+      const isAnswer1Correct = values.answer1.toLowerCase() === currentQuestions[0]?.answer;
+      const isAnswer2Correct = values.answer2.toLowerCase() === currentQuestions[1]?.answer;
+      const isAnswer3Correct = values.answer3.toLowerCase() === currentQuestions[2]?.answer;
+      
+      if (isAnswer1Correct && isAnswer2Correct && isAnswer3Correct) {
           setStep(3);
       } else {
-          toast({ variant: 'destructive', title: 'Incorrect Answer', description: 'The security answer is not correct.'})
+          toast({ variant: 'destructive', title: 'Incorrect Answer', description: 'One or more security answers are incorrect.'})
       }
       setIsLoading(false);
     }, 1000);
@@ -184,35 +190,35 @@ export default function ResetPasswordPage() {
             <Form {...securityForm}>
                  <form onSubmit={securityForm.handleSubmit(handleSecuritySubmit)}>
                     <CardHeader>
-                        <CardTitle className="font-headline text-2xl">Security Question</CardTitle>
-                        <CardDescription>Answer your security question to continue.</CardDescription>
+                        <CardTitle className="font-headline text-2xl">Security Questions</CardTitle>
+                        <CardDescription>Answer your security questions for <span className="font-semibold text-primary">{currentUser?.email}</span> to continue.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="p-4 rounded-md bg-secondary border">
-                            <p className="text-sm font-medium">{currentQuestion?.question}</p>
-                        </div>
-                        <FormField
-                            control={securityForm.control}
-                            name="answer"
-                            render={({ field }) => (
-                                <FormItem>
-                                <Label>Your Answer</Label>
-                                <div className="relative">
-                                    <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                    <FormControl>
-                                        <Input type="text" placeholder="Enter your answer" className="pl-10" {...field} />
-                                    </FormControl>
-                                </div>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        {currentQuestions.map((q, index) => (
+                             <FormField
+                                key={index}
+                                control={securityForm.control}
+                                name={`answer${index + 1}` as 'answer1' | 'answer2' | 'answer3'}
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <Label>{q.question}</Label>
+                                    <div className="relative">
+                                        <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                        <FormControl>
+                                            <Input type="text" placeholder="Enter your answer" className="pl-10" {...field} />
+                                        </FormControl>
+                                    </div>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                         <Button variant="ghost" onClick={() => setStep(1)}>Back</Button>
+                         <Button variant="link" onClick={() => setStep(1)} className="p-0">Back</Button>
                         <Button type="submit" disabled={isLoading}>
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Verify
+                            Verify Answers
                         </Button>
                     </CardFooter>
                  </form>
