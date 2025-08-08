@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Building, UserPlus, ArrowRight, Home } from 'lucide-react';
+import { Building, UserPlus, ArrowRight, Home, PackagePlus } from 'lucide-react';
+import Link from 'next/link';
 
 export type RegistrationChoice = 'new-property' | 'new-company' | 'add-tenant' | 'add-family-member';
 
@@ -55,6 +56,28 @@ export function RegistrationOptions({ onChoice }: RegistrationOptionsProps) {
                 Continue <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </button>
+
+            {accountType === 'company' && (
+               <Card className="group text-left p-6 border rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                <CardHeader className="p-0">
+                  <div className="flex items-center gap-4 mb-2">
+                    <PackagePlus className="h-8 w-8 text-purple-600" />
+                    <CardTitle className="font-headline text-xl font-semibold">Company Asset Management</CardTitle>
+                  </div>
+                  <CardDescription className="mb-4">
+                    Manage your company's tokenized assets, such as minting new shares tied to your verified headquarters.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                   <Button asChild>
+                    <Link href="/company/tokenize-shares">
+                        Tokenize Company Shares
+                    </Link>
+                  </Button>
+                </CardContent>
+               </Card>
+            )}
+           
             <div className="p-6 border rounded-lg">
                <div className="flex items-center gap-4 mb-2">
                 <UserPlus className="h-8 w-8 text-accent" />
