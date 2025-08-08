@@ -74,4 +74,9 @@ declare module 'lucide-react' {
   export const PackagePlus: Icon;
   export const Wand2: Icon;
   export const PackageCheck: Icon;
+  export const Printer: Icon;
+  export const ArrowUp: Icon;
+  export const ArrowDown: Icon;
+  export const EyeOff: Icon;
+  export const BarChart2: Icon;
 }

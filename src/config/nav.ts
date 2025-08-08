@@ -62,6 +62,11 @@ export const mainNav: NavItem[] = [
     icon: CandlestickChart,
   },
    {
+    title: 'CryptoShare Market',
+    href: '/share-market',
+    icon: CandlestickChart,
+  },
+   {
     title: 'Company Tools',
     href: '/company/tokenize-shares',
     icon: Building,
