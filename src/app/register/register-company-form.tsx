@@ -38,6 +38,7 @@ const formSchema = z.object({
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   physicalAddress: z.string().min(1, 'Physical address is required.'),
   doorPhoto: z.instanceof(File, { message: 'A photo of the building entrance is required.' }).optional(),
+  isHeadquarters: z.boolean().default(false).optional(),
   terms: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions to proceed.",
   }),
@@ -131,7 +132,7 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       country: '', state: '', companyName: '', registrationNumber: '', taxId: '', contactPerson: '',
-      gpsCoordinates: '', physicalAddress: '', terms: false,
+      gpsCoordinates: '', physicalAddress: '', terms: false, isHeadquarters: false,
     },
   });
 
@@ -277,7 +278,29 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
                             <FormField control={form.control} name="country" render={({ field }) => (<FormItem><FormLabel>7. Country</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /><span className="pl-6"><SelectValue placeholder="Select..." /></span></SelectTrigger></FormControl><SelectContent>{countries.map(country => (<SelectItem key={country.code} value={country.code}>{country.name}</SelectItem>))}</SelectContent></Select><FormMessage /></FormItem>)}/>
                         </div>
                         {generatedAddress && (<FormItem><FormLabel>8. Generated Crypto Wallet Address</FormLabel><FormControl><div className="relative flex-grow bg-secondary p-2 rounded-md"><Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /><p className="pl-10 font-mono text-sm truncate">{generatedAddress}</p></div></FormControl></FormItem>)}
-                        <FormField control={form.control} name="terms" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 mt-6 shadow-sm"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><div className="space-y-1 leading-none"><FormLabel>Agree to terms and conditions</FormLabel><FormDescription>By submitting, you confirm you are an authorized representative of this company.</FormDescription><FormMessage /></div></FormItem>)}/>
+                         <FormField
+                            control={form.control}
+                            name="isHeadquarters"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
+                                <FormControl>
+                                    <Checkbox
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <div className="space-y-1 leading-none">
+                                    <FormLabel>
+                                    Set as company headquarters
+                                    </FormLabel>
+                                    <FormDescription>
+                                    This address will be used for official correspondence and share tokenization.
+                                    </FormDescription>
+                                </div>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField control={form.control} name="terms" render={({ field }) => (<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow-sm"><FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl><div className="space-y-1 leading-none"><FormLabel>Agree to terms and conditions</FormLabel><FormDescription>By submitting, you confirm you are an authorized representative of this company.</FormDescription><FormMessage /></div></FormItem>)}/>
                     </div>
                 )}
                 {step === 2 && (
