@@ -80,4 +80,8 @@ declare module 'lucide-react' {
   export const EyeOff: Icon;
   export const BarChart2: Icon;
   export const ArrowDownLeft: Icon;
+  export const Archive: Icon;
+  export const Package: Icon;
+  export const PieChart: Icon;
+  export const BarChart: Icon;
 }

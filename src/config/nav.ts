@@ -20,6 +20,7 @@ import {
   Phone,
   PackagePlus,
   Building,
+  Archive,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import React from 'react';
@@ -174,6 +175,11 @@ export const companyNav: NavItem[] = [
     title: 'Tokenize Shares',
     href: '/company/tokenize-shares',
     icon: PackagePlus,
+  },
+   {
+    title: 'Treasury & Distribution',
+    href: '/company/distribution',
+    icon: Archive,
   },
    {
     title: 'User Dashboard',
