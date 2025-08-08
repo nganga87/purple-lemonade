@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Building, UserPlus, ArrowRight, Home } from 'lucide-react';
@@ -12,6 +12,19 @@ interface RegistrationOptionsProps {
 }
 
 export function RegistrationOptions({ onChoice }: RegistrationOptionsProps) {
+  const [accountType, setAccountType] = useState<'individual' | 'company' | null>(null);
+
+  useEffect(() => {
+    // In a real app, you would get this from a user context or session.
+    // For this prototype, we'll simulate checking localStorage.
+    const name = localStorage.getItem('loggedInUserName');
+    if (name && (name.toLowerCase().includes('corp') || name.toLowerCase().includes('inc') || name.toLowerCase().includes('logistics'))) {
+        setAccountType('company');
+    } else {
+        setAccountType('individual');
+    }
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto">
       <Card className="shadow-lg">
@@ -21,19 +34,21 @@ export function RegistrationOptions({ onChoice }: RegistrationOptionsProps) {
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="p-6 border rounded-lg space-y-4 flex flex-col">
-              <div className="flex items-center gap-4 mb-2">
-                <Home className="h-8 w-8 text-primary" />
-                <h3 className="font-headline text-xl font-semibold">Register a Personal Property</h3>
-              </div>
-              <p className="text-muted-foreground flex-1">
-                Verify a new physical address you own, like a home or rental property. This will create a new primary Address NFT for an individual.
-              </p>
-              <Button onClick={() => onChoice('new-property')} className="w-full">
-                Register Personal Property <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-             <div className="p-6 border rounded-lg space-y-4 flex flex-col">
+            {accountType === 'individual' && (
+                 <div className="p-6 border rounded-lg space-y-4 flex flex-col">
+                    <div className="flex items-center gap-4 mb-2">
+                        <Home className="h-8 w-8 text-primary" />
+                        <h3 className="font-headline text-xl font-semibold">Register a Personal Property</h3>
+                    </div>
+                    <p className="text-muted-foreground flex-1">
+                        Verify a new physical address you own, like a home or rental property. This will create a new primary Address NFT for an individual.
+                    </p>
+                    <Button onClick={() => onChoice('new-property')} className="w-full">
+                        Register Personal Property <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </div>
+            )}
+             <div className={`p-6 border rounded-lg space-y-4 flex flex-col ${accountType === 'company' ? 'md:col-span-2' : ''}`}>
               <div className="flex items-center gap-4 mb-2">
                 <Building className="h-8 w-8 text-primary" />
                 <h3 className="font-headline text-xl font-semibold">Register a Company Address</h3>
