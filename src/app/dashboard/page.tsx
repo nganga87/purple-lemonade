@@ -18,6 +18,7 @@ import {
   Wallet,
   ArrowDownLeft,
   ArrowUpRight,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,12 @@ import {
   CardDescription,
   CardFooter,
 } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -159,7 +166,7 @@ export default function DashboardPage() {
                 <CardHeader>
                     <CardTitle className="font-headline">My Wallet</CardTitle>
                     <CardDescription>
-                    Your balance for trading on the CryptoShare Market.
+                    Your balance for trading on the markets.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 space-y-4">
@@ -169,9 +176,21 @@ export default function DashboardPage() {
                         <p className="text-muted-foreground">≈ $15,612.00 USD</p>
                     </div>
                 </CardContent>
-                <CardFooter className="flex gap-2">
-                    <Button className="w-full"><ArrowDownLeft className="mr-2"/>Deposit</Button>
-                    <Button variant="outline" className="w-full"><ArrowUpRight className="mr-2"/>Withdraw</Button>
+                <CardFooter className="flex-col items-stretch gap-2">
+                     <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button className="w-full"><ArrowLeftRight className="mr-2"/>Trade on Markets</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem asChild>
+                           <Link href="/exchange">Address Marketplace</Link>
+                        </DropdownMenuItem>
+                         <DropdownMenuItem asChild>
+                           <Link href="/share-market">CryptoShare Market</Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button variant="outline" className="w-full"><Wallet className="mr-2"/>View Full Wallet</Button>
                 </CardFooter>
             </Card>
 
