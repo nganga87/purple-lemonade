@@ -5,20 +5,17 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  LayoutDashboard,
   MapPin,
   PlusCircle,
-  Users,
-  CandlestickChart,
-  Download,
-  ChevronDown,
   QrCode,
   Copy,
   Mail,
-  Wallet,
   ArrowDownLeft,
   ArrowUpRight,
   ArrowLeftRight,
+  ChevronDown,
+  Check,
+  Wallet,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -36,10 +33,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { AppLayout } from '@/components/layout/app-layout';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 
 const activityItems = [
@@ -95,10 +104,12 @@ const activityItems = [
 ];
 
 const INITIAL_VISIBLE_ACTIVITIES = 5;
+const USER_WALLET_ADDRESS = '0x7A1B2c3D4e5F6a7B8c9d0E1f2A3b4C5d6E7f8A9B';
 
 export default function DashboardPage() {
   const [visibleActivities, setVisibleActivities] = useState(INITIAL_VISIBLE_ACTIVITIES);
   const { toast } = useToast();
+  const [copiedAddress, setCopiedAddress] = useState(false);
 
   const showMoreActivities = () => {
     setVisibleActivities(activityItems.length);
@@ -110,6 +121,17 @@ export default function DashboardPage() {
       description: "Your activity statement will be sent to your email shortly.",
     });
   };
+
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(USER_WALLET_ADDRESS);
+    setCopiedAddress(true);
+    toast({ title: 'Address Copied!', description: 'Your wallet address has been copied.' });
+    setTimeout(() => setCopiedAddress(false), 2000);
+  };
+  
+  const getQrCodeUrl = (data: string, size: number) => {
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(data)}`;
+  }
 
   return (
     <AppLayout>
@@ -136,7 +158,7 @@ export default function DashboardPage() {
                 <div className="space-y-2">
                   <h3 className="font-semibold text-sm">Address NFT ID</h3>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground bg-secondary p-2 rounded-md">
-                    <p className="truncate font-mono">0x7A1B2c3D4e5F6a7B8c9d0E1f2A3b4C5d6E7f8A9B</p>
+                    <p className="truncate font-mono">{USER_WALLET_ADDRESS}</p>
                     <Button variant="ghost" size="icon" className="h-7 w-7">
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -176,8 +198,70 @@ export default function DashboardPage() {
                         <p className="text-muted-foreground">≈ $15,612.00 USD</p>
                     </div>
                      <div className="grid grid-cols-2 gap-2">
-                         <Button variant="outline"><ArrowDownLeft className="mr-2"/> Receive</Button>
-                         <Button variant="outline"><ArrowUpRight className="mr-2"/> Send</Button>
+                         <Dialog>
+                            <DialogTrigger asChild>
+                               <Button variant="outline"><ArrowDownLeft className="mr-2"/> Receive</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Receive Funds</DialogTitle>
+                                    <DialogDescription>Share your address or QR code to receive cryptocurrency.</DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4 space-y-4">
+                                     <div className="flex flex-col items-center justify-center p-4 bg-secondary rounded-lg">
+                                        <div className="p-2 bg-white rounded-lg shadow-md">
+                                        <Image src={getQrCodeUrl(USER_WALLET_ADDRESS, 200)} alt="Wallet QR Code" width={200} height={200} data-ai-hint="qr code"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <Label>Your Wallet Address</Label>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <Input readOnly value={USER_WALLET_ADDRESS} className="font-mono"/>
+                                            <Button size="icon" variant="outline" onClick={handleCopyAddress}>
+                                                {copiedAddress ? <Check className="text-green-500" /> : <Copy />}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogContent>
+                         </Dialog>
+                         <Dialog>
+                            <DialogTrigger asChild>
+                               <Button variant="outline"><ArrowUpRight className="mr-2"/> Send</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                 <DialogHeader>
+                                    <DialogTitle>Send Funds</DialogTitle>
+                                    <DialogDescription>Enter the recipient details to send funds.</DialogDescription>
+                                </DialogHeader>
+                                <div className="py-4 space-y-4">
+                                    <div className="space-y-1">
+                                        <Label>Recipient Address</Label>
+                                        <Input placeholder="0x..."/>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label>Amount</Label>
+                                        <div className="flex gap-2">
+                                            <Input type="number" placeholder="0.0"/>
+                                            <Button variant="outline" className="w-24">ETH</Button>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label>Transaction Fee</Label>
+                                        <Tabs defaultValue="standard">
+                                            <TabsList className="grid w-full grid-cols-3">
+                                                <TabsTrigger value="slow">Slow</TabsTrigger>
+                                                <TabsTrigger value="standard">Standard</TabsTrigger>
+                                                <TabsTrigger value="fast">Fast</TabsTrigger>
+                                            </TabsList>
+                                        </Tabs>
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button className="w-full">Review Transaction</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                         </Dialog>
                     </div>
                 </CardContent>
                 <CardFooter className="flex-col items-stretch gap-2">
@@ -289,3 +373,4 @@ export default function DashboardPage() {
     </AppLayout>
   );
 }
+
