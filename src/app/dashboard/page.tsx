@@ -166,7 +166,7 @@ export default function DashboardPage() {
                 <CardHeader>
                     <CardTitle className="font-headline">My Wallet</CardTitle>
                     <CardDescription>
-                    Your balance for trading on the markets.
+                    Your balance for payments and trading.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 space-y-4">
@@ -174,6 +174,10 @@ export default function DashboardPage() {
                         <p className="text-sm text-muted-foreground">Current Balance</p>
                         <p className="text-3xl font-bold font-mono">5.204 ETH</p>
                         <p className="text-muted-foreground">≈ $15,612.00 USD</p>
+                    </div>
+                     <div className="grid grid-cols-2 gap-2">
+                         <Button variant="outline"><ArrowDownLeft className="mr-2"/> Receive</Button>
+                         <Button variant="outline"><ArrowUpRight className="mr-2"/> Send</Button>
                     </div>
                 </CardContent>
                 <CardFooter className="flex-col items-stretch gap-2">
@@ -190,7 +194,6 @@ export default function DashboardPage() {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button variant="outline" className="w-full"><Wallet className="mr-2"/>View Full Wallet</Button>
                 </CardFooter>
             </Card>
 
