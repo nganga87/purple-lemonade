@@ -27,6 +27,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { countries, type Country } from '@/lib/countries';
 import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
+import type { AdminUser } from '../admin/user-management/user-dialog';
 
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
@@ -117,7 +118,7 @@ interface RegisterCompanyFormProps {
 
 type RegistrationResult = ValidateDoorPhotoOutput & { submitted?: boolean };
 
-const LOCAL_STORAGE_KEY = 'addressChainCompanyForm';
+const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
   const [step, setStep] = useState(1);
@@ -136,8 +137,25 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
     },
   });
 
-  const { watch, setValue, getValues, formState: { isValid }, trigger } = form;
+  const { watch, setValue, getValues, formState: { isValid }, trigger, reset } = form;
   const watchedValues = watch();
+
+  useEffect(() => {
+    // Pre-populate form with logged-in company data
+    const loggedInUserName = localStorage.getItem('loggedInUserName');
+    if (loggedInUserName) {
+        const allUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
+        const allUsers: AdminUser[] = allUsersRaw ? JSON.parse(allUsersRaw) : [];
+        const currentUser = allUsers.find(u => u.name === loggedInUserName && u.role === 'company');
+        if (currentUser) {
+            reset({
+                companyName: currentUser.name,
+                contactPerson: currentUser.name, // Assuming contact person is the user for now
+                // Pre-fill other fields if they exist on the user object
+            });
+        }
+    }
+  }, [reset]);
 
   useEffect(() => {
     if (watchedValues.gpsCoordinates && watchedValues.country) {
@@ -263,7 +281,8 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
                         <FormField control={form.control} name="companyName" render={({ field }) => (
                             <FormItem>
                             <FormLabel>1. Company Name</FormLabel>
-                            <FormControl><div className="relative"><Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /><Input placeholder="e.g., Acme Corporation" {...field} className="pl-10 capitalize" /></div></FormControl>
+                            <FormControl><div className="relative"><Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /><Input placeholder="e.g., Acme Corporation" {...field} className="pl-10 capitalize" readOnly /></div></FormControl>
+                            <FormDescription>Company name cannot be changed.</FormDescription>
                             <FormMessage />
                             </FormItem>
                         )}/>
