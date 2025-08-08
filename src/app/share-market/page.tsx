@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -43,6 +43,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Search, ChevronDown, ChevronUp, ArrowUp, ArrowDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const mockCompanies = [
   { id: 'GL', name: 'Global Logistics', symbol: 'GLOG', price: 125.4, change: 1.25, changePercent: 1.01 },
@@ -121,7 +122,18 @@ function OrderForm({ side, onSubmit }: { side: 'Buy' | 'Sell', onSubmit: () => v
     );
 }
 
-function OrderBookTable({ title, data, colorClass }: { title: string, data: any[], colorClass: string }) {
+function OrderBookTable({ title, data, colorClass, isLoading }: { title: string, data: any[], colorClass: string, isLoading?: boolean }) {
+    if (isLoading) {
+        return (
+             <div>
+                <h3 className="p-2 font-semibold text-sm">{title}</h3>
+                <div className="space-y-1 p-2">
+                    {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-6 w-full" />)}
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div>
             <h3 className="p-2 font-semibold text-sm">{title}</h3>
@@ -149,10 +161,18 @@ function OrderBookTable({ title, data, colorClass }: { title: string, data: any[
 
 export default function ShareMarketPage() {
   const [selectedCompany, setSelectedCompany] = useState(mockCompanies[0]);
-  const [chartData, setChartData] = useState(generateChartData());
-  const [orderBook, setOrderBook] = useState({ bids: generateOrderBookData(true), asks: generateOrderBookData(false) });
-  const [tradeHistory, setTradeHistory] = useState(generateTradeHistory());
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [orderBook, setOrderBook] = useState<{ bids: any[], asks: any[] }>({ bids: [], asks: [] });
+  const [tradeHistory, setTradeHistory] = useState<any[]>([]);
+  const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setIsClient(true);
+    setChartData(generateChartData());
+    setOrderBook({ bids: generateOrderBookData(true), asks: generateOrderBookData(false) });
+    setTradeHistory(generateTradeHistory());
+  }, []);
 
   const handlePlaceOrder = (side: 'Buy' | 'Sell') => {
       toast({
@@ -234,16 +254,20 @@ export default function ShareMarketPage() {
                 </CardHeader>
                 <CardContent className="h-[300px] w-full p-0">
                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                            <defs>
-                                <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                                </linearGradient>
-                            </defs>
-                            <Tooltip contentStyle={{backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
-                            <Area type="monotone" dataKey="price" stroke="hsl(var(--primary))" fill="url(#priceGradient)" strokeWidth={2}/>
-                        </AreaChart>
+                        {isClient ? (
+                            <AreaChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <defs>
+                                    <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <Tooltip contentStyle={{backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))' }}/>
+                                <Area type="monotone" dataKey="price" stroke="hsl(var(--primary))" fill="url(#priceGradient)" strokeWidth={2}/>
+                            </AreaChart>
+                        ) : (
+                            <Skeleton className="h-full w-full" />
+                        )}
                     </ResponsiveContainer>
                 </CardContent>
             </Card>
@@ -275,14 +299,15 @@ export default function ShareMarketPage() {
               <TabsContent value="order-book">
                 <Card>
                     <CardContent className="p-0">
-                        <OrderBookTable title="Bids" data={orderBook.bids} colorClass="text-green-500" />
-                        <OrderBookTable title="Asks" data={orderBook.asks} colorClass="text-red-500" />
+                        <OrderBookTable title="Bids" data={orderBook.bids} colorClass="text-green-500" isLoading={!isClient} />
+                        <OrderBookTable title="Asks" data={orderBook.asks} colorClass="text-red-500" isLoading={!isClient} />
                     </CardContent>
                 </Card>
               </TabsContent>
               <TabsContent value="trade-history">
                  <Card>
                     <CardContent className="p-0">
+                       {isClient ? (
                         <Table>
                              <TableHeader>
                                 <TableRow>
@@ -301,6 +326,11 @@ export default function ShareMarketPage() {
                                 ))}
                             </TableBody>
                         </Table>
+                       ) : (
+                         <div className="space-y-1 p-2">
+                            {[...Array(10)].map((_, i) => <Skeleton key={i} className="h-6 w-full" />)}
+                        </div>
+                       )}
                     </CardContent>
                  </Card>
               </TabsContent>
