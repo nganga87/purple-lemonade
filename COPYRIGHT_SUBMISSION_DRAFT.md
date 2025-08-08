@@ -1,3 +1,4 @@
+
 # Software Documentation for Copyright Registration
 
 ## 1. Title of the Work
@@ -15,15 +16,15 @@
 ## 2. Abstract
 
 ### a) Purpose of the Software
-AddressChain is a revolutionary digital platform designed to transform physical addresses into verifiable, tradable, and secure digital assets on the blockchain. By leveraging Artificial Intelligence for validation and smart contracts for management, AddressChain solves critical, long-standing problems related to address fraud, last-mile delivery failures, and proof of residence. The platform provides a single source of truth for physical locations, creating a secure, transparent, and efficient ecosystem for individuals, businesses, and governments.
+AddressChain is a revolutionary digital platform designed to solve critical, long-standing problems related to address fraud, last-mile delivery failures, and corporate equity management. It achieves this by transforming physical addresses and private company shares into verifiable, tradable, and secure digital assets on the blockchain. By leveraging Artificial Intelligence for validation and smart contracts for asset management, AddressChain provides a single source of truth for both physical locations and corporate ownership, creating a secure and efficient ecosystem for individuals, businesses, and investors.
 
 ### b) Technology Stack
 The platform is built using a modern, robust technology stack:
 *   **Frontend**: Next.js, React, TypeScript
 *   **UI/Styling**: ShadCN UI Components, Tailwind CSS
 *   **Artificial Intelligence**: Google's Gemini models via the Genkit framework for multimodal analysis, structured data extraction, and forensic analysis.
-*   **Backend & Hosting**: The application is hosted on Firebase App Hosting, utilizing Firebase for backend services and authentication.
-*   **Blockchain**: The system is designed to be blockchain-agnostic, running on any EVM-compatible blockchain, with Address NFTs being ERC-721 compliant tokens.
+*   **Backend & Hosting**: The application is hosted on Firebase App Hosting, utilizing Firestore for the database and Firebase for backend services.
+*   **Blockchain**: The system is designed to be blockchain-agnostic, running on any EVM-compatible blockchain. Address and Share assets are represented as ERC-721 or ERC-1155 compliant tokens.
 
 ### c) Platform
 AddressChain is a cloud-based web application accessible through modern web browsers on both desktop and mobile devices.
@@ -32,12 +33,15 @@ AddressChain is a cloud-based web application accessible through modern web brow
 
 ## 3. Introduction
 
-Traditional address systems are fraught with inefficiencies and vulnerabilities, leading to significant financial losses and operational friction. Key problems include address fraud, failed deliveries, and the difficulty of verifying proof of residence. AddressChain addresses these challenges by creating a tamper-proof digital representation of physical addresses.
+Traditional systems for managing physical addresses and private company equity are siloed, inefficient, and vulnerable to fraud. AddressChain addresses these challenges by creating a unified, tamper-proof digital representation of these real-world assets.
 
-The core of the system is the **Address NFT**, a unique digital token representing a single, AI-verified physical address. This transforms a simple address into a manageable, secure, and valuable digital asset.
+The two core components of the system are:
+1.  **The Address NFT**: A unique digital token representing a single, AI-verified physical address.
+2.  **The CryptoShare Token**: A digital token representing a specific class of equity in a verified company.
 
-The software works through several key user-facing and administrative portals:
-*   **User Application**: Allows individuals to register their physical properties, manage their Address NFTs, grant access to tenants or family, and trade their address assets on a secure marketplace.
+The software works through several key portals:
+*   **User Application**: Allows individuals and companies to register their physical properties, manage their Address NFTs, grant access to others, and trade their assets on secure marketplaces.
+*   **Company Portal**: A dedicated suite of tools for verified businesses to tokenize their corporate shares, manage their capitalization table, and distribute tokens to stakeholders.
 *   **Administrator Portal**: A comprehensive back-office for managing the entire platform, from user and client onboarding to incident response and monetization settings.
 *   **Public Resolver**: A mechanism for third parties to verify the authenticity of an Address NFT.
 
@@ -49,9 +53,9 @@ The following documentation provides a detailed, sequential overview of the soft
 
 ### a) Accessing the Application
 
-Users access the application through a main landing page. From here, they can either log in to an existing account or sign up for a new one. The system uses a modern, passwordless authentication flow. A user enters their email, and the system determines whether to send a secure login link (for existing accounts) or direct them to the registration page (for new accounts).
+Users access the application through a main landing page. From here, they can either log in to an existing account or sign up for a new one. The system uses a modern, password-based authentication flow.
 
-**[SCREENSHOT: Main Landing Page showing the login/signup email form]**
+**[SCREENSHOT: Main Landing Page showing the login/signup options]**
 
 The administrator portal is accessed through a separate, secure login page.
 
@@ -61,51 +65,55 @@ The administrator portal is accessed through a separate, secure login page.
 
 #### i. User Dashboard
 
-Upon logging in, the user is presented with their dashboard. This serves as the central hub for managing their primary digital address, viewing recent activity (such as deliveries or verification checks), and accessing all other platform features.
+Upon logging in, the user is presented with their dashboard. This serves as the central hub for managing their primary digital address, viewing their wallet balance, and accessing all other platform features.
 
-**[SCREENSHOT: User Dashboard, showing the primary address, QR code, and recent activity feed]**
+**[SCREENSHOT: User Dashboard, showing the primary address, wallet, and recent activity feed]**
 
 #### ii. Address Registration
 
 This is a core, innovative workflow of the application. The user is guided through a multi-step process to register a new property they own.
 
-1.  **Select Registration Type**: The user chooses to register a new property, add a tenant, or add a family member.
+1.  **Select Registration Type**: The user chooses to register a personal property, a company property, a tenant, or a family member.
     **[SCREENSHOT: Registration Options Page]**
 
 2.  **Submit Property Details**: The user provides the address name, physical address, and GPS coordinates. The system uses this data to generate a unique, "country-stamped" crypto wallet address for the property.
     **[SCREENSHOT: Register Form - Step 1 showing address and GPS input]**
 
-3.  **AI-Powered Photo Validation**: The user must capture or upload a photo of the property's main entrance. The software then digitally stamps this photo with the crypto address and a timestamp. This "ground-truth" photo is a critical piece of evidence. The system's AI then cross-validates this photo against satellite imagery corresponding to the provided GPS coordinates to check for inconsistencies.
+3.  **AI-Powered Photo Validation**: The user must capture or upload a photo of the property's main entrance. The software then digitally stamps this photo with the crypto address and a timestamp. The system's AI cross-validates this "ground-truth" photo against satellite imagery corresponding to the provided GPS coordinates to check for inconsistencies.
     **[SCREENSHOT: Register Form - Step 2 showing the camera/upload interface with the signed photo preview]**
 
-4.  **Submission & Verification**: Once submitted, the registration is marked as "Pending" and may be sent to a decentralized network of third-party validators for final physical confirmation.
-    **[SCREENSHOT: Successful submission confirmation screen]**
+#### iii. Company Share Tokenization
 
-#### iii. Address Management (`/my-addresses`)
+Verified companies can access a secure portal to tokenize their equity.
 
-Users can view and manage all their owned Address NFTs on this page. They can select an address to view its details, set a primary address, edit its name, or view its shareable QR code which links to the public resolver.
+1.  **Location Verification**: As a security measure, the user must first verify they are physically present at the company's registered headquarters.
+    **[SCREENSHOT: Tokenize Shares page showing the location verification step]**
 
-**[SCREENSHOT: My Addresses page showing a list of addresses and the details of a selected address]**
+2.  **Define Share Classes**: The company defines one or more classes of shares (e.g., Founders, Series A, Employee Pool) and the number of shares in each class. They can choose from predefined classes or create custom ones.
+    **[SCREENSHOT: Tokenize Shares page showing the form for adding share classes with a dropdown menu]**
 
-#### iv. Access Request Management (`/access-requests`)
+3.  **Minting**: The company mints the defined shares, which creates the corresponding number of digital tokens in the company's treasury.
+    **[SCREENSHOT: Tokenize Shares page showing a successfully minted share class]**
 
-Property owners can review and approve or reject requests from other users (e.g., tenants, family) who wish to be associated with their verified address.
+#### iv. Company Treasury & Distribution Dashboard
 
-**[SCREENSHOT: Access Requests page showing a table of pending, approved, and rejected requests]**
+After minting, companies are directed to their Treasury dashboard, which provides a complete overview of their tokenized equity.
 
-#### v. Address Marketplace (`/exchange`)
+1.  **Capitalization Table**: A detailed table shows all minted share classes, the number of tokens in the treasury, the number distributed, and the estimated value.
+    **[SCREENSHOT: Treasury Dashboard showing the full capitalization table]**
 
-The platform includes a P2P marketplace for buying and selling verified Address NFTs. A key feature here is the **AI Due Diligence Report**. Before purchasing, a user can generate an AI-powered report that analyzes the address's on-chain history, commercial usage, and potential risk factors.
+2.  **Visual Breakdown**: A pie chart visualizes the proportion of each share class relative to the total number of minted shares.
+    **[SCREENSHOT: Treasury Dashboard showing the share class pie chart]**
 
-**[SCREENSHOT: Address Marketplace page showing a list of properties for sale]**
+#### v. CryptoShare Market
 
-**[SCREENSHOT: AI Due Diligence Report dialog showing the structured analysis]**
+The platform includes a dedicated, secure marketplace for trading the tokenized shares of companies registered on AddressChain.
 
-#### vi. Administrator Portal: User Feedback Analysis
+1.  **Market View**: Users can view a list of all tradable company shares, their current price, and recent performance.
+    **[SCREENSHOT: CryptoShare Market page showing the list of tradable company stock tokens]**
 
-Admins can view all user-submitted feedback. A crucial feature is the AI analysis tool. With one click, an admin can trigger a Genkit AI flow that reads the user's message and returns a structured analysis, including a summary, a refined category, a priority level, and a suggested next action.
-
-**[SCREENSHOT: Admin Feedback page showing the list of tickets and the AI analysis dialog]**
+2.  **Trading Interface**: For a selected company, users see a detailed chart, an order book, and forms to place buy or sell orders.
+    **[SCREENSHOT: CryptoShare Market trading interface with chart, order book, and order forms]**
 
 ---
 
@@ -150,6 +158,8 @@ const ValidateDoorPhotoInputSchema = z.object({
    physicalAddress: z
     .string()
     .describe('The full physical address provided by the user.'),
+  idNumber: z.string().optional().describe('The government-issued ID number of the user (e.g., Passport, National ID).'),
+  phoneNumber: z.string().optional().describe("The user's primary phone number."),
 });
 export type ValidateDoorPhotoInput = z.infer<typeof ValidateDoorPhotoInputSchema>;
 
@@ -175,7 +185,7 @@ const prompt = ai.definePrompt({
   name: 'validateDoorPhotoPrompt',
   input: {schema: ValidateDoorPhotoInputSchema},
   output: {schema: ValidateDoorPhotoOutputSchema},
-  prompt: `You are a Physical-to-Digital Asset Verifier. Your primary function is to establish a trusted link between a digital asset (an address NFT) and a physical location within a specific national jurisdiction. The user's door photo is the critical "ground truth" evidence.
+  prompt: `You are a Physical-to-Digital Asset Verifier. Your primary function is to establish a trusted link between a digital asset (an address NFT) and a physical location. You will perform a tiered verification based on the provided identity documents.
 
 You will receive:
 1.  A door photo with an embedded digital signature (crypto address, timestamp, and physical address).
@@ -184,30 +194,40 @@ You will receive:
 4.  The user's crypto wallet address.
 5.  The two-letter country code for the address ('{{{countryCode}}}').
 6.  The physical address text provided by the user.
+7.  An optional ID Number: {{{idNumber}}}.
+8.  An optional Phone Number: {{{phoneNumber}}}.
 
 Your validation process must follow these steps strictly:
 
-**Step 1: Signature & Authenticity Check**
+**Step 1: Determine Verification Tier**
+-   **Level 1 (Highest Trust):** Both ID Number and Phone Number are provided.
+-   **Level 2 (High Trust):** Only ID Number is provided.
+-   **Level 3 (Standard Trust):** Only Phone Number is provided.
+-   **Level 4 (Basic Trust):** Neither is provided.
+State the determined verification level in your final validation details.
+
+**Step 2: Signature & Authenticity Check**
 -   Verify that the crypto address in the prompt ('{{{cryptoAddress}}}') EXACTLY matches the one visible in the door photo's digital signature.
 -   Verify that the physical address in the prompt ('{{{physicalAddress}}}') is reasonably represented in the signature.
--   Analyze the door photo for any signs of digital manipulation (e.g., edited text, doctored backgrounds, inconsistent lighting on the signature). If tampering is suspected, the validation fails.
--   Confirm that the crypto address appears to be correctly formatted and plausibly linked to the provided country code and GPS coordinates.
+-   Analyze the door photo for any signs of digital manipulation. If tampering is suspected, the validation fails immediately.
 
-**Step 2: Ground-Truth Correlation**
--   Analyze the satellite image to understand the context of the property (e.g., is it a standalone house, an apartment building, a commercial storefront?). The visual style should be consistent with the architecture of the specified country ('{{{countryCode}}}').
--   Critically examine the door photo. Analyze the entryway's features: door style (wood, metal, glass), color, surrounding wall materials (brick, siding, concrete), presence of windows, a porch, stairs, etc.
--   Correlate the two images. Do the features in the door photo plausibly belong to the building seen in the satellite image? For example, a residential-style door photo should correspond to a house or apartment building in the satellite view, not a large warehouse. The validation fails if there is a major architectural inconsistency.
+**Step 3: Ground-Truth Correlation**
+-   Analyze the satellite image to understand the context of the property (e.g., standalone house, apartment building). The visual style should be consistent with the architecture of the specified country ('{{{countryCode}}}').
+-   Critically examine the door photo. Analyze the entryway's features: door style, color, surrounding materials, windows, etc.
+-   Correlate the two images. Do the features in the door photo plausibly belong to the building seen in the satellite image? A major architectural inconsistency is a validation failure.
 
-**Step 3: Final Decision**
--   Based on the successful completion of all prior steps, determine if the door photo is a valid and authentic representation of an entrance at the specified property and country.
--   Provide a concise summary of your findings in the validation details.
+**Step 4: Final Decision**
+-   Based on the successful completion of all prior steps, determine if the door photo is a valid and authentic representation of an entrance at the specified property.
+-   Provide a concise summary of your findings in the validation details, explicitly mentioning the determined Verification Tier.
 
 Door Photo: {{media url=doorPhotoDataUri}}
 GPS Coordinates: {{{gpsCoordinates}}}
 Satellite Image: {{media url=satelliteImageDataUri}}
 User's Crypto Address: {{{cryptoAddress}}}
 User's Physical Address: {{{physicalAddress}}}
-Country Code: {{{countryCode}}}`,
+Country Code: {{{countryCode}}}
+ID Number: {{{idNumber}}}
+Phone Number: {{{phoneNumber}}}`,
 });
 
 const validateDoorPhotoFlow = ai.defineFlow(
