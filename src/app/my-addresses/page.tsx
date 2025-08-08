@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -105,6 +106,20 @@ export default function MyAddressesPage() {
       title: "Primary Address Updated",
       description: "Your primary address has been changed.",
     });
+  }
+
+  const handleSetHeadquarters = (nftId: string) => {
+      const newAddresses = addresses.map(addr => ({
+        ...addr,
+        isHeadquarters: addr.nftId === nftId
+      }));
+      setAddresses(newAddresses);
+      const newSelected = newAddresses.find(addr => addr.nftId === selectedAddress?.nftId);
+      if(newSelected) setSelectedAddress(newSelected);
+      toast({
+        title: "Headquarters Updated",
+        description: "Your company headquarters has been set.",
+      });
   }
 
   const handleArchiveAddress = async (nftId: string) => {
@@ -271,6 +286,9 @@ export default function MyAddressesPage() {
                                 </CardDescription>
                                 </div>
                                 <div className="flex items-center gap-2">
+                                {selectedAddress.isHeadquarters && (
+                                    <Badge variant="outline" className="mr-2 border-purple-500 text-purple-600">Headquarters</Badge>
+                                )}
                                 {selectedAddress.isPrimary && (
                                     <Badge variant="outline" className="mr-2 border-primary text-primary">Primary</Badge>
                                 )}
@@ -293,6 +311,12 @@ export default function MyAddressesPage() {
                                            <Check className="mr-2 h-4 w-4" />
                                            <span>Set as Primary</span>
                                         </DropdownMenuItem>
+                                        {selectedAddress.type === 'Company' && (
+                                            <DropdownMenuItem onSelect={() => handleSetHeadquarters(selectedAddress.nftId)} disabled={selectedAddress.isHeadquarters || selectedAddress.status !== 'Verified'}>
+                                                <Building className="mr-2 h-4 w-4" />
+                                                <span>Set as Headquarters</span>
+                                            </DropdownMenuItem>
+                                        )}
                                         <DropdownMenuSeparator />
                                          <DropdownMenuItem className="text-destructive" onSelect={() => setActionDialog('incident')}>
                                             <ShieldAlert className="mr-2 h-4 w-4" />
