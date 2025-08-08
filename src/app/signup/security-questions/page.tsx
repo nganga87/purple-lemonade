@@ -58,6 +58,7 @@ export default function SecurityQuestionsPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [accountName, setAccountName] = useState<string | null>(null);
   const [accountType, setAccountType] = useState<'individual' | 'company'>('individual');
   
   const allSecurityQuestions = accountType === 'company' ? companySecurityQuestions : individualSecurityQuestions;
@@ -72,6 +73,7 @@ export default function SecurityQuestionsPage() {
 
   useEffect(() => {
     setUserId(searchParams.get('userId'));
+    setAccountName(searchParams.get('name'));
     const type = searchParams.get('accountType');
     if (type === 'company') {
       setAccountType('company');
@@ -147,7 +149,9 @@ export default function SecurityQuestionsPage() {
                 <ShieldCheck className="h-8 w-8 text-primary"/>
             </div>
           <CardTitle className="font-headline text-2xl">Set Up Your Security Questions</CardTitle>
-          <CardDescription>Choose exactly 3 questions. This will help you recover your account if you forget your password.</CardDescription>
+          <CardDescription>
+            Choose exactly 3 questions for <span className="font-semibold text-primary">{accountName || 'your account'}</span>. This will help you recover your account if you forget your password.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

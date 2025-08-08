@@ -75,7 +75,7 @@ export default function SignUpPage() {
           description: "You're all set! Redirecting you to set up security questions.",
         });
         
-        router.push(`/signup/security-questions?userId=${newUser.id}&accountType=${accountType}`);
+        router.push(`/signup/security-questions?userId=${newUser.id}&accountType=${accountType}&name=${encodeURIComponent(values.name)}`);
 
       } catch (error) {
         console.error("Signup error:", error);
