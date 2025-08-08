@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo } from 'react';
@@ -86,6 +87,65 @@ const userPortfolio = [
     { symbol: 'GLOG', shares: 150, avgCost: 110.5, marketValue: 18810 },
     { symbol: 'ESHP', shares: 50, avgCost: 90.0, marketValue: 4410 },
 ]
+
+function OrderForm({ side, onSubmit }: { side: 'Buy' | 'Sell', onSubmit: () => void }) {
+    const [orderType, setOrderType] = useState('market');
+    return (
+        <div className="p-4 space-y-4">
+            <Select value={orderType} onValueChange={setOrderType}>
+                <SelectTrigger>
+                    <SelectValue placeholder="Select order type" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="market">Market Order</SelectItem>
+                    <SelectItem value="limit">Limit Order</SelectItem>
+                    <SelectItem value="stop">Stop Order</SelectItem>
+                </SelectContent>
+            </Select>
+            <div className="grid grid-cols-2 gap-4">
+                {orderType !== 'market' && (
+                    <div className="space-y-1">
+                        <label className="text-xs">Price (USD)</label>
+                        <Input type="number" placeholder="Price" />
+                    </div>
+                )}
+                <div className="space-y-1 col-span-2">
+                    <label className="text-xs">Amount (Shares)</label>
+                    <Input type="number" placeholder="Amount" />
+                </div>
+            </div>
+            <Button className={`w-full ${side === 'Buy' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`} onClick={onSubmit}>
+                {side}
+            </Button>
+        </div>
+    );
+}
+
+function OrderBookTable({ title, data, colorClass }: { title: string, data: any[], colorClass: string }) {
+    return (
+        <div>
+            <h3 className="p-2 font-semibold text-sm">{title}</h3>
+            <Table>
+                 <TableHeader>
+                    <TableRow>
+                        <TableHead>Price (USD)</TableHead>
+                        <TableHead>Size</TableHead>
+                        <TableHead className="text-right">Total</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {data.map((order, i) => (
+                        <TableRow key={i}>
+                            <TableCell className={colorClass}>{order.price}</TableCell>
+                            <TableCell>{order.size}</TableCell>
+                            <TableCell className="text-right">{order.total}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
+}
 
 export default function ShareMarketPage() {
   const [selectedCompany, setSelectedCompany] = useState(mockCompanies[0]);
@@ -282,252 +342,3 @@ export default function ShareMarketPage() {
     </AppLayout>
   );
 }
-
-function OrderForm({ side, onSubmit }: { side: 'Buy' | 'Sell', onSubmit: () => void }) {
-    const [orderType, setOrderType] = useState('market');
-    return (
-        <div className="p-4 space-y-4">
-            <Select value={orderType} onValueChange={setOrderType}>
-                <SelectTrigger>
-                    <SelectValue placeholder="Select order type" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="market">Market Order</SelectItem>
-                    <SelectItem value="limit">Limit Order</SelectItem>
-                    <SelectItem value="stop">Stop Order</SelectItem>
-                </SelectContent>
-            </Select>
-            <div className="grid grid-cols-2 gap-4">
-                {orderType !== 'market' && (
-                    <div className="space-y-1">
-                        <label className="text-xs">Price (USD)</label>
-                        <Input type="number" placeholder="Price" />
-                    </div>
-                )}
-                <div className="space-y-1 col-span-2">
-                    <label className="text-xs">Amount (Shares)</label>
-                    <Input type="number" placeholder="Amount" />
-                </div>
-            </div>
-            <Button className={`w-full ${side === 'Buy' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`} onClick={onSubmit}>
-                {side}
-            </Button>
-        </div>
-    );
-}
-
-function OrderBookTable({ title, data, colorClass }: { title: string, data: any[], colorClass: string }) {
-    return (
-        <div>
-            <h3 className="p-2 font-semibold text-sm">{title}</h3>
-            <Table>
-                 <TableHeader>
-                    <TableRow>
-                        <TableHead>Price (USD)</TableHead>
-                        <TableHead>Size</TableHead>
-                        <TableHead className="text-right">Total</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {data.map((order, i) => (
-                        <TableRow key={i}>
-                            <TableCell className={colorClass}>{order.price}</TableCell>
-                            <TableCell>{order.size}</TableCell>
-                            <TableCell className="text-right">{order.total}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </div>
-    );
-}
-
-```
-  </change>
-  <change>
-    <file>/src/config/nav.ts</file>
-    <content><![CDATA[
-import {
-  LayoutDashboard,
-  MapPin,
-  PlusCircle,
-  Users,
-  CandlestickChart,
-  Settings,
-  LogOut,
-  Briefcase,
-  ShieldCheck,
-  DollarSign,
-  ShieldAlert,
-  Mail,
-  HelpCircle,
-  MessageSquare,
-  FileText,
-  KeyRound,
-  BarChart2,
-  Phone,
-  PackagePlus,
-  Building,
-} from 'lucide-react';
-import type { LucideProps } from 'lucide-react';
-import React from 'react';
-
-export interface NavItem {
-  title: string;
-  href: string;
-  icon: React.ComponentType<LucideProps>;
-  badge?: string | number;
-  isFooter?: boolean;
-  isBottomSeparator?: boolean;
-  items?: NavItem[];
-}
-
-export const mainNav: NavItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'My Addresses',
-    href: '/my-addresses',
-    icon: MapPin,
-  },
-  {
-    title: 'Register New Address',
-    href: '/register',
-    icon: PlusCircle,
-  },
-  {
-    title: 'Access Requests',
-    href: '/access-requests',
-    icon: Users,
-    badge: 3,
-  },
-  {
-    title: 'Address Marketplace',
-    href: '/exchange',
-    icon: CandlestickChart,
-  },
-   {
-    title: 'CryptoShare Market',
-    href: '/share-market',
-    icon: CandlestickChart,
-  },
-   {
-    title: 'Company Tools',
-    href: '/company/tokenize-shares',
-    icon: Building,
-    isBottomSeparator: true,
-  },
-  {
-    title: 'Settings',
-    href: '#',
-    icon: Settings,
-    isFooter: true,
-  },
-];
-
-export const adminNav: NavItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/admin/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'User Management',
-    href: '/admin/user-management',
-    icon: Users,
-  },
-  {
-    title: 'B2B Clients',
-    href: '/admin/b2b-clients',
-    icon: Briefcase,
-  },
-  {
-    title: 'Address Audit',
-    href: '/admin/address-audit',
-    icon: ShieldCheck,
-  },
-  {
-    title: 'User Feedback',
-    href: '/admin/feedback',
-    icon: MessageSquare,
-  },
-  {
-    title: 'Monetization',
-    href: '/admin/monetization',
-    icon: DollarSign,
-  },
-  {
-    title: 'Incident Response',
-    href: '/admin/incident-response',
-    icon: ShieldAlert,
-  },
-  {
-    title: 'USSD Gateway',
-    href: '/admin/ussd-gateway',
-    icon: Phone,
-  },
-  {
-    title: 'Platform Settings',
-    href: '/admin/platform-settings',
-    icon: Settings,
-    isFooter: true,
-  },
-  {
-    title: 'Exit Portal',
-    href: '/admin/login',
-    icon: LogOut,
-    isFooter: true,
-    isBottomSeparator: true,
-  },
-];
-
-export const businessNav: NavItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/business/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'API Usage',
-    href: '/business/api-usage',
-    icon: BarChart2,
-  },
-  {
-    title: 'API Keys',
-    href: '/business/api-keys',
-    icon: KeyRound,
-  },
-  {
-    title: 'Billing',
-    href: '/business/billing',
-    icon: DollarSign,
-  },
-  {
-    title: 'Documentation',
-    href: '/docs',
-    icon: FileText,
-  },
-];
-
-export const companyNav: NavItem[] = [
-   {
-    title: 'My Company Addresses',
-    href: '/my-addresses?type=company',
-    icon: Briefcase,
-  },
-  {
-    title: 'Tokenize Shares',
-    href: '/company/tokenize-shares',
-    icon: PackagePlus,
-  },
-   {
-    title: 'User Dashboard',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-    isFooter: true,
-    isBottomSeparator: true,
-  },
-];
