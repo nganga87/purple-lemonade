@@ -181,7 +181,7 @@ export default function MyAddressesPage() {
   const handleGetDirections = () => {
     if (!selectedAddress || !selectedAddress.gps) return;
     try {
-        const cleanedGps = selectedAddress.gps.replace(/[°N°W°S°E\s]/g, '');
+        const cleanedGps = selectedAddress.gps.replace(/[°N°W°S°E\\s]/g, '');
         const [lat, lng] = cleanedGps.split(',');
         if (lat && lng) {
             const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;

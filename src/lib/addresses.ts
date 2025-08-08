@@ -14,7 +14,7 @@ export const addresses = [
   {
     isPrimary: false,
     isHeadquarters: true,
-    name: 'Work',
+    name: 'Global Logistics HQ',
     address: '456 Oak Avenue, Springfield, USA 67890',
     nftId: '0x1A2B3c4D5e6F7a8B9c0d1E2f3A4b5C6d7E8f9A0C',
     personalId: 'did:dap:9876-5432-1098-7654',
@@ -25,7 +25,7 @@ export const addresses = [
   {
     isPrimary: false,
     isHeadquarters: false,
-    name: 'New Property',
+    name: 'Vacation Home',
     address: '789 Pine Lane, Lakeside, USA 54321',
     nftId: '0x9D8C7B6A5F4E3D2C1B0A9F8E7D6C5B4A3F2E1D0C',
     personalId: 'did:dap:1122-3344-5566-7788',
