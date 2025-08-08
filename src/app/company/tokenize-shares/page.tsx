@@ -12,12 +12,13 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PlusCircle, Trash2, Loader2, CheckCircle, PackageCheck, Wand2, MapPin, AlertTriangle, Briefcase, FileText } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, CheckCircle, PackageCheck, Wand2, MapPin, AlertTriangle, Briefcase, FileText, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import CompanyLayout from '../layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Link from 'next/link';
 
 type ShareClass = {
   id: string;
@@ -111,6 +112,7 @@ export default function TokenizeSharesPage() {
   }
   
   const totalShares = shareClasses.reduce((acc, sc) => acc + (parseInt(sc.shares, 10) || 0), 0);
+  const atLeastOneClassMinted = shareClasses.some(sc => sc.isMinted);
 
   return (
     <CompanyLayout>
@@ -255,10 +257,15 @@ export default function TokenizeSharesPage() {
                     </div>
                 </div>
             </CardContent>
-             <CardFooter>
-                 <div className="p-4 rounded-lg bg-primary/10 text-primary border border-primary/20">
+             <CardFooter className="flex-col items-start gap-4">
+                 <div className="p-4 rounded-lg bg-primary/10 text-primary border border-primary/20 w-full">
                     <h4 className="font-bold flex items-center gap-2"><PackageCheck /> Next Steps</h4>
                     <p className="text-sm mt-1 text-primary/90">Once minted, you can proceed to the 'Distribution' page to allocate these tokens to founder wallets, employee vesting contracts, or list them on the marketplace for a Security Token Offering (STO).</p>
+                    <Button asChild className="mt-4" disabled={!atLeastOneClassMinted}>
+                        <Link href="/company/distribution">
+                            Go to Distribution <ArrowRight className="ml-2"/>
+                        </Link>
+                    </Button>
                 </div>
              </CardFooter>
             </Card>
