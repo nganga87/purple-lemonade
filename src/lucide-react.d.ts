@@ -84,4 +84,6 @@ declare module 'lucide-react' {
   export const Package: Icon;
   export const PieChart: Icon;
   export const BarChart: Icon;
+  export const CreditCard: Icon;
+  export const ShieldQuestion: Icon;
 }
