@@ -71,4 +71,7 @@ declare module 'lucide-react' {
   export const HelpCircle: Icon;
   export const MessageSquare: Icon;
   export const Bug: Icon;
+  export const PackagePlus: Icon;
+  export const Wand2: Icon;
+  export const PackageCheck: Icon;
 }

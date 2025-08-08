@@ -18,6 +18,8 @@ import {
   KeyRound,
   BarChart2,
   Phone,
+  PackagePlus,
+  Building,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import React from 'react';
@@ -58,6 +60,12 @@ export const mainNav: NavItem[] = [
     title: 'Address Marketplace',
     href: '/exchange',
     icon: CandlestickChart,
+  },
+   {
+    title: 'Company Tools',
+    href: '/company/tokenize-shares',
+    icon: Building,
+    isBottomSeparator: true,
   },
   {
     title: 'Settings',
@@ -148,5 +156,25 @@ export const businessNav: NavItem[] = [
     title: 'Documentation',
     href: '/docs',
     icon: FileText,
+  },
+];
+
+export const companyNav: NavItem[] = [
+   {
+    title: 'My Company Addresses',
+    href: '/my-addresses?type=company',
+    icon: Briefcase,
+  },
+  {
+    title: 'Tokenize Shares',
+    href: '/company/tokenize-shares',
+    icon: PackagePlus,
+  },
+   {
+    title: 'User Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
+    isFooter: true,
+    isBottomSeparator: true,
   },
 ];
