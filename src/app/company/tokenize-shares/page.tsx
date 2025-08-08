@@ -13,9 +13,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PlusCircle, Trash2, Loader2, CheckCircle, PackageCheck, Copy, Wand2 } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, CheckCircle, PackageCheck, Wand2, MapPin, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type ShareClass = {
   id: string;
@@ -29,6 +30,8 @@ export default function TokenizeSharesPage() {
     { id: `sc_${Date.now()}`, name: 'Founders', shares: '1000000', isMinted: false },
   ]);
   const [isMinting, setIsMinting] = useState<string | null>(null);
+  const [locationVerified, setLocationVerified] = useState(false);
+  const [isVerifyingLocation, setIsVerifyingLocation] = useState(false);
   const { toast } = useToast();
 
   const handleAddClass = () => {
@@ -65,6 +68,18 @@ export default function TokenizeSharesPage() {
       });
       setIsMinting(null);
   }
+
+  const handleVerifyLocation = async () => {
+      setIsVerifyingLocation(true);
+      // Simulate fetching GPS and comparing with the company's verified address
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setLocationVerified(true);
+      setIsVerifyingLocation(false);
+      toast({
+          title: "Location Verified!",
+          description: "You are at the company's registered address. Minting is now enabled.",
+      });
+  }
   
   const totalShares = shareClasses.reduce((acc, sc) => acc + (parseInt(sc.shares, 10) || 0), 0);
 
@@ -79,6 +94,25 @@ export default function TokenizeSharesPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+                 <Alert variant="default" className="border-amber-500/50 text-amber-700 dark:border-amber-500/50 dark:text-amber-400 [&>svg]:text-amber-500">
+                    <AlertTriangle className="h-4 w-4"/>
+                    <AlertTitle>Physical Location Required</AlertTitle>
+                    <AlertDescription>
+                        For security, minting new share tokens can only be performed from a computer located at your company's primary verified address. Please verify your location to proceed.
+                    </AlertDescription>
+                </Alert>
+
+                 <div className="p-4 border rounded-lg bg-secondary/50 space-y-4">
+                    <h4 className="font-semibold">Step 1: Verify Your Location</h4>
+                    <p className="text-sm text-muted-foreground">Confirm you are at your company's registered address to enable minting.</p>
+                    <Button onClick={handleVerifyLocation} disabled={locationVerified || isVerifyingLocation}>
+                        {isVerifyingLocation ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <MapPin className="mr-2 h-4 w-4"/>}
+                        {isVerifyingLocation ? 'Verifying...' : locationVerified ? 'Location Verified' : 'Verify My Location'}
+                    </Button>
+                    {locationVerified && <p className="text-sm text-green-600 font-medium flex items-center gap-2"><CheckCircle className="h-4 w-4"/>Location confirmed. You may now mint shares.</p>}
+                </div>
+
+
                 {shareClasses.map((shareClass, index) => (
                 <div key={shareClass.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4 relative">
                     <div className="grid md:grid-cols-2 gap-4">
@@ -89,7 +123,7 @@ export default function TokenizeSharesPage() {
                         placeholder="e.g., Founders, Series A, Employee Pool"
                         value={shareClass.name}
                         onChange={e => handleClassChange(shareClass.id, 'name', e.target.value)}
-                        disabled={shareClass.isMinted}
+                        disabled={shareClass.isMinted || !locationVerified}
                         />
                     </div>
                     <div className="space-y-1">
@@ -100,7 +134,7 @@ export default function TokenizeSharesPage() {
                         placeholder="e.g., 1,000,000"
                         value={shareClass.shares}
                         onChange={e => handleClassChange(shareClass.id, 'shares', e.target.value)}
-                        disabled={shareClass.isMinted}
+                        disabled={shareClass.isMinted || !locationVerified}
                         />
                     </div>
                     </div>
@@ -110,7 +144,7 @@ export default function TokenizeSharesPage() {
                            <p className="font-semibold">This class has been minted.</p>
                         </div>
                     ) : (
-                         <Button onClick={() => handleMint(shareClass.id)} disabled={isMinting !== null}>
+                         <Button onClick={() => handleMint(shareClass.id)} disabled={isMinting !== null || !locationVerified}>
                             {isMinting === shareClass.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Wand2 className="mr-2 h-4 w-4" />}
                             {isMinting === shareClass.id ? 'Minting...' : 'Mint Share Class'}
                         </Button>
@@ -122,6 +156,7 @@ export default function TokenizeSharesPage() {
                         size="icon"
                         className="absolute top-2 right-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         onClick={() => handleRemoveClass(shareClass.id)}
+                        disabled={!locationVerified}
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>
@@ -129,7 +164,7 @@ export default function TokenizeSharesPage() {
                 </div>
                 ))}
 
-                <Button variant="outline" onClick={handleAddClass} disabled={isMinting !== null}>
+                <Button variant="outline" onClick={handleAddClass} disabled={isMinting !== null || !locationVerified}>
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Add Share Class
                 </Button>
