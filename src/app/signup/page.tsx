@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Loader2, Eye, EyeOff, Building } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
@@ -36,6 +37,7 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [accountType, setAccountType] = useState<'individual' | 'company'>('individual');
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -61,7 +63,7 @@ export default function SignUpPage() {
           name: values.name,
           email: values.email,
           password: values.password,
-          role: 'user', // Assign a default role
+          role: accountType,
           status: 'Active',
         };
 
@@ -73,7 +75,7 @@ export default function SignUpPage() {
           description: "You're all set! Redirecting you to set up security questions.",
         });
         
-        router.push(`/signup/security-questions?userId=${newUser.id}`);
+        router.push(`/signup/security-questions?userId=${newUser.id}&accountType=${accountType}`);
 
       } catch (error) {
         console.error("Signup error:", error);
@@ -100,16 +102,27 @@ export default function SignUpPage() {
         <CardContent>
           <Form {...form}>
             <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+              <Tabs defaultValue="individual" onValueChange={(value) => setAccountType(value as 'individual' | 'company')} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="individual">
+                    <User className="mr-2 h-4 w-4"/> Individual
+                  </TabsTrigger>
+                  <TabsTrigger value="company">
+                    <Building className="mr-2 h-4 w-4"/> Company
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+
                <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>{accountType === 'individual' ? 'Full Name' : 'Company Name'}</FormLabel>
                     <FormControl>
                        <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input placeholder="John Doe" className="pl-10" {...field} />
+                        {accountType === 'individual' ? <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /> : <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />}
+                        <Input placeholder={accountType === 'individual' ? 'John Doe' : 'Acme Corporation'} className="pl-10" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />

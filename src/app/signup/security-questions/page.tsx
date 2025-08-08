@@ -19,13 +19,22 @@ import type { AdminUser } from '../../admin/user-management/user-dialog';
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
-const allSecurityQuestions = [
+const individualSecurityQuestions = [
   "What was your first pet's name?",
   "What is the name of the city where you were born?",
   "What is your mother's maiden name?",
   "What was the make of your first car?",
   "What is the name of your favorite childhood friend?",
   "What was the name of your elementary school?",
+];
+
+const companySecurityQuestions = [
+    "What is the company's incorporation city?",
+    "What was the last name of the company's first CEO?",
+    "What is the company's primary bank name?",
+    "What was the year the company was founded?",
+    "What is the street name of the first office address?",
+    "What is the company's tax identification number?",
 ];
 
 const formSchema = z.object({
@@ -49,9 +58,19 @@ export default function SecurityQuestionsPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [accountType, setAccountType] = useState<'individual' | 'company'>('individual');
+  
+  const allSecurityQuestions = accountType === 'company' ? companySecurityQuestions : individualSecurityQuestions;
+
 
   useEffect(() => {
     setUserId(searchParams.get('userId'));
+    const type = searchParams.get('accountType');
+    if (type === 'company') {
+      setAccountType('company');
+    } else {
+      setAccountType('individual');
+    }
   }, [searchParams]);
 
   const form = useForm<FormValues>({
@@ -143,13 +162,19 @@ export default function SecurityQuestionsPage() {
                                                 <Checkbox
                                                 checked={field.value?.includes(question)}
                                                 onCheckedChange={(checked) => {
-                                                    return checked
-                                                    ? field.onChange([...field.value, question])
-                                                    : field.onChange(
-                                                        field.value?.filter(
-                                                        (value) => value !== question
-                                                        )
-                                                    )
+                                                    const newSelection = checked
+                                                        ? [...field.value, question]
+                                                        : field.value?.filter((value) => value !== question);
+
+                                                    if (newSelection.length <= 3) {
+                                                        field.onChange(newSelection);
+                                                    } else {
+                                                        toast({
+                                                            variant: 'destructive',
+                                                            title: 'Limit Reached',
+                                                            description: 'You can only select up to 3 questions.'
+                                                        })
+                                                    }
                                                 }}
                                                 />
                                             </FormControl>
