@@ -25,6 +25,10 @@ export function RegistrationOptions({ onChoice }: RegistrationOptionsProps) {
     }
   }, []);
 
+  const handlePropertyRegistration = () => {
+      onChoice(accountType === 'company' ? 'new-company' : 'new-property');
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <Card className="shadow-lg">
@@ -33,34 +37,25 @@ export function RegistrationOptions({ onChoice }: RegistrationOptionsProps) {
           <CardDescription>Choose an option to get started.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
-            {accountType === 'individual' && (
-                 <div className="p-6 border rounded-lg space-y-4 flex flex-col">
-                    <div className="flex items-center gap-4 mb-2">
-                        <Home className="h-8 w-8 text-primary" />
-                        <h3 className="font-headline text-xl font-semibold">Register a Personal Property</h3>
-                    </div>
-                    <p className="text-muted-foreground flex-1">
-                        Verify a new physical address you own, like a home or rental property. This will create a new primary Address NFT for an individual.
-                    </p>
-                    <Button onClick={() => onChoice('new-property')} className="w-full">
-                        Register Personal Property <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                </div>
-            )}
-             <div className={`p-6 border rounded-lg space-y-4 flex flex-col ${accountType === 'company' ? 'md:col-span-2' : ''}`}>
+          <div className="grid md:grid-cols-1 gap-6">
+            <button
+              onClick={handlePropertyRegistration}
+              className="group text-left p-6 border rounded-lg hover:bg-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
               <div className="flex items-center gap-4 mb-2">
-                <Building className="h-8 w-8 text-primary" />
-                <h3 className="font-headline text-xl font-semibold">Register a Company Address</h3>
+                {accountType === 'company' ? <Building className="h-8 w-8 text-primary" /> : <Home className="h-8 w-8 text-primary" />}
+                <h3 className="font-headline text-xl font-semibold">
+                    {accountType === 'company' ? 'Register a Company Property' : 'Register a Personal Property'}
+                </h3>
               </div>
-              <p className="text-muted-foreground flex-1">
-                Verify a new address for a registered business or organization. This requires company registration details.
+              <p className="text-muted-foreground mb-4">
+                Verify a new physical address for yourself or your company. This will create a new primary Address NFT.
               </p>
-              <Button onClick={() => onChoice('new-company')} className="w-full">
-                Register Company Address <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-            <div className="p-6 border rounded-lg md:col-span-2">
+              <div className="flex items-center text-primary font-medium">
+                Continue <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </button>
+            <div className="p-6 border rounded-lg">
                <div className="flex items-center gap-4 mb-2">
                 <UserPlus className="h-8 w-8 text-accent" />
                 <h3 className="font-headline text-xl font-semibold">Grant Access to an Address</h3>
