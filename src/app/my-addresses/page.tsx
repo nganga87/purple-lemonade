@@ -19,6 +19,7 @@ import {
   Fingerprint,
   Home,
   Building,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -77,7 +78,8 @@ export default function MyAddressesPage() {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses.find(a => a.isPrimary) || addresses[0] || null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
-  const [actionDialog, setActionDialog] = useState<'archive' | 'incident' | null>(null);
+  const [actionDialog, setActionDialog] = useState<'archive' | 'incident' | 'headquarters' | null>(null);
+  const [confirmationText, setConfirmationText] = useState('');
 
   const { toast } = useToast();
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
@@ -114,12 +116,14 @@ export default function MyAddressesPage() {
         isHeadquarters: addr.nftId === nftId
       }));
       setAddresses(newAddresses);
-      const newSelected = newAddresses.find(addr => addr.nftId === selectedAddress?.nftId);
+      const newSelected = newAddresses.find(addr => addr.nftId === nftId);
       if(newSelected) setSelectedAddress(newSelected);
       toast({
         title: "Headquarters Updated",
         description: "Your company headquarters has been set.",
       });
+      setActionDialog(null);
+      setConfirmationText('');
   }
 
   const handleArchiveAddress = async (nftId: string) => {
@@ -149,6 +153,7 @@ export default function MyAddressesPage() {
         description: errorMessage,
       });
     }
+    setActionDialog(null);
   };
 
   const handleCopy = (text: string, type: 'Address' | 'NFT ID' | 'GPS' | 'Personal ID') => {
@@ -231,6 +236,57 @@ export default function MyAddressesPage() {
     }
   };
 
+  const renderActionDialog = () => {
+      if (!actionDialog || !selectedAddress) return null;
+
+      if (actionDialog === 'headquarters') {
+          return (
+             <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle className="font-headline text-xl">Confirm Headquarters Change</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This is a significant legal and financial action. Changing your headquarters will create a permanent, auditable record on the blockchain and may trigger a compliance review.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="py-4 space-y-2">
+                    <Label htmlFor="confirm-text">To confirm, please type "CONFIRM" below:</Label>
+                    <Input id="confirm-text" value={confirmationText} onChange={(e) => setConfirmationText(e.target.value)} />
+                </div>
+                <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => { setActionDialog(null); setConfirmationText(''); }}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction 
+                        onClick={() => handleSetHeadquarters(selectedAddress.nftId)}
+                        disabled={confirmationText !== 'CONFIRM'}
+                    >
+                        Confirm Change
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+             </AlertDialogContent>
+          )
+      }
+
+      return (
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                {actionDialog === 'archive' && `This action cannot be undone. This will permanently archive the address "${selectedAddress.name}".`}
+                {actionDialog === 'incident' && `This will mark the address "${selectedAddress.name}" as compromised, requiring re-validation. This action is recorded publicly.`}
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setActionDialog(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => {
+                    if (actionDialog === 'archive') handleArchiveAddress(selectedAddress.nftId);
+                    if (actionDialog === 'incident') handleReportIncident(selectedAddress.nftId);
+                }}>
+                Continue
+                </AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      )
+  }
+
   return (
     <AppLayout>
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -312,7 +368,7 @@ export default function MyAddressesPage() {
                                            <span>Set as Primary</span>
                                         </DropdownMenuItem>
                                         {selectedAddress.type === 'Company' && (
-                                            <DropdownMenuItem onSelect={() => handleSetHeadquarters(selectedAddress.nftId)} disabled={selectedAddress.isHeadquarters || selectedAddress.status !== 'Verified'}>
+                                            <DropdownMenuItem onSelect={() => setActionDialog('headquarters')} disabled={selectedAddress.isHeadquarters || selectedAddress.status !== 'Verified'}>
                                                 <Building className="mr-2 h-4 w-4" />
                                                 <span>Set as Headquarters</span>
                                             </DropdownMenuItem>
@@ -328,24 +384,7 @@ export default function MyAddressesPage() {
                                         </DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                    <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                        {actionDialog === 'archive' && `This action cannot be undone. This will permanently archive the address "${selectedAddress.name}".`}
-                                        {actionDialog === 'incident' && `This will mark the address "${selectedAddress.name}" as compromised, requiring re-validation. This action is recorded publicly.`}
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel onClick={() => setActionDialog(null)}>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => {
-                                            if (actionDialog === 'archive') handleArchiveAddress(selectedAddress.nftId);
-                                            if (actionDialog === 'incident') handleReportIncident(selectedAddress.nftId);
-                                        }}>
-                                        Continue
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                    </AlertDialogContent>
+                                    {renderActionDialog()}
                                 </AlertDialog>
                                 </div>
                             </CardHeader>
