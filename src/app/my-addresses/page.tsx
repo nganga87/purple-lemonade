@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -17,6 +16,8 @@ import {
   FileText,
   Link as LinkIcon,
   Fingerprint,
+  Home,
+  Building,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -241,9 +242,12 @@ export default function MyAddressesPage() {
                     <SelectContent>
                       {addresses.map((address) => (
                         <SelectItem key={address.nftId} value={address.nftId}>
-                          {address.name}{' '}
-                          <span className="text-muted-foreground">({address.address})</span>
-                          {address.isPrimary && ' - Primary'}
+                            <div className="flex items-center gap-2">
+                                {address.type === 'Company' ? <Building className="h-4 w-4 text-muted-foreground" /> : <Home className="h-4 w-4 text-muted-foreground" />}
+                                <span>{address.name}</span>
+                                <span className="text-muted-foreground truncate">({address.address})</span>
+                                {address.isPrimary && <Badge variant="outline" className="ml-auto">Primary</Badge>}
+                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -258,7 +262,10 @@ export default function MyAddressesPage() {
                                     <TabsTrigger value="details">Details</TabsTrigger>
                                     <TabsTrigger value="succession">Succession</TabsTrigger>
                                 </TabsList>
-                                <CardTitle className="font-headline mt-4">{selectedAddress.name}</CardTitle>
+                                <div className="flex items-center gap-3 mt-4">
+                                    {selectedAddress.type === 'Company' ? <Building className="h-6 w-6 text-muted-foreground" /> : <Home className="h-6 w-6 text-muted-foreground" />}
+                                    <CardTitle className="font-headline">{selectedAddress.name}</CardTitle>
+                                </div>
                                 <CardDescription>
                                     {selectedAddress.address}
                                 </CardDescription>
@@ -459,4 +466,3 @@ export default function MyAddressesPage() {
     </AppLayout>
   );
 }
-

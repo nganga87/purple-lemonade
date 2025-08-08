@@ -1,4 +1,3 @@
-
 export const addresses = [
   {
     isPrimary: true,
@@ -8,6 +7,7 @@ export const addresses = [
     personalId: 'did:dap:1234-5678-9012-3456',
     gps: '34.0522° N, 118.2437° W',
     status: 'Verified' as const,
+    type: 'Individual' as const,
   },
   {
     isPrimary: false,
@@ -17,6 +17,7 @@ export const addresses = [
     personalId: 'did:dap:9876-5432-1098-7654',
     gps: '39.7817° N, 89.6501° W',
     status: 'Verified' as const,
+    type: 'Company' as const,
   },
   {
     isPrimary: false,
@@ -26,6 +27,7 @@ export const addresses = [
     personalId: 'did:dap:1122-3344-5566-7788',
     gps: '41.7638° N, 72.6851° W',
     status: 'Pending' as const,
+    type: 'Individual' as const,
   },
   {
     isPrimary: false,
@@ -35,6 +37,7 @@ export const addresses = [
     personalId: 'did:dap:0000-1111-2222-3333',
     gps: '40.7128° N, 74.0060° W',
     status: 'Compromised' as const,
+    type: 'Company' as const,
   },
 ];
 
