@@ -17,12 +17,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import CompanyLayout from '../layout';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type ShareClass = {
   id: string;
   name: string;
   shares: string;
   isMinted: boolean;
+  selectedClass: string;
 };
 
 // Mock data for the logged-in company
@@ -32,9 +34,18 @@ const companyDetails = {
     headquartersAddress: "456 Oak Avenue, Springfield, USA 67890",
 };
 
+const predefinedShareClasses = [
+    "Common Stock",
+    "Preferred Stock",
+    "Founders Shares",
+    "Series A",
+    "Series B",
+    "Employee Stock Option Pool",
+];
+
 export default function TokenizeSharesPage() {
   const [shareClasses, setShareClasses] = useState<ShareClass[]>([
-    { id: `sc_${Date.now()}`, name: 'Founders', shares: '1000000', isMinted: false },
+    { id: `sc_${Date.now()}`, name: 'Founders Shares', shares: '1000000', isMinted: false, selectedClass: 'Founders Shares' },
   ]);
   const [isMinting, setIsMinting] = useState<string | null>(null);
   const [locationVerified, setLocationVerified] = useState(false);
@@ -44,7 +55,7 @@ export default function TokenizeSharesPage() {
   const handleAddClass = () => {
     setShareClasses(prev => [
       ...prev,
-      { id: `sc_${Date.now()}`, name: '', shares: '', isMinted: false },
+      { id: `sc_${Date.now()}`, name: '', shares: '', isMinted: false, selectedClass: '' },
     ]);
   };
 
@@ -52,15 +63,26 @@ export default function TokenizeSharesPage() {
     setShareClasses(prev => prev.filter(sc => sc.id !== id));
   };
 
-  const handleClassChange = (id: string, field: 'name' | 'shares', value: string) => {
+  const handleClassChange = (id: string, field: 'name' | 'shares' | 'selectedClass', value: string) => {
     setShareClasses(prev =>
-      prev.map(sc => (sc.id === id ? { ...sc, [field]: value } : sc))
+      prev.map(sc => {
+          if (sc.id === id) {
+              if (field === 'selectedClass') {
+                  const isCustom = value === 'Custom...';
+                  return { ...sc, selectedClass: value, name: isCustom ? '' : value };
+              }
+              return { ...sc, [field]: value };
+          }
+          return sc;
+      })
     );
   };
   
   const handleMint = async (id: string) => {
       const shareClass = shareClasses.find(sc => sc.id === id);
-      if (!shareClass || !shareClass.name || !shareClass.shares) {
+      const finalClassName = shareClass?.selectedClass === 'Custom...' ? shareClass.name : shareClass?.selectedClass;
+
+      if (!shareClass || !finalClassName || !shareClass.shares) {
           toast({ variant: 'destructive', title: 'Error', description: 'Share class name and number of shares cannot be empty.' });
           return;
       }
@@ -71,7 +93,7 @@ export default function TokenizeSharesPage() {
       setShareClasses(prev => prev.map(sc => sc.id === id ? {...sc, isMinted: true} : sc));
       toast({
           title: 'Minting Successful!',
-          description: `Successfully minted ${shareClass.shares} shares for the ${shareClass.name} class.`
+          description: `Successfully minted ${shareClass.shares} shares for the ${finalClassName} class.`
       });
       setIsMinting(null);
   }
@@ -154,27 +176,43 @@ export default function TokenizeSharesPage() {
                 {shareClasses.map((shareClass, index) => (
                 <div key={shareClass.id} className="p-4 border rounded-lg bg-secondary/50 space-y-4 relative">
                     <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                        <Label htmlFor={`class-name-${index}`}>Share Class Name</Label>
-                        <Input
-                        id={`class-name-${index}`}
-                        placeholder="e.g., Founders, Series A, Employee Pool"
-                        value={shareClass.name}
-                        onChange={e => handleClassChange(shareClass.id, 'name', e.target.value)}
-                        disabled={shareClass.isMinted || !locationVerified}
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor={`shares-count-${index}`}>Number of Shares</Label>
-                        <Input
-                        id={`shares-count-${index}`}
-                        type="number"
-                        placeholder="e.g., 1,000,000"
-                        value={shareClass.shares}
-                        onChange={e => handleClassChange(shareClass.id, 'shares', e.target.value)}
-                        disabled={shareClass.isMinted || !locationVerified}
-                        />
-                    </div>
+                        <div className="space-y-1">
+                            <Label>Share Class Name</Label>
+                            <Select 
+                                value={shareClass.selectedClass}
+                                onValueChange={(value) => handleClassChange(shareClass.id, 'selectedClass', value)}
+                                disabled={shareClass.isMinted || !locationVerified}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a share class..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {predefinedShareClasses.map(name => (
+                                        <SelectItem key={name} value={name}>{name}</SelectItem>
+                                    ))}
+                                    <SelectItem value="Custom...">Custom...</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {shareClass.selectedClass === 'Custom...' && (
+                                <Input
+                                    placeholder="Enter custom class name"
+                                    value={shareClass.name}
+                                    onChange={e => handleClassChange(shareClass.id, 'name', e.target.value)}
+                                    className="mt-2"
+                                />
+                            )}
+                        </div>
+                        <div className="space-y-1">
+                            <Label htmlFor={`shares-count-${index}`}>Number of Shares</Label>
+                            <Input
+                            id={`shares-count-${index}`}
+                            type="number"
+                            placeholder="e.g., 1,000,000"
+                            value={shareClass.shares}
+                            onChange={e => handleClassChange(shareClass.id, 'shares', e.target.value)}
+                            disabled={shareClass.isMinted || !locationVerified}
+                            />
+                        </div>
                     </div>
                     {shareClass.isMinted ? (
                         <div className="flex items-center gap-2 text-green-600">
