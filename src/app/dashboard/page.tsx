@@ -15,6 +15,9 @@ import {
   QrCode,
   Copy,
   Mail,
+  Wallet,
+  ArrowDownLeft,
+  ArrowUpRight,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -151,8 +154,61 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            <Card className="shadow-lg flex flex-col">
+          <div className="grid lg:grid-cols-3 gap-8">
+             <Card className="shadow-lg flex flex-col">
+                <CardHeader>
+                    <CardTitle className="font-headline">My Wallet</CardTitle>
+                    <CardDescription>
+                    Your balance for trading on the CryptoShare Market.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 space-y-4">
+                    <div className="p-4 rounded-lg bg-secondary border space-y-1">
+                        <p className="text-sm text-muted-foreground">Current Balance</p>
+                        <p className="text-3xl font-bold font-mono">5.204 ETH</p>
+                        <p className="text-muted-foreground">≈ $15,612.00 USD</p>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex gap-2">
+                    <Button className="w-full"><ArrowDownLeft className="mr-2"/>Deposit</Button>
+                    <Button variant="outline" className="w-full"><ArrowUpRight className="mr-2"/>Withdraw</Button>
+                </CardFooter>
+            </Card>
+
+            <div className="space-y-8 lg:col-span-2">
+              <Card className="shadow-lg bg-primary text-primary-foreground">
+                <CardHeader>
+                  <CardTitle className="font-headline">Register a New Address</CardTitle>
+                  <CardDescription className="text-primary-foreground/80">Expand your portfolio by adding another property.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Link href="/register">
+                    <Button variant="secondary" className="w-full">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Start Registration
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+               <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="font-headline">Pending Access Requests</CardTitle>
+                  <CardDescription>Manage requests from others to use your address.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                   <p className="text-muted-foreground mb-4">You have 3 pending requests.</p>
+                   <Link href="/access-requests">
+                     <Button variant="outline" className="w-full">
+                        <Users className="mr-2 h-4 w-4" />
+                        View Requests
+                      </Button>
+                   </Link>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+           <Card className="shadow-lg flex flex-col">
               <CardHeader>
                 <CardTitle className="font-headline">Recent Activity</CardTitle>
                 <CardDescription>
@@ -206,39 +262,6 @@ export default function DashboardPage() {
                 </CardFooter>
               )}
             </Card>
-
-            <div className="space-y-8">
-              <Card className="shadow-lg bg-primary text-primary-foreground">
-                <CardHeader>
-                  <CardTitle className="font-headline">Register a New Address</CardTitle>
-                  <CardDescription className="text-primary-foreground/80">Expand your portfolio by adding another property.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Link href="/register">
-                    <Button variant="secondary" className="w-full">
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Start Registration
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-               <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="font-headline">Pending Access Requests</CardTitle>
-                  <CardDescription>Manage requests from others to use your address.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                   <p className="text-muted-foreground mb-4">You have 3 pending requests.</p>
-                   <Link href="/access-requests">
-                     <Button variant="outline" className="w-full">
-                        <Users className="mr-2 h-4 w-4" />
-                        View Requests
-                      </Button>
-                   </Link>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
         </div>
       </main>
     </AppLayout>

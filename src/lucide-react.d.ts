@@ -79,4 +79,5 @@ declare module 'lucide-react' {
   export const ArrowDown: Icon;
   export const EyeOff: Icon;
   export const BarChart2: Icon;
+  export const ArrowDownLeft: Icon;
 }
