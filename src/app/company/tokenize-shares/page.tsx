@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -13,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PlusCircle, Trash2, Loader2, CheckCircle, PackageCheck, Wand2, MapPin, AlertTriangle } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, CheckCircle, PackageCheck, Wand2, MapPin, AlertTriangle, Briefcase, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -24,6 +23,13 @@ type ShareClass = {
   name: string;
   shares: string;
   isMinted: boolean;
+};
+
+// Mock data for the logged-in company
+const companyDetails = {
+    name: "Global Logistics",
+    registrationNumber: "GLO-12345",
+    headquartersAddress: "456 Oak Avenue, Springfield, USA 67890",
 };
 
 export default function TokenizeSharesPage() {
@@ -88,6 +94,36 @@ export default function TokenizeSharesPage() {
     <CompanyLayout>
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <div className="max-w-4xl mx-auto">
+            <Card className="mb-8">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Briefcase/>Company Details</CardTitle>
+                    <CardDescription>Minting is based on the following verified company information.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center gap-3 p-3 bg-secondary rounded-md">
+                        <FileText className="h-5 w-5 text-muted-foreground"/>
+                        <div>
+                            <p className="text-muted-foreground">Company Name</p>
+                            <p className="font-semibold">{companyDetails.name}</p>
+                        </div>
+                    </div>
+                     <div className="flex items-center gap-3 p-3 bg-secondary rounded-md">
+                        <FileText className="h-5 w-5 text-muted-foreground"/>
+                        <div>
+                            <p className="text-muted-foreground">Registration No.</p>
+                            <p className="font-semibold">{companyDetails.registrationNumber}</p>
+                        </div>
+                    </div>
+                     <div className="flex items-center gap-3 p-3 bg-secondary rounded-md sm:col-span-2">
+                        <MapPin className="h-5 w-5 text-muted-foreground"/>
+                        <div>
+                            <p className="text-muted-foreground">Registered Headquarters</p>
+                            <p className="font-semibold">{companyDetails.headquartersAddress}</p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
             <Card className="shadow-lg">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">Tokenize Company Shares</CardTitle>
