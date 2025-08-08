@@ -14,6 +14,7 @@ export const initialClients = [
     bankName: 'Global Bank',
     bankAccountNumber: '...1234',
     onboardedSince: '2024-05-10',
+    isTokenizationAuthorized: true,
   },
   {
     id: 'cli_2',
@@ -30,6 +31,7 @@ export const initialClients = [
     bankName: 'Commerce Bank',
     bankAccountNumber: '...5678',
     onboardedSince: '2024-06-22',
+    isTokenizationAuthorized: false,
   },
   {
     id: 'cli_3',
@@ -46,6 +48,7 @@ export const initialClients = [
     bankName: 'Rapid Bank',
     bankAccountNumber: '...9012',
     onboardedSince: '2024-08-01',
+    isTokenizationAuthorized: false,
   },
    {
     id: 'cli_4',
@@ -62,5 +65,6 @@ export const initialClients = [
     bankName: 'Questionable Bank',
     bankAccountNumber: '...0000',
     onboardedSince: '2024-08-05',
+    isTokenizationAuthorized: false,
   },
 ];

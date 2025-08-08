@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, PlusCircle, UserCheck, UserX, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, PlusCircle, UserCheck, UserX, Edit, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import { OnboardingDialog, Client } from './onboarding-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { initialClients } from './clients';
@@ -72,6 +72,20 @@ export function ClientTable() {
       toast({ variant: 'destructive', title: `Client Deleted`, description: `${clientName} has been removed.` });
   }
 
+  const handleToggleTokenization = (clientId: string) => {
+      setClients(clients.map(c => {
+          if (c.id === clientId) {
+              const wasAuthorized = c.isTokenizationAuthorized;
+              toast({
+                  title: `Authorization ${wasAuthorized ? 'Revoked' : 'Granted'}`,
+                  description: `${c.companyName} is now ${wasAuthorized ? 'no longer' : ''} authorized for share tokenization.`
+              });
+              return { ...c, isTokenizationAuthorized: !wasAuthorized };
+          }
+          return c;
+      }));
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -94,9 +108,9 @@ export function ClientTable() {
             <TableRow>
               <TableHead>Company</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Tokenization Status</TableHead>
               <TableHead>Plan</TableHead>
-              <TableHead>Contact Person</TableHead>
-              <TableHead>Onboarded Since</TableHead>
+              <TableHead>Onboarded</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -113,10 +127,14 @@ export function ClientTable() {
                         {client.status}
                     </Badge>
                 </TableCell>
+                 <TableCell>
+                    <Badge variant={client.isTokenizationAuthorized ? 'default' : 'secondary'} className={client.isTokenizationAuthorized ? 'bg-blue-100 text-blue-800' : ''}>
+                        {client.isTokenizationAuthorized ? 'Authorized' : 'Not Authorized'}
+                    </Badge>
+                </TableCell>
                 <TableCell>
                   <Badge variant="outline">{client.plan}</Badge>
                 </TableCell>
-                <TableCell>{client.contactName}</TableCell>
                 <TableCell>{client.onboardedSince}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -143,6 +161,18 @@ export function ClientTable() {
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Details
                         </DropdownMenuItem>
+                        {client.isTokenizationAuthorized ? (
+                             <DropdownMenuItem className="text-destructive" onClick={() => handleToggleTokenization(client.id)}>
+                                <XCircle className="mr-2 h-4 w-4" />
+                                Revoke Tokenization
+                            </DropdownMenuItem>
+                        ) : (
+                             <DropdownMenuItem onClick={() => handleToggleTokenization(client.id)}>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Authorize Tokenization
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator/>
                         <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(client.id)}>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete

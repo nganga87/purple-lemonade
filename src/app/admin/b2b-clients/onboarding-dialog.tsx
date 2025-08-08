@@ -62,6 +62,7 @@ const clientSchema = z.object({
 
   status: z.enum(['Pending Review', 'Active', 'Rejected']).default('Pending Review'),
   onboardedSince: z.string().default(new Date().toISOString().split('T')[0]),
+  isTokenizationAuthorized: z.boolean().default(false),
 });
 
 export type Client = z.infer<typeof clientSchema>;
@@ -73,7 +74,7 @@ interface OnboardingDialogProps {
   client: Client | null;
 }
 
-const defaultValues = {
+const defaultValues: Omit<Client, 'id'> = {
       companyName: '',
       registrationNumber: '',
       taxId: '',
@@ -87,6 +88,7 @@ const defaultValues = {
       bankAccountNumber: '',
       status: 'Pending Review' as const,
       onboardedSince: new Date().toISOString().split('T')[0],
+      isTokenizationAuthorized: false,
 };
 
 export function OnboardingDialog({ isOpen, setIsOpen, onSave, client }: OnboardingDialogProps) {
