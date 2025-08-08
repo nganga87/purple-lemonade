@@ -17,6 +17,7 @@ import { PlusCircle, Trash2, Loader2, CheckCircle, PackageCheck, Wand2, MapPin, 
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import CompanyLayout from '../layout';
 
 type ShareClass = {
   id: string;
@@ -84,6 +85,7 @@ export default function TokenizeSharesPage() {
   const totalShares = shareClasses.reduce((acc, sc) => acc + (parseInt(sc.shares, 10) || 0), 0);
 
   return (
+    <CompanyLayout>
       <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">
         <div className="max-w-4xl mx-auto">
             <Card className="shadow-lg">
@@ -188,5 +190,6 @@ export default function TokenizeSharesPage() {
             </Card>
         </div>
       </main>
+    </CompanyLayout>
   );
 }
