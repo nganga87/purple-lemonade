@@ -21,7 +21,7 @@ declare module 'lucide-react' {
   export const Copy: Icon;
   export const Users: Icon;
   export const CheckCircle2: Icon;
-  export const MoreVertical: Icon;
+  export const MoreHorizontal: Icon;
   export const ChevronRight: Icon;
   export const UserCheck: Icon;
   export const UserX: Icon;

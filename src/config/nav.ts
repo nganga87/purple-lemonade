@@ -20,6 +20,7 @@ import {
   PackagePlus,
   Building,
   Archive,
+  CreditCard,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import React from 'react';
@@ -110,6 +111,11 @@ export const adminNav: NavItem[] = [
     title: 'Monetization',
     href: '/admin/monetization',
     icon: DollarSign,
+  },
+  {
+    title: 'Expenses',
+    href: '/admin/expenses',
+    icon: CreditCard,
   },
   {
     title: 'Incident Response',
