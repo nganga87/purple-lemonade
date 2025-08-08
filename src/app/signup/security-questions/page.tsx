@@ -62,6 +62,13 @@ export default function SecurityQuestionsPage() {
   
   const allSecurityQuestions = accountType === 'company' ? companySecurityQuestions : individualSecurityQuestions;
 
+  const generateDefaultAnswers = () => {
+    const allQuestions = [...individualSecurityQuestions, ...companySecurityQuestions];
+    return allQuestions.reduce((acc, q) => {
+        acc[q] = '';
+        return acc;
+    }, {} as Record<string, string>);
+  };
 
   useEffect(() => {
     setUserId(searchParams.get('userId'));
@@ -77,7 +84,7 @@ export default function SecurityQuestionsPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       selectedQuestions: [],
-      answers: {},
+      answers: generateDefaultAnswers(),
     },
   });
 
