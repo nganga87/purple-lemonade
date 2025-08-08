@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { DollarSign, ArrowUpRight, Edit, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History, Users, PlusCircle, Trash2 } from 'lucide-react';
+import { DollarSign, ArrowUpRight, Edit, Briefcase, Save, ShoppingCart, ArrowLeftRight, FileText, History, Users, PlusCircle, Trash2, CandlestickChart } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +37,9 @@ const initialRevenueStreams = [
     { id: 'transfer', name: 'NFT Transfer Fee', description: 'Commission on wallet-to-wallet address NFT transfers.', value: 0.1, type: 'percentage', isActive: true, icon: ArrowLeftRight },
     { id: 'minting', name: 'Address Minting Fee', description: 'One-time fee charged for creating a new digital address NFT.', value: 5.00, type: 'flat', isActive: true, icon: History },
     { id: 'handshake', name: 'Handshake Delivery Fee', description: 'Service fee for verified, in-person "handshake" deliveries.', value: 1.00, type: 'flat', isActive: true, icon: Users },
+    { id: 'share_minting', name: 'Share Class Minting Fee', description: 'Flat fee for minting a new class of company shares.', value: 100.00, type: 'flat', isActive: true, icon: History },
+    { id: 'share_trading', name: 'Share Trading Commission', description: 'Percentage fee for each trade on the CryptoShare Market.', value: 0.5, type: 'percentage', isActive: true, icon: CandlestickChart },
+    { id: 'token_distribution', name: 'Token Distribution Fee', description: 'Service fee for allocating tokens to shareholder wallets.', value: 0.25, type: 'flat', isActive: true, icon: Users },
 ];
 
 const initialTaxRules = [
