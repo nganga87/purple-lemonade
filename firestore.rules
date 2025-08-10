@@ -1,0 +1,17 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // By default, deny all read/write access to your database.
+    // You must create specific rules to allow access to your collections.
+    // For example, to allow anyone to read a 'public' collection:
+    // match /public/{docId} {
+    //   allow read: if true;
+    //   allow write: if false;
+    // }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

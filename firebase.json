@@ -10,5 +10,9 @@
     "frameworksBackend": {
       "id": "addresschain-backend"
     }
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.json"
   }
 }
