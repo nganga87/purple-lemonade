@@ -8,6 +8,10 @@ runConfig:
   # Sets the maximum number of container instances that can be running at once.
   maxInstances: 10
 
+# The service account that the backend will run as.
+# This ensures the backend has the correct permissions to access secrets.
+serviceAccount: addresschain-backend
+
 # Environment variables that can be used by your application.
 # The values of these variables are not visible to other users of the
 # Firebase console.
