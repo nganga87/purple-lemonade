@@ -14,6 +14,7 @@ env:
     secret: GEMINI_API_KEY
 
 # The service account that the backend will run as.
+# This ensures the backend has the correct permissions to access secrets.
 serviceAccount: addresschain-backend
 
 # Specifies the Node.js version to use.
