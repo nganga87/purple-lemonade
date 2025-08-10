@@ -40,7 +40,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Logo } from '@/components/icons';
 import { Separator } from '@/components/ui/separator';
-import { adminNav, mainNav, type NavItem } from '@/config/nav';
+import { adminNav, mainNav as allMainNavItems, type NavItem } from '@/config/nav';
+import useFeatureFlags from '@/hooks/use-feature-flags';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -51,6 +52,14 @@ export function AppLayout({ children, nav = 'main' }: AppLayoutProps) {
   const pathname = usePathname();
   const [userName, setUserName] = useState('John Doe');
   const [userInitial, setUserInitial] = useState('JD');
+  const { featureFlags } = useFeatureFlags();
+
+  const mainNav = allMainNavItems.filter(item => {
+    if (item.href === '/exchange') return featureFlags.addressMarketplace;
+    if (item.href === '/share-market') return featureFlags.shareMarket;
+    if (item.href === '/company/tokenize-shares') return featureFlags.tokenization;
+    return true;
+  });
 
   const updateUserInfo = () => {
     if (typeof window !== 'undefined') {

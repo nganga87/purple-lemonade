@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -19,6 +19,9 @@ import {
   Bug,
   PlusCircle,
   Trash2,
+  CandlestickChart,
+  ShoppingCart,
+  PackagePlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +31,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AppLayout } from '@/components/layout/app-layout';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import useFeatureFlags from '@/hooks/use-feature-flags';
 
 type DebugToken = {
     id: string;
@@ -45,11 +49,13 @@ export default function PlatformSettingsPage() {
   const { toast } = useToast();
   
   // State for Domain & DNS settings
-  const [domainRegistrar, setDomainRegistrar] = useState('Squarespace');
-  const [domainExpiry, setDomainExpiry] = useState('2025-10-26');
-  const [dnsProvider, setDnsProvider] = useState('Squarespace');
-  const [paymentMethod, setPaymentMethod] = useState('Corporate Visa **** 1234');
-  const [debugTokens, setDebugTokens] = useState<DebugToken[]>(initialDebugTokens);
+  const [domainRegistrar, setDomainRegistrar] = React.useState('Squarespace');
+  const [domainExpiry, setDomainExpiry] = React.useState('2025-10-26');
+  const [dnsProvider, setDnsProvider] = React.useState('Squarespace');
+  const [paymentMethod, setPaymentMethod] = React.useState('Corporate Visa **** 1234');
+  const [debugTokens, setDebugTokens] = React.useState<DebugToken[]>(initialDebugTokens);
+
+  const { featureFlags, setFeatureFlag } = useFeatureFlags();
 
 
   const handleSaveDomainSettings = () => {
@@ -168,6 +174,50 @@ export default function PlatformSettingsPage() {
                 <Save className="mr-2 h-4 w-4" /> Save Security Policies
               </Button>
             </CardFooter>
+          </Card>
+
+          {/* Feature Flags Card */}
+          <Card className="lg:col-span-3">
+             <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Save className="h-5 w-5" /> Feature Flags
+                </CardTitle>
+                <CardDescription>
+                    Enable or disable major platform modules in real-time.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex items-center gap-3">
+                        <ShoppingCart className="h-6 w-6 text-muted-foreground"/>
+                        <div>
+                            <Label htmlFor="address-marketplace-flag">Address NFT Marketplace</Label>
+                            <p className="text-sm text-muted-foreground">Toggle the `/exchange` page for buying/selling Address NFTs.</p>
+                        </div>
+                    </div>
+                    <Switch id="address-marketplace-flag" checked={featureFlags.addressMarketplace} onCheckedChange={(checked) => setFeatureFlag('addressMarketplace', checked)} />
+                </div>
+                 <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex items-center gap-3">
+                        <CandlestickChart className="h-6 w-6 text-muted-foreground"/>
+                        <div>
+                            <Label htmlFor="share-market-flag">CryptoShare Market</Label>
+                            <p className="text-sm text-muted-foreground">Toggle the `/share-market` page for trading company shares.</p>
+                        </div>
+                    </div>
+                    <Switch id="share-market-flag" checked={featureFlags.shareMarket} onCheckedChange={(checked) => setFeatureFlag('shareMarket', checked)} />
+                </div>
+                 <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div className="flex items-center gap-3">
+                        <PackagePlus className="h-6 w-6 text-muted-foreground"/>
+                        <div>
+                            <Label htmlFor="tokenization-flag">Company Share Tokenization</Label>
+                            <p className="text-sm text-muted-foreground">Toggle the `/company` portal for tokenizing shares.</p>
+                        </div>
+                    </div>
+                    <Switch id="tokenization-flag" checked={featureFlags.tokenization} onCheckedChange={(checked) => setFeatureFlag('tokenization', checked)} />
+                </div>
+            </CardContent>
           </Card>
           
            {/* API Keys Card */}
