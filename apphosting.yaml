@@ -17,6 +17,9 @@ env:
 # This ensures the backend has the correct permissions to access secrets.
 serviceAccount: addresschain-backend
 
+# The list of secrets that the backend will have access to.
+secretNames:
+  - GEMINI_API_KEY
 # Specifies the Node.js version to use.
 buildConfig:
   nodejsVersion: 20
