@@ -16,12 +16,6 @@ env:
 # The service account that the backend will run as.
 serviceAccount: addresschain-backend
 
-# Build-time environment variables.
-build:
-  env:
-    - variable: GOOGLE_BUILDABLE
-      value: .
-
 # Specifies the Node.js version to use.
 buildConfig:
   nodejsVersion: 20
