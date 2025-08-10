@@ -13,6 +13,9 @@ env:
   - variable: GEMINI_API_KEY
     secret: GEMINI_API_KEY
 
+# The service account that the backend will run as.
+serviceAccount: addresschain-backend
+
 # Build-time environment variables.
 build:
   env:
