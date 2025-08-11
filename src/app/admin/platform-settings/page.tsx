@@ -49,9 +49,9 @@ export default function PlatformSettingsPage() {
   const { toast } = useToast();
   
   // State for Domain & DNS settings
-  const [domainRegistrar, setDomainRegistrar] = React.useState('Squarespace');
+  const [domainRegistrar, setDomainRegistrar] = React.useState('Google Domains');
   const [domainExpiry, setDomainExpiry] = React.useState('2025-10-26');
-  const [dnsProvider, setDnsProvider] = React.useState('Squarespace');
+  const [dnsProvider, setDnsProvider] = React.useState('Google Cloud DNS');
   const [paymentMethod, setPaymentMethod] = React.useState('Corporate Visa **** 1234');
   const [debugTokens, setDebugTokens] = React.useState<DebugToken[]>(initialDebugTokens);
 
