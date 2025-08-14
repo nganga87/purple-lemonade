@@ -1,6 +1,7 @@
+
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -42,10 +43,6 @@ const faqData = {
             answer: 'Yes. NFTs in AddressChain represent real-world locations—like homes, businesses, or landmarks—by linking metadata (GPS coordinates, behavioral signals, ownership proofs) to the token. This creates a digital twin of the physical address.'
         },
         {
-            question: 'How does AddressChain ensure privacy while using blockchain?',
-            answer: 'While blockchain is transparent, AddressChain uses:\n• Zero-knowledge proofs to validate ownership without revealing personal data.\n• Encrypted metadata stored off-chain, with access controlled by the address owner.\n• Behavioral verification to confirm presence or usage without tracking identity.'
-        },
-        {
             question: 'What happens when an address changes or is reassigned?',
             answer: 'The NFT can be updated or transferred via smart contracts. Ownership changes, metadata updates, or behavioral revalidation are recorded immutably, ensuring historical traceability.'
         }
@@ -61,14 +58,6 @@ const faqData = {
             question: 'What blockchain standard does AddressChain use?',
             answer: 'AddressChain utilizes the ERC-721 standard for non-fungible tokens (NFTs), allowing each digital address to be uniquely represented, owned, and transferred securely on-chain.'
         },
-        {
-            question: 'How does AddressChain handle offline environments?',
-            answer: 'The system supports offline-first syncing and validation mechanisms, enabling address registration and verification even in low-connectivity areas. Data is queued locally and synced once connectivity is restored.'
-        },
-        {
-            question: 'How is user privacy protected?',
-            answer: 'AddressChain employs zero-knowledge proofs and behavioral verification to validate address ownership without exposing personal data. Users retain control over what information is shared and with whom.'
-        }
     ],
     'Deployment & Integration': [
         {
