@@ -41,45 +41,67 @@ export default function PrivacyPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Information We Collect</CardTitle>
+                    <CardTitle>1. Information We Collect</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-muted-foreground">
                     <p>
-                       We collect information that you provide to us directly, such as when you create an account, register an address, or communicate with us. This may include your name, email address, physical address, and government-issued ID numbers.
+                       We collect information that you provide to us directly when you use our services. This includes:
                     </p>
+                    <ul className="list-disc pl-6 space-y-1">
+                        <li><b>Account Information:</b> Name, email address, password.</li>
+                        <li><b>Address Information:</b> Physical address, GPS coordinates, property photos, and optionally, title deed or government-issued ID numbers for enhanced verification.</li>
+                        <li><b>Communications:</b> Any feedback, questions, or information you provide when you contact us.</li>
+                    </ul>
                      <p>
-                        We may also collect information automatically when you use our services, such as your IP address, device information, and browsing activity.
+                        We may also collect technical information automatically when you use our services, such as your IP address, device information, and browsing activity.
                     </p>
                 </CardContent>
             </Card>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>How We Use Your Information</CardTitle>
+                    <CardTitle>2. How We Use Your Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-muted-foreground">
                    <p>
-                       We use the information we collect to provide, maintain, and improve our services, including for:
+                       We use the information we collect to provide, maintain, and improve our services, including to:
                    </p>
                     <ul className="list-disc pl-6 space-y-1">
-                        <li>Verifying your identity and address.</li>
-                        <li>Securing your account and preventing fraud.</li>
-                        <li>Communicating with you about your account and our services.</li>
-                        <li>Personalizing your experience.</li>
+                        <li>Verify your identity and link it to a physical address to create a Digital Address NFT.</li>
+                        <li>Use your submitted data, including photos and location information, with our AI models to perform validation checks and generate due diligence reports.</li>
+                        <li>Secure your account and prevent fraudulent activity.</li>
+                        <li>Communicate with you about your account and our services.</li>
+                        <li>Provide customer support.</li>
                    </ul>
                 </CardContent>
             </Card>
 
              <Card>
                 <CardHeader>
-                    <CardTitle>Information Sharing</CardTitle>
+                    <CardTitle>3. Information Sharing and Disclosure</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 text-muted-foreground">
                    <p>
-                       We do not share your personal information with third parties except as described in this policy, such as with your consent, with service providers who perform services on our behalf, or for legal reasons.
+                       We do not sell your personal information. We may share your information with third parties only in the following circumstances:
                    </p>
+                    <ul className="list-disc pl-6 space-y-1">
+                        <li><b>With Your Consent:</b> When you authorize a third-party service to access your Digital Address.</li>
+                        <li><b>For Verification:</b> With third-party validators who are contractually obligated to verify physical addresses.</li>
+                        <li><b>For Legal Reasons:</b> If required by law or in response to a valid legal process.</li>
+                    </ul>
                    <p>
-                        Your Digital Address NFT ID is public on the blockchain, but your personal identifying information linked to it is not, unless you choose to share it.
+                        Your Digital Address NFT ID, its transaction history, and its status (e.g., Verified, Compromised) are public information recorded on the blockchain. However, the personal identifying information linked to it is kept private and is not stored on the blockchain.
+                   </p>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>4. Data Security</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-muted-foreground">
+                   <p>
+                       We implement a variety of security measures to maintain the safety of your personal information. Your data is stored in a secure environment and is accessible only by a limited number of persons who have special access rights and are required to keep the information confidential.
                    </p>
                 </CardContent>
             </Card>
