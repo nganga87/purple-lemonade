@@ -1,8 +1,7 @@
-
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowRight, KeyRound, Mail, Search, Copy } from 'lucide-react';
+import { ArrowRight, KeyRound, Search, Copy } from 'lucide-react';
 import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +10,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { Faq } from '@/components/faq';
 
 
 export default function LandingPage() {
@@ -124,6 +124,12 @@ export default function LandingPage() {
               data-ai-hint="digital globe network"
             />
           </div>
+        </section>
+        
+        <section className="bg-secondary py-16 md:py-24">
+            <div className="container">
+                <Faq />
+            </div>
         </section>
 
       </main>
