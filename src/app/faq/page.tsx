@@ -14,46 +14,60 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
 const faqData = {
-    'About AddressChain': [
+    'Core Concept & Value Proposition': [
         {
-            question: 'What is AddressChain?',
-            answer: 'AddressChain is a platform that transforms physical addresses into verifiable, tradable digital assets (NFTs) on the blockchain. It uses AI to validate addresses, reducing fraud and streamlining logistics.'
+            question: 'What is AddressChain Systems?',
+            answer: 'AddressChain is a blockchain-powered digital addressing platform that transforms how locations are identified, verified, and accessed. It enables secure, interoperable, and privacy-respecting address management for emergency response, logistics, and civic infrastructure.'
         },
         {
             question: 'What problem does AddressChain solve?',
-            answer: 'It solves issues like address fraud, failed deliveries, and complex proof-of-residence verification by creating a single, secure, and tamper-proof source of truth for physical locations.'
+            answer: 'It addresses the fragmentation, inaccuracy, and lack of verifiability in traditional addressing systems—especially in underserved regions. By leveraging blockchain and behavioral validation, AddressChain ensures every address is unique, secure, and context-aware.'
         }
     ],
-    'Blockchain & NFTs': [
+    'Technology & Architecture': [
         {
-            question: 'What is an Address NFT?',
-            answer: 'An Address NFT is a unique digital token (Non-Fungible Token) that represents a single, AI-verified physical address on the blockchain. It serves as a secure and portable proof of address.'
+            question: 'What blockchain standard does AddressChain use?',
+            answer: 'AddressChain utilizes the ERC-721 standard for non-fungible tokens (NFTs), allowing each digital address to be uniquely represented, owned, and transferred securely on-chain.'
         },
         {
-            question: 'Do I need to know about crypto to use AddressChain?',
-            answer: 'While the underlying technology is blockchain, the user interface is designed to be intuitive for everyone. We handle the complexities of crypto wallet generation and blockchain interactions for you.'
-        }
-    ],
-    'Security & Privacy': [
-        {
-            question: 'Is my personal information public on the blockchain?',
-            answer: 'No. While the Address NFT ID is public, your personal identifying information is kept private. You control who has access to your detailed information.'
+            question: 'How does AddressChain handle offline environments?',
+            answer: 'The system supports offline-first syncing and validation mechanisms, enabling address registration and verification even in low-connectivity areas. Data is queued locally and synced once connectivity is restored.'
         },
         {
-            question: 'How do you prevent fraudulent address registrations?',
-            answer: 'We use a multi-step, AI-powered validation process. This includes cross-validating user-submitted photos with satellite imagery and requiring third-party human verification for final approval.'
+            question: 'How is user privacy protected?',
+            answer: 'AddressChain employs zero-knowledge proofs and behavioral verification to validate address ownership without exposing personal data. Users retain control over what information is shared and with whom.'
         }
     ],
-    'Integration & APIs': [
+    'Deployment & Integration': [
         {
-            question: 'Can my business use AddressChain?',
-            answer: 'Yes! We offer a simple REST API for businesses to integrate address verification into their applications, websites, and logistics systems.'
+            question: 'Can AddressChain integrate with existing GIS or logistics platforms?',
+            answer: 'Yes. AddressChain offers APIs and SDKs for seamless integration with GIS tools, logistics platforms, and emergency dispatch systems. It’s designed to be interoperable and modular.'
         },
         {
-            question: 'What are the benefits for e-commerce stores?',
-            answer: 'By integrating our API, e-commerce stores can validate shipping addresses in real-time at checkout. This drastically reduces failed deliveries, costly returns, and customer frustration.'
+            question: 'What hosting infrastructure does AddressChain use?',
+            answer: 'The MVP is deployed on cost-efficient cloud infrastructure with containerized services, secure secret management, and CI/CD pipelines for rapid iteration and scalability.'
         }
     ],
+    'Use Cases & Partnerships': [
+        {
+            question: 'Who are the ideal pilot partners?',
+            answer: 'Emergency response units, logistics companies, municipal governments, and NGOs operating in regions with poor address infrastructure are ideal partners for pilot deployment.'
+        },
+        {
+            question: 'How does AddressChain improve emergency response?',
+            answer: 'By providing precise, validated digital addresses, responders can locate individuals faster, even in informal settlements or rural areas. Behavioral signals can also trigger alerts or verify presence.'
+        }
+    ],
+    'Business Model & Growth': [
+        {
+            question: 'How does AddressChain generate revenue?',
+            answer: 'Through tiered SaaS subscriptions for enterprise users, transaction fees for address minting and verification, and licensing of its API for third-party integrations.'
+        },
+        {
+            question: 'What’s the long-term vision?',
+            answer: 'To become the foundational layer for global addressing—enabling smart cities, autonomous logistics, and resilient civic infrastructure through secure, decentralized location intelligence.'
+        }
+    ]
 };
 
 export default function FaqPage() {
