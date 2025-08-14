@@ -50,6 +50,12 @@ const faqData = {
             answer: 'The NFT can be updated or transferred via smart contracts. Ownership changes, metadata updates, or behavioral revalidation are recorded immutably, ensuring historical traceability.'
         }
     ],
+    'Printed NFTs vs Platform': [
+        {
+            question: 'Printing or Displaying an NFT Address Outside AddressChain',
+            answer: '✅ What You Can Do\n• View and export metadata: If your NFT includes metadata (e.g., GPS coordinates, ownership proof, address description), you can extract it from the token URI and print it as a certificate, QR code, or visual map.\n• Use blockchain explorers: Tools like Etherscan or Moralis let you view NFT ownership, token ID, and contract details.\n• Print visual representations: Platforms like NFTY INK allow you to upscale and print NFTs as physical art or certificates, even if they originated digitally.\n\n🧾 Example Use Case: Printed Address Certificate\nImagine a printed certificate that includes:\n• Address name (e.g., “Plot 12, Green Valley”)\n• Token ID and blockchain contract\n• QR code linking to the token URI or metadata\n• Ownership signature or validation hash\n• Timestamp of minting\nThis can be used for:\n• Proof of residence\n• Emergency response tagging\n• Logistics drop-point verification\n• Civic documentation\n\n⚠️ Considerations\n• Metadata access: Ensure your NFT includes a token URI pointing to accessible metadata (e.g., IPFS or HTTPS).\n• Privacy: Avoid printing sensitive data unless encrypted or anonymized.\n• Legal recognition: Printed NFTs may not yet be legally recognized as address proof unless backed by local authorities or pilot agreements.'
+        }
+    ],
     'Technology & Architecture': [
         {
             question: 'What blockchain standard does AddressChain use?',
