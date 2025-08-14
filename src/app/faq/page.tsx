@@ -24,6 +24,32 @@ const faqData = {
             answer: 'It addresses the fragmentation, inaccuracy, and lack of verifiability in traditional addressing systems—especially in underserved regions. By leveraging blockchain and behavioral validation, AddressChain ensures every address is unique, secure, and context-aware.'
         }
     ],
+    'Blockchain & NFTs': [
+        {
+            question: 'How does blockchain make digital addresses reliable?',
+            answer: 'AddressChain uses blockchain to ensure that every digital address is:\n• Tamper-proof: Once registered, it cannot be altered without consensus.\n• Verifiable: Anyone can confirm the authenticity of an address.\n• Decentralized: No single authority controls the data, reducing risk of manipulation.'
+        },
+        {
+            question: 'What is an NFT and how does it relate to digital addresses?',
+            answer: 'An NFT (Non-Fungible Token) is a unique digital asset stored on a blockchain. In AddressChain, each address is minted as an ERC-721 NFT, meaning:\n• It’s one-of-a-kind and cannot be duplicated.\n• It has a traceable ownership history.\n• It can be transferred or updated securely via smart contracts.\nThis makes each address a provable, ownable, and tradable asset, similar to a digital deed.'
+        },
+        {
+            question: 'Why use ERC-721 instead of ERC-20?',
+            answer: 'ERC-721 is designed for non-fungible assets, where each token is unique—perfect for representing distinct addresses. ERC-20 is for fungible tokens (like cryptocurrencies), which are interchangeable. Since no two addresses are alike, ERC-721 is the ideal standard.'
+        },
+        {
+            question: 'Can an NFT represent a physical location?',
+            answer: 'Yes. NFTs in AddressChain represent real-world locations—like homes, businesses, or landmarks—by linking metadata (GPS coordinates, behavioral signals, ownership proofs) to the token. This creates a digital twin of the physical address.'
+        },
+        {
+            question: 'How does AddressChain ensure privacy while using blockchain?',
+            answer: 'While blockchain is transparent, AddressChain uses:\n• Zero-knowledge proofs to validate ownership without revealing personal data.\n• Encrypted metadata stored off-chain, with access controlled by the address owner.\n• Behavioral verification to confirm presence or usage without tracking identity.'
+        },
+        {
+            question: 'What happens when an address changes or is reassigned?',
+            answer: 'The NFT can be updated or transferred via smart contracts. Ownership changes, metadata updates, or behavioral revalidation are recorded immutably, ensuring historical traceability.'
+        }
+    ],
     'Technology & Architecture': [
         {
             question: 'What blockchain standard does AddressChain use?',
@@ -138,7 +164,7 @@ export default function FaqPage() {
                             {qas.map((qa, index) => (
                                 <AccordionItem key={index} value={`item-${index}`}>
                                 <AccordionTrigger className="text-lg text-left">{qa.question}</AccordionTrigger>
-                                <AccordionContent className="text-base text-muted-foreground">
+                                <AccordionContent className="text-base text-muted-foreground whitespace-pre-line">
                                     {qa.answer}
                                 </AccordionContent>
                                 </AccordionItem>
