@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -28,11 +27,11 @@ const faqData = {
     'Blockchain & NFTs': [
         {
             question: 'How does blockchain make digital addresses reliable?',
-            answer: 'AddressChain uses blockchain to ensure that every digital address is:\n• Tamper-proof: Once registered, it cannot be altered without consensus.\n• Verifiable: Anyone can confirm the authenticity of an address.\n• Decentralized: No single authority controls the data, reducing risk of manipulation.'
+            answer: 'AddressChain uses blockchain to ensure that every digital address is:\n• \tTamper-proof: Once registered, it cannot be altered without consensus.\n• \tVerifiable: Anyone can confirm the authenticity of an address.\n• \tDecentralized: No single authority controls the data, reducing risk of manipulation.'
         },
         {
             question: 'What is an NFT and how does it relate to digital addresses?',
-            answer: 'An NFT (Non-Fungible Token) is a unique digital asset stored on a blockchain. In AddressChain, each address is minted as an ERC-721 NFT, meaning:\n• It’s one-of-a-kind and cannot be duplicated.\n• It has a traceable ownership history.\n• It can be transferred or updated securely via smart contracts.\nThis makes each address a provable, ownable, and tradable asset, similar to a digital deed.'
+            answer: 'An NFT (Non-Fungible Token) is a unique digital asset stored on a blockchain. In AddressChain, each address is minted as an ERC-721 NFT, meaning:\n• \tIt’s one-of-a-kind and cannot be duplicated.\n• \tIt has a traceable ownership history.\n• \tIt can be transferred or updated securely via smart contracts.\nThis makes each address a provable, ownable, and tradable asset, similar to a digital deed.'
         },
         {
             question: 'Why use ERC-721 instead of ERC-20?',
@@ -50,7 +49,7 @@ const faqData = {
     'Printed NFTs vs Platform': [
         {
             question: 'Printing or Displaying an NFT Address Outside AddressChain',
-            answer: '✅ What You Can Do\n• View and export metadata: If your NFT includes metadata (e.g., GPS coordinates, ownership proof, address description), you can extract it from the token URI and print it as a certificate, QR code, or visual map.\n• Use blockchain explorers: Tools like Etherscan or Moralis let you view NFT ownership, token ID, and contract details.\n• Print visual representations: Platforms like NFTY INK allow you to upscale and print NFTs as physical art or certificates, even if they originated digitally.\n\n🧾 Example Use Case: Printed Address Certificate\nImagine a printed certificate that includes:\n• Address name (e.g., “Plot 12, Green Valley”)\n• Token ID and blockchain contract\n• QR code linking to the token URI or metadata\n• Ownership signature or validation hash\n• Timestamp of minting\nThis can be used for:\n• Proof of residence\n• Emergency response tagging\n• Logistics drop-point verification\n• Civic documentation\n\n⚠️ Considerations\n• Metadata access: Ensure your NFT includes a token URI pointing to accessible metadata (e.g., IPFS or HTTPS).\n• Privacy: Avoid printing sensitive data unless encrypted or anonymized.\n• Legal recognition: Printed NFTs may not yet be legally recognized as address proof unless backed by local authorities or pilot agreements.'
+            answer: '✅ What You Can Do\n• \tView and export metadata: If your NFT includes metadata (e.g., GPS coordinates, ownership proof, address description), you can extract it from the token URI and print it as a certificate, QR code, or visual map.\n• \tUse blockchain explorers: Tools like Etherscan or Moralis let you view NFT ownership, token ID, and contract details.\n• \tPrint visual representations: Platforms like NFTY INK allow you to upscale and print NFTs as physical art or certificates, even if they originated digitally.\n\n🧾 Example Use Case: Printed Address Certificate\nImagine a printed certificate that includes:\n• \tAddress name (e.g., “Plot 12, Green Valley”)\n• \tToken ID and blockchain contract\n• \tQR code linking to the token URI or metadata\n• \tOwnership signature or validation hash\n• \tTimestamp of minting\nThis can be used for:\n• \tProof of residence\n• \tEmergency response tagging\n• \tLogistics drop-point verification\n• \tCivic documentation\n\n⚠️ Considerations\n• \tMetadata access: Ensure your NFT includes a token URI pointing to accessible metadata (e.g., IPFS or HTTPS).\n• \tPrivacy: Avoid printing sensitive data unless encrypted or anonymized.\n• \tLegal recognition: Printed NFTs may not yet be legally recognized as address proof unless backed by local authorities or pilot agreements.'
         }
     ],
     'Technology & Architecture': [
@@ -58,6 +57,14 @@ const faqData = {
             question: 'What blockchain standard does AddressChain use?',
             answer: 'AddressChain utilizes the ERC-721 standard for non-fungible tokens (NFTs), allowing each digital address to be uniquely represented, owned, and transferred securely on-chain.'
         },
+        {
+            question: 'How does AddressChain handle offline environments?',
+            answer: 'The system supports offline-first syncing and validation mechanisms, enabling address registration and verification even in low-connectivity areas. Data is queued locally and synced once connectivity is restored.'
+        },
+        {
+            question: 'How is user privacy protected?',
+            answer: 'AddressChain employs zero-knowledge proofs and behavioral verification to validate address ownership without exposing personal data. Users retain control over what information is shared and with whom.'
+        }
     ],
     'Deployment & Integration': [
         {
