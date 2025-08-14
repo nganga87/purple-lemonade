@@ -125,19 +125,13 @@ export default function LandingPage() {
             />
           </div>
         </section>
-        
-        <section className="bg-secondary py-16 md:py-24">
-            <div className="container">
-                <Faq />
-            </div>
-        </section>
-
       </main>
 
       <footer className="border-t">
         <div className="container flex items-center justify-between py-6 text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} Digital Address. All rights reserved.</p>
           <div className="flex items-center gap-4">
+            <Link href="/faq" className="hover:text-primary">FAQ</Link>
             <Link href="/for-businesses" className="hover:text-primary">For Businesses</Link>
             <Link href="/admin/login" className="hover:text-primary">Admin</Link>
             <Link href="/terms" className="hover:text-primary">Terms of Service</Link>
