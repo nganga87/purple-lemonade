@@ -1,4 +1,3 @@
-
 'use server';
 
 import { validateDoorPhoto, type ValidateDoorPhotoInput, type ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';

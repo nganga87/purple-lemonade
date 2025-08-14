@@ -364,6 +364,9 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     formData.append('doorPhoto', values.doorPhoto);
     formData.append('countryCode', values.country);
     formData.append('physicalAddress', values.physicalAddress);
+    if (values.idNumber) {
+        formData.append('idNumber', values.idNumber);
+    }
     
     try {
       const response = await handleRegistration(formData);
