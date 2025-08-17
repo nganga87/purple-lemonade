@@ -162,12 +162,11 @@ export default function SecurityQuestionsPage() {
                     render={() => (
                         <FormItem className="space-y-4">
                            {allSecurityQuestions.map((question, index) => (
-                               <FormField
-                                key={index}
-                                control={form.control}
-                                name="selectedQuestions"
-                                render={({ field }) => (
-                                    <div className="space-y-2 rounded-md border p-4">
+                               <div key={index} className="space-y-2 rounded-md border p-4">
+                                   <FormField
+                                    control={form.control}
+                                    name="selectedQuestions"
+                                    render={({ field }) => (
                                         <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                                             <FormControl>
                                                 <Checkbox
@@ -191,22 +190,22 @@ export default function SecurityQuestionsPage() {
                                             </FormControl>
                                             <FormLabel className="font-normal">{question}</FormLabel>
                                         </FormItem>
-                                        {field.value?.includes(question) && (
-                                            <FormField
-                                                control={form.control}
-                                                name={`answers.${question}`}
-                                                render={({field: answerField}) => (
-                                                    <FormItem>
-                                                        <FormControl>
-                                                            <Input placeholder="Your secret answer" {...answerField}/>
-                                                        </FormControl>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        )}
-                                    </div>
-                                )}
-                               />
+                                    )}
+                                   />
+                                    {selectedQuestions?.includes(question) && (
+                                        <FormField
+                                            control={form.control}
+                                            name={`answers.${question}`}
+                                            render={({field: answerField}) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input placeholder="Your secret answer" {...answerField}/>
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+                                </div>
                            ))}
                            <FormMessage />
                         </FormItem>
