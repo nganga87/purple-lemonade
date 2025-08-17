@@ -29,6 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { countries, type Country } from '@/lib/countries';
 import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
@@ -134,8 +135,10 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cameraStatus, setCameraStatus] = useState<'idle' | 'loading' | 'allowed' | 'denied' | 'notsupported'>('idle');
   const [isCapturing, setIsCapturing] = useState(false);
-  
   const [capturedImage, setCapturedImage] = useState<{ src: string, file: File } | null>(null);
+  
+  const [showTitleDeed, setShowTitleDeed] = useState(false);
+  const [showIdNumber, setShowIdNumber] = useState(false);
 
 
   const form = useForm<FormValues>({
@@ -167,9 +170,10 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedData) {
         const parsedData:Partial<FormValues> = JSON.parse(savedData);
-        // We don't restore the file input, but we restore the text fields
         const { doorPhoto, terms, ...restOfData } = parsedData;
         reset(restOfData);
+        if (restOfData.titleDeedNumber) setShowTitleDeed(true);
+        if (restOfData.idNumber) setShowIdNumber(true);
         toast({
           title: "Draft Loaded",
           description: "Your previously saved registration data has been loaded.",
@@ -196,7 +200,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     if (countryCode) {
       const country = countries.find(c => c.code === countryCode) || null;
       setSelectedCountry(country);
-      setValue('state', ''); // Reset state selection when country changes
+      setValue('state', '');
     } else {
       setSelectedCountry(null);
     }
@@ -364,7 +368,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     formData.append('doorPhoto', values.doorPhoto);
     formData.append('countryCode', values.country);
     formData.append('physicalAddress', values.physicalAddress);
-    if (values.idNumber) {
+    if (showIdNumber && values.idNumber) {
         formData.append('idNumber', values.idNumber);
     }
     
@@ -378,7 +382,6 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
         title: response.submitted ? "Registration Submitted" : "Validation Complete",
         description: response.validationDetails,
       });
-      // Clear saved data on successful submission
       localStorage.removeItem(LOCAL_STORAGE_KEY);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -396,7 +399,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const handleSave = () => {
     try {
       const currentData = getValues();
-      const { doorPhoto, ...dataToSave } = currentData; // Don't save the file object
+      const { doorPhoto, ...dataToSave } = currentData;
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
       toast({
         title: "Draft Saved",
@@ -564,52 +567,39 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                           </FormItem>
                         )}
                       />
-                      <div className="grid sm:grid-cols-2 gap-4">
-                       <FormField
-                        control={form.control}
-                        name="titleDeedNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>5. Title Deed Number</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <Input placeholder="e.g., T-1234567" {...field} className="pl-10" />
-                              </div>
-                            </FormControl>
-                            <FormDescription>
-                              (Optional)
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                       <FormField
-                        control={form.control}
-                        name="idNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>6. ID/Passport No.</FormLabel>
-                            <FormControl>
-                              <div className="relative">
-                                <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                <Input placeholder="Owner's ID" {...field} className="pl-10" />
-                              </div>
-                            </FormControl>
-                             <FormDescription>
-                              (Optional)
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <div className="space-y-4 rounded-lg border p-4">
+                        <Alert>
+                           <AlertTriangle className="h-4 w-4" />
+                            <AlertTitle>Optional: Increase Trust Level</AlertTitle>
+                            <AlertDescription>
+                                Providing a Title Deed and/or a Government ID number increases the verification tier of your address, making it more trusted for high-value transactions.
+                            </AlertDescription>
+                        </Alert>
+                         <div className="space-y-4">
+                          <div className="flex items-center space-x-2">
+                             <Switch id="title-deed-switch" checked={showTitleDeed} onCheckedChange={(checked) => {setShowTitleDeed(checked); if(!checked) setValue('titleDeedNumber', '');}}/>
+                             <Label htmlFor="title-deed-switch">Add Title Deed Number</Label>
+                           </div>
+                           <FormField control={form.control} name="titleDeedNumber" render={({ field }) => (
+                             <FormItem><FormControl><Input placeholder="e.g., T-1234567" {...field} disabled={!showTitleDeed} /></FormControl><FormMessage /></FormItem>
+                           )}/>
+                         </div>
+                         <div className="space-y-4">
+                            <div className="flex items-center space-x-2">
+                                <Switch id="id-number-switch" checked={showIdNumber} onCheckedChange={(checked) => {setShowIdNumber(checked); if(!checked) setValue('idNumber', '');}}/>
+                                <Label htmlFor="id-number-switch">Add ID/Passport Number</Label>
+                            </div>
+                           <FormField control={form.control} name="idNumber" render={({ field }) => (
+                             <FormItem><FormControl><Input placeholder="Owner's ID" {...field} disabled={!showIdNumber} /></FormControl><FormMessage /></FormItem>
+                           )}/>
+                         </div>
                       </div>
                       <FormField
                         control={form.control}
                         name="gpsCoordinates"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>7. GPS Coordinates</FormLabel>
+                            <FormLabel>5. GPS Coordinates</FormLabel>
                             <div className="flex gap-2">
                                 <FormControl>
                                   <div className="relative flex-grow">
@@ -631,7 +621,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                       />
                        {generatedAddress && (
                           <FormItem>
-                            <FormLabel>8. Generated Crypto Wallet Address</FormLabel>
+                            <FormLabel>6. Generated Crypto Wallet Address</FormLabel>
                              <FormControl>
                               <div className="relative flex-grow bg-secondary p-2 rounded-md">
                                 <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -649,7 +639,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                     name="doorPhoto"
                     render={() => (
                       <FormItem>
-                        <FormLabel>9. Door Photo</FormLabel>
+                        <FormLabel>7. Door Photo</FormLabel>
                         <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>
                           <TabsList className="grid w-full grid-cols-2">
                             <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
@@ -765,11 +755,11 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                           </div>
                            <div>
                               <span className="font-semibold text-muted-foreground">Title Deed Number:</span>
-                              <p>{titleDeedNumber || 'N/A'}</p>
+                              <p>{showTitleDeed && titleDeedNumber ? titleDeedNumber : 'N/A'}</p>
                           </div>
                            <div>
                               <span className="font-semibold text-muted-foreground">ID / Passport Number:</span>
-                              <p>{idNumber || 'N/A'}</p>
+                              <p>{showIdNumber && idNumber ? idNumber : 'N/A'}</p>
                           </div>
                           <div>
                               <span className="font-semibold text-muted-foreground">GPS Coordinates:</span>
