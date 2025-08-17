@@ -41,13 +41,20 @@ const formSchema = z.object({
   selectedQuestions: z.array(z.string()).refine(value => value.length === 3, {
     message: "You must select exactly 3 questions.",
   }),
-  answers: z.record(z.string()),
+  answer1: z.string().optional(),
+  answer2: z.string().optional(),
+  answer3: z.string().optional(),
 }).refine(data => {
-    // Ensure every selected question has a non-empty answer
-    return data.selectedQuestions.every(q => data.answers[q] && data.answers[q].length > 0);
+    const selectedCount = data.selectedQuestions.length;
+    if (selectedCount < 3) return true; // Don't validate answers until 3 questions are selected
+    return (
+        (selectedCount > 0 ? data.answer1 && data.answer1.length > 0 : true) &&
+        (selectedCount > 1 ? data.answer2 && data.answer2.length > 0 : true) &&
+        (selectedCount > 2 ? data.answer3 && data.answer3.length > 0 : true)
+    );
 }, {
     message: "Please provide an answer for each selected question.",
-    path: ["answers"], // This error isn't easily displayed, but the logic is sound.
+    path: ["answer1"], 
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -62,14 +69,6 @@ export default function SecurityQuestionsPage() {
   const [accountType, setAccountType] = useState<'individual' | 'company'>('individual');
   
   const allSecurityQuestions = accountType === 'company' ? companySecurityQuestions : individualSecurityQuestions;
-
-  const generateDefaultAnswers = () => {
-    const allQuestions = [...individualSecurityQuestions, ...companySecurityQuestions];
-    return allQuestions.reduce((acc, q) => {
-        acc[q] = '';
-        return acc;
-    }, {} as Record<string, string>);
-  };
 
   useEffect(() => {
     setUserId(searchParams.get('userId'));
@@ -86,7 +85,9 @@ export default function SecurityQuestionsPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       selectedQuestions: [],
-      answers: generateDefaultAnswers(),
+      answer1: '',
+      answer2: '',
+      answer3: '',
     },
   });
 
@@ -109,7 +110,7 @@ export default function SecurityQuestionsPage() {
          return;
       }
       
-      const answersArray = values.selectedQuestions.map(q => values.answers[q].toLowerCase());
+      const answersArray = [values.answer1, values.answer2, values.answer3].filter(Boolean).map(a => a!.toLowerCase());
 
       users[userIndex].securityQuestions = values.selectedQuestions;
       users[userIndex].securityAnswers = answersArray;
@@ -159,43 +160,42 @@ export default function SecurityQuestionsPage() {
                 <FormField
                     control={form.control}
                     name="selectedQuestions"
-                    render={() => (
+                    render={({ field }) => (
                         <FormItem className="space-y-4">
-                           {allSecurityQuestions.map((question, index) => (
-                               <div key={index} className="space-y-2 rounded-md border p-4">
-                                   <FormField
-                                    control={form.control}
-                                    name="selectedQuestions"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                            <FormControl>
-                                                <Checkbox
-                                                checked={field.value?.includes(question)}
-                                                onCheckedChange={(checked) => {
-                                                    const newSelection = checked
-                                                        ? [...field.value, question]
-                                                        : field.value?.filter((value) => value !== question);
+                           {allSecurityQuestions.map((question) => {
+                             const isChecked = field.value?.includes(question);
+                             const checkedIndex = isChecked ? field.value.indexOf(question) : -1;
+                             
+                             return (
+                               <div key={question} className="space-y-2 rounded-md border p-4">
+                                   <div className="flex flex-row items-start space-x-3 space-y-0">
+                                       <FormControl>
+                                           <Checkbox
+                                           checked={isChecked}
+                                           onCheckedChange={(checked) => {
+                                               const currentSelection = field.value || [];
+                                               const newSelection = checked
+                                                   ? [...currentSelection, question]
+                                                   : currentSelection.filter((value) => value !== question);
 
-                                                    if (newSelection.length <= 3) {
-                                                        field.onChange(newSelection);
-                                                    } else {
-                                                        toast({
-                                                            variant: 'destructive',
-                                                            title: 'Limit Reached',
-                                                            description: 'You can only select up to 3 questions.'
-                                                        })
-                                                    }
-                                                }}
-                                                />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">{question}</FormLabel>
-                                        </FormItem>
-                                    )}
-                                   />
-                                    {selectedQuestions?.includes(question) && (
+                                               if (newSelection.length <= 3) {
+                                                   field.onChange(newSelection);
+                                               } else {
+                                                   toast({
+                                                       variant: 'destructive',
+                                                       title: 'Limit Reached',
+                                                       description: 'You can only select up to 3 questions.'
+                                                   })
+                                               }
+                                           }}
+                                           />
+                                       </FormControl>
+                                       <FormLabel className="font-normal">{question}</FormLabel>
+                                   </div>
+                                    {isChecked && checkedIndex !== -1 && (
                                         <FormField
                                             control={form.control}
-                                            name={`answers.${question}`}
+                                            name={`answer${checkedIndex + 1}` as 'answer1' | 'answer2' | 'answer3'}
                                             render={({field}) => (
                                                 <FormItem>
                                                     <FormControl>
@@ -206,7 +206,7 @@ export default function SecurityQuestionsPage() {
                                         />
                                     )}
                                 </div>
-                           ))}
+                           )})}
                            <FormMessage />
                         </FormItem>
                     )}
