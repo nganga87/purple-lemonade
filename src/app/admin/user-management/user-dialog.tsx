@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -31,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, Fingerprint, Lock } from 'lucide-react';
+import { Loader2, Mail, User, Briefcase, Phone, KeyRound, Copy, Globe, Fingerprint, Lock, ShieldCheck } from 'lucide-react';
 import { roles } from './roles';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -40,6 +39,7 @@ import { countries } from '@/lib/countries';
 import { verifyNftId } from '@/lib/verify-nft';
 import { portals } from './portals';
 import { Checkbox } from '@/components/ui/checkbox';
+import { individualSecurityQuestions, companySecurityQuestions } from '@/app/signup/security-questions/questions';
 
 const userSchema = z.object({
   id: z.string().optional(),
@@ -95,6 +95,7 @@ const defaultValues: Omit<AdminUser, 'id'> = {
 
 export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [currentTab, setCurrentTab] = useState('account');
   const { toast } = useToast();
 
   const form = useForm<AdminUser>({
@@ -104,6 +105,7 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
 
   useEffect(() => {
     form.reset(user || defaultValues);
+    setCurrentTab('account');
   }, [user, form, isOpen]);
 
 
@@ -174,6 +176,8 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
   };
 
   const isEditingSelfAsSuperAdmin = user?.role === 'super-admin' && user?.email === 'nicholas@digitaladdress.com';
+  const allSecurityQuestions = user?.role === 'company' ? companySecurityQuestions : individualSecurityQuestions;
+  const selectedQuestions = form.watch('securityQuestions') || [];
 
 
   return (
@@ -187,12 +191,13 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <Tabs defaultValue="account">
-              <TabsList className="grid w-full grid-cols-5">
+            <Tabs value={currentTab} onValueChange={setCurrentTab}>
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="account">Account</TabsTrigger>
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="location">Location</TabsTrigger>
                 <TabsTrigger value="permissions">Permissions</TabsTrigger>
+                <TabsTrigger value="security">Security</TabsTrigger>
                 <TabsTrigger value="biometric">Biometric</TabsTrigger>
               </TabsList>
               <div className="py-4 max-h-[50vh] overflow-y-auto px-1">
@@ -546,6 +551,67 @@ export function UserDialog({ isOpen, setIsOpen, user, onSave }: UserDialogProps)
                               }}
                             />
                           ))}
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                <TabsContent value="security">
+                  <FormField
+                    control={form.control}
+                    name="securityQuestions"
+                    render={() => (
+                      <FormItem>
+                         <div className="mb-4">
+                          <FormLabel className="text-base">Security Questions</FormLabel>
+                          <FormDescription>
+                            Reset the user's security questions. Select 3 questions and provide temporary answers. The user will be prompted to change them on their next login.
+                          </FormDescription>
+                        </div>
+                        <div className="space-y-4">
+                           {allSecurityQuestions.map((question, qIndex) => {
+                             const isChecked = selectedQuestions.includes(question);
+                             const checkedIndex = isChecked ? selectedQuestions.indexOf(question) : -1;
+                             
+                             return (
+                               <div key={qIndex} className="space-y-2 rounded-md border p-4">
+                                   <div className="flex flex-row items-start space-x-3 space-y-0">
+                                      <Checkbox
+                                           checked={isChecked}
+                                           onCheckedChange={(checked) => {
+                                               const currentSelection = selectedQuestions;
+                                               const newSelection = checked
+                                                   ? [...currentSelection, question]
+                                                   : currentSelection.filter((value) => value !== question);
+
+                                               if (newSelection.length <= 3) {
+                                                   form.setValue('securityQuestions', newSelection);
+                                               } else {
+                                                   toast({
+                                                       variant: 'destructive',
+                                                       title: 'Limit Reached',
+                                                       description: 'You can only select up to 3 questions.'
+                                                   })
+                                               }
+                                           }}
+                                      />
+                                       <FormLabel className="font-normal">{question}</FormLabel>
+                                   </div>
+                                    {isChecked && checkedIndex !== -1 && (
+                                        <FormField
+                                            control={form.control}
+                                            name={`securityAnswers.${checkedIndex}` as const}
+                                            render={({field}) => (
+                                                <FormItem>
+                                                    <FormControl>
+                                                        <Input placeholder={`Answer for question ${checkedIndex + 1}`} {...field}/>
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )}
+                                </div>
+                           )})}
                         </div>
                       </FormItem>
                     )}
