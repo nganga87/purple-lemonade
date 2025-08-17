@@ -196,10 +196,10 @@ export default function SecurityQuestionsPage() {
                                         <FormField
                                             control={form.control}
                                             name={`answers.${question}`}
-                                            render={({field: answerField}) => (
+                                            render={({field}) => (
                                                 <FormItem>
                                                     <FormControl>
-                                                        <Input placeholder="Your secret answer" {...answerField}/>
+                                                        <Input placeholder="Your secret answer" {...field}/>
                                                     </FormControl>
                                                 </FormItem>
                                             )}
