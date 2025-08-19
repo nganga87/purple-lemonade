@@ -121,6 +121,13 @@ type RegistrationResult = ValidateDoorPhotoOutput & { submitted?: boolean };
 
 const LOCAL_STORAGE_KEY = 'addressChainRegistrationForm';
 
+// Helper to convert data URL to File object
+const dataUrlToFile = async (dataUrl: string, filename: string): Promise<File> => {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: blob.type });
+};
+
 export function RegisterForm({ onBack }: RegisterFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<RegistrationResult | null>(null);
@@ -167,13 +174,23 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
 
   useEffect(() => {
     try {
-      const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (savedData) {
-        const parsedData:Partial<FormValues> = JSON.parse(savedData);
-        const { doorPhoto, terms, ...restOfData } = parsedData;
+      const savedDataRaw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedDataRaw) {
+        const savedData = JSON.parse(savedDataRaw);
+        const { doorPhotoPreview, doorPhotoFilename, terms, ...restOfData } = savedData;
+        
         reset(restOfData);
+
+        if (doorPhotoPreview && doorPhotoFilename) {
+          setDoorPhotoPreview(doorPhotoPreview);
+          dataUrlToFile(doorPhotoPreview, doorPhotoFilename).then(file => {
+            setValue('doorPhoto', file, { shouldValidate: true });
+          });
+        }
+        
         if (restOfData.titleDeedNumber) setShowTitleDeed(true);
         if (restOfData.idNumber) setShowIdNumber(true);
+        
         toast({
           title: "Draft Loaded",
           description: "Your previously saved registration data has been loaded.",
@@ -182,16 +199,11 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     } catch (e) {
       console.error("Failed to load saved form data:", e);
     }
-  }, [reset, toast]);
+  }, [reset, toast, setValue]);
 
   useEffect(() => {
-    const subscription = watch((value) => {
-      try {
-        const { doorPhoto, ...dataToSave } = value;
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
-      } catch (e) {
-        console.error("Failed to save form data:", e);
-      }
+    const subscription = watch((value, { name }) => {
+      // We handle saving explicitly with the save button now.
     });
     return () => subscription.unsubscribe();
   }, [watch]);
@@ -374,7 +386,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     
     try {
       const response = await handleRegistration(formData);
-      if (response.error) {
+      if (response.error && !response.submitted) {
         throw new Error(response.error);
       }
       setResult(response);
@@ -384,7 +396,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       });
       localStorage.removeItem(LOCAL_STORAGE_KEY);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
       toast({
         variant: "destructive",
@@ -399,7 +411,14 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const handleSave = () => {
     try {
       const currentData = getValues();
-      const { doorPhoto, ...dataToSave } = currentData;
+      const dataToSave: any = { ...currentData };
+      delete dataToSave.doorPhoto;
+
+      if (doorPhotoPreview) {
+        dataToSave.doorPhotoPreview = doorPhotoPreview;
+        dataToSave.doorPhotoFilename = currentData.doorPhoto?.name || 'signed_photo.jpg';
+      }
+
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
       toast({
         title: "Draft Saved",
@@ -665,9 +684,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                                   ) : (
                                     <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
                                       <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
-                                      <p className="mb-2 text-sm text-muted-foreground">
-                                        <span className="font-semibold">Click to upload</span> or drag and drop
-                                      </p>
+                                      <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                                       <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
                                     </div>
                                   )}
