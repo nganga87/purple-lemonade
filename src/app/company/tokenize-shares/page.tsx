@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -19,6 +20,9 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import CompanyLayout from '../layout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
+import { addresses, type Address } from '@/lib/addresses';
+import { initialUsers, type AdminUser } from '@/app/admin/user-management/users';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type ShareClass = {
   id: string;
@@ -26,13 +30,6 @@ type ShareClass = {
   shares: string;
   isMinted: boolean;
   selectedClass: string;
-};
-
-// Mock data for the logged-in company
-const companyDetails = {
-    name: "Global Logistics",
-    registrationNumber: "GLO-12345",
-    headquartersAddress: "456 Oak Avenue, Springfield, USA 67890",
 };
 
 const predefinedShareClasses = [
@@ -44,6 +41,8 @@ const predefinedShareClasses = [
     "Employee Stock Option Pool",
 ];
 
+const USER_STORAGE_KEY = 'addressChainAdminUsers';
+
 export default function TokenizeSharesPage() {
   const [shareClasses, setShareClasses] = useState<ShareClass[]>([
     { id: `sc_${Date.now()}`, name: 'Founders Shares', shares: '1000000', isMinted: false, selectedClass: 'Founders Shares' },
@@ -51,7 +50,36 @@ export default function TokenizeSharesPage() {
   const [isMinting, setIsMinting] = useState<string | null>(null);
   const [locationVerified, setLocationVerified] = useState(false);
   const [isVerifyingLocation, setIsVerifyingLocation] = useState(false);
+  const [companyDetails, setCompanyDetails] = useState<{name: string, registrationNumber: string | undefined, headquartersAddress: string} | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // In a real app, this data would come from a user session/context.
+    // For this prototype, we simulate fetching it based on the logged-in user.
+    const loggedInUserName = localStorage.getItem('loggedInUserName');
+    const allUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
+    const allUsers: AdminUser[] = allUsersRaw ? JSON.parse(allUsersRaw) : initialUsers;
+    const currentUser = allUsers.find(u => u.name === loggedInUserName && u.role === 'company');
+
+    if (currentUser) {
+        // Find the company's headquarters address from the mock data
+        const hqAddress = addresses.find(a => a.type === 'Company' && a.isHeadquarters);
+        
+        setCompanyDetails({
+            name: currentUser.name,
+            registrationNumber: currentUser.jobTitle, // Assuming reg no. is stored here for demo
+            headquartersAddress: hqAddress ? hqAddress.address : "No headquarters set",
+        });
+    } else {
+        // Fallback for when no user is found or user is not a company
+        setCompanyDetails({
+            name: "Your Company",
+            registrationNumber: "N/A",
+            headquartersAddress: "Please set a headquarters address.",
+        });
+    }
+
+  }, []);
 
   const handleAddClass = () => {
     setShareClasses(prev => [
@@ -124,27 +152,37 @@ export default function TokenizeSharesPage() {
                     <CardDescription>Minting is based on the following verified company information.</CardDescription>
                 </CardHeader>
                 <CardContent className="grid sm:grid-cols-2 gap-4 text-sm">
-                    <div className="flex items-center gap-3 p-3 bg-secondary rounded-md">
-                        <FileText className="h-5 w-5 text-muted-foreground"/>
-                        <div>
-                            <p className="text-muted-foreground">Company Name</p>
-                            <p className="font-semibold">{companyDetails.name}</p>
+                    {!companyDetails ? (
+                      <>
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-16 w-full" />
+                        <Skeleton className="h-16 w-full sm:col-span-2" />
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-3 p-3 bg-secondary rounded-md">
+                            <FileText className="h-5 w-5 text-muted-foreground"/>
+                            <div>
+                                <p className="text-muted-foreground">Company Name</p>
+                                <p className="font-semibold">{companyDetails.name}</p>
+                            </div>
                         </div>
-                    </div>
-                     <div className="flex items-center gap-3 p-3 bg-secondary rounded-md">
-                        <FileText className="h-5 w-5 text-muted-foreground"/>
-                        <div>
-                            <p className="text-muted-foreground">Registration No.</p>
-                            <p className="font-semibold">{companyDetails.registrationNumber}</p>
+                         <div className="flex items-center gap-3 p-3 bg-secondary rounded-md">
+                            <FileText className="h-5 w-5 text-muted-foreground"/>
+                            <div>
+                                <p className="text-muted-foreground">Registration No.</p>
+                                <p className="font-semibold">{companyDetails.registrationNumber}</p>
+                            </div>
                         </div>
-                    </div>
-                     <div className="flex items-center gap-3 p-3 bg-secondary rounded-md sm:col-span-2">
-                        <MapPin className="h-5 w-5 text-muted-foreground"/>
-                        <div>
-                            <p className="text-muted-foreground">Registered Headquarters</p>
-                            <p className="font-semibold">{companyDetails.headquartersAddress}</p>
+                         <div className="flex items-center gap-3 p-3 bg-secondary rounded-md sm:col-span-2">
+                            <MapPin className="h-5 w-5 text-muted-foreground"/>
+                            <div>
+                                <p className="text-muted-foreground">Registered Headquarters</p>
+                                <p className="font-semibold">{companyDetails.headquartersAddress}</p>
+                            </div>
                         </div>
-                    </div>
+                      </>
+                    )}
                 </CardContent>
             </Card>
 
