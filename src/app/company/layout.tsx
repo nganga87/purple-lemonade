@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -45,7 +45,25 @@ export default function CompanyLayout({ children }: CompanyLayoutProps) {
   const pathname = usePathname();
   const navItems = companyNav;
 
-  const user = { name: 'Global Logistics', email: 'sales@globallogistics.com', fallback: 'GL' };
+  const [userName, setUserName] = useState('Your Company');
+  const [userInitial, setUserInitial] = useState('YC');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedName = localStorage.getItem('loggedInUserName');
+      if (storedName) {
+        setUserName(storedName);
+        const initials = storedName
+          .split(' ')
+          .map(n => n[0])
+          .join('')
+          .toUpperCase();
+        setUserInitial(initials);
+      }
+    }
+  }, []);
+
+  const user = { name: userName, email: `${userName.toLowerCase().replace(/\s/g, '.')}@digitaladdress.com`, fallback: userInitial };
 
   const getPageTitle = () => {
     for (const item of navItems) {
