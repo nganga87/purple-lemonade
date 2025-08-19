@@ -19,7 +19,7 @@ export function RegistrationOptions({ onChoice }: RegistrationOptionsProps) {
     // In a real app, you would get this from a user context or session.
     // For this prototype, we'll simulate checking localStorage.
     const name = localStorage.getItem('loggedInUserName');
-    if (name && (name.toLowerCase().includes('corp') || name.toLowerCase().includes('inc') || name.toLowerCase().includes('logistics'))) {
+    if (name && (name.toLowerCase().includes('corp') || name.toLowerCase().includes('inc') || name.toLowerCase().includes('logistics') || name.toLowerCase().includes('limited'))) {
         setAccountType('company');
     } else {
         setAccountType('individual');

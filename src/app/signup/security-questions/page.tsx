@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -116,6 +117,10 @@ export default function SecurityQuestionsPage() {
       users[userIndex].securityAnswers = answersArray;
 
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
+
+      // Set the newly created user as the logged-in user
+      localStorage.setItem('loggedInUserName', users[userIndex].name || 'User');
+
 
       toast({
         title: "Security Questions Saved!",
