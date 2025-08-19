@@ -83,7 +83,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred during validation.';
     return {
       isValid: false,
-      validationDetails: `Submission failed due to a server error.`,
+      validationDetails: `Submission failed due to a server error. Please try again.`,
       error: errorMessage,
     };
   }

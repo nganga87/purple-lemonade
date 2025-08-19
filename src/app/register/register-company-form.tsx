@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -245,9 +246,13 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
 
     try {
       const response = await handleRegistration(formData);
-      if (response.error) throw new Error(response.error);
+      if (response.error) {
+        throw new Error(response.error);
+      }
       setResult(response);
-      toast({ title: "Registration Submitted", description: response.validationDetails });
+      if (response.isValid) {
+        toast({ title: "Registration Submitted", description: response.validationDetails });
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
