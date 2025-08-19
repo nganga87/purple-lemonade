@@ -50,7 +50,7 @@ export default function TokenizeSharesPage() {
   const [isMinting, setIsMinting] = useState<string | null>(null);
   const [locationVerified, setLocationVerified] = useState(false);
   const [isVerifyingLocation, setIsVerifyingLocation] = useState(false);
-  const [companyDetails, setCompanyDetails] = useState<{name: string, registrationNumber: string | undefined, headquartersAddress: string} | null>(null);
+  const [companyDetails, setCompanyDetails] = useState<{name: string, registrationNumber: string, headquartersAddress: string} | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -66,8 +66,8 @@ export default function TokenizeSharesPage() {
         const hqAddress = addresses.find(a => a.type === 'Company' && a.isHeadquarters);
         
         setCompanyDetails({
-            name: currentUser.name,
-            registrationNumber: currentUser.jobTitle, // Assuming reg no. is stored here for demo
+            name: currentUser.name || "Your Company",
+            registrationNumber: currentUser.jobTitle || "Not set", // Assuming reg no. is stored here for demo
             headquartersAddress: hqAddress ? hqAddress.address : "No headquarters set",
         });
     } else {
