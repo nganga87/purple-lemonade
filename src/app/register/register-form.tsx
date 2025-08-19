@@ -202,13 +202,6 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   }, [reset, toast, setValue]);
 
   useEffect(() => {
-    const subscription = watch((value, { name }) => {
-      // We handle saving explicitly with the save button now.
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  useEffect(() => {
     if (countryCode) {
       const country = countries.find(c => c.code === countryCode) || null;
       setSelectedCountry(country);
