@@ -17,26 +17,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, ShieldCheck } from 'lucide-react';
 import type { AdminUser } from '../../admin/user-management/user-dialog';
+import { individualSecurityQuestions, companySecurityQuestions } from './questions';
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
-
-const individualSecurityQuestions = [
-  "What was your first pet's name?",
-  "What is the name of the city where you were born?",
-  "What is your mother's maiden name?",
-  "What was the make of your first car?",
-  "What is the name of your favorite childhood friend?",
-  "What was the name of your elementary school?",
-];
-
-const companySecurityQuestions = [
-    "What is the company's incorporation city?",
-    "What was the last name of the company's first CEO?",
-    "What is the company's primary bank name?",
-    "What was the year the company was founded?",
-    "What is the street name of the first office address?",
-    "What is the company's tax identification number?",
-];
 
 const formSchema = z.object({
   selectedQuestions: z.array(z.string()).refine(value => value.length === 3, {
@@ -206,6 +189,7 @@ export default function SecurityQuestionsPage() {
                                                     <FormControl>
                                                         <Input placeholder="Your secret answer" {...field}/>
                                                     </FormControl>
+                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
