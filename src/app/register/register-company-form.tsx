@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
@@ -128,6 +129,7 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [doorPhotoPreview, setDoorPhotoPreview] = useState<string | null>(null);
   const [generatedAddress, setGeneratedAddress] = useState<string | null>(null);
+  const [isCompanyInfoLoaded, setIsCompanyInfoLoaded] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -145,16 +147,11 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
     // Pre-populate form with logged-in company data
     const loggedInUserName = localStorage.getItem('loggedInUserName');
     if (loggedInUserName) {
-        const allUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
-        const allUsers: AdminUser[] = allUsersRaw ? JSON.parse(allUsersRaw) : [];
-        const currentUser = allUsers.find(u => u.name === loggedInUserName && u.role === 'company');
-        if (currentUser) {
-            reset({
-                companyName: currentUser.name,
-                contactPerson: currentUser.name, // Assuming contact person is the user for now
-                // Pre-fill other fields if they exist on the user object
-            });
-        }
+        reset({
+            companyName: loggedInUserName,
+            contactPerson: loggedInUserName, // Default to company name as contact person
+        });
+        setIsCompanyInfoLoaded(true);
     }
   }, [reset]);
 
@@ -286,8 +283,7 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
                         <FormField control={form.control} name="companyName" render={({ field }) => (
                             <FormItem>
                             <FormLabel>1. Company Name</FormLabel>
-                            <FormControl><div className="relative"><Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /><Input placeholder="e.g., Acme Corporation" {...field} className="pl-10 capitalize" readOnly /></div></FormControl>
-                            <FormDescription>Company name cannot be changed.</FormDescription>
+                            <FormControl><div className="relative"><Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" /><Input placeholder="e.g., Acme Corporation" {...field} className="pl-10 capitalize" readOnly={isCompanyInfoLoaded} /></div></FormControl>
                             <FormMessage />
                             </FormItem>
                         )}/>
@@ -396,3 +392,4 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
     </div>
   );
 }
+
