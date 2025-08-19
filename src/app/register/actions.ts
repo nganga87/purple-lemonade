@@ -1,3 +1,4 @@
+
 'use server';
 
 import { validateDoorPhoto, type ValidateDoorPhotoInput, type ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
@@ -98,7 +99,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred during validation.';
     return {
       isValid: false,
-      validationDetails: `Submission failed due to a server error: ${errorMessage}`,
+      validationDetails: `Submission failed due to a server error.`,
       error: errorMessage,
     };
   }
