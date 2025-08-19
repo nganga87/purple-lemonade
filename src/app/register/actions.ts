@@ -56,38 +56,22 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
         return { isValid: false, validationDetails: 'Physical address is required.', error: 'Physical address is required.' };
     }
 
-    // Fetch satellite image based on GPS
-    const satelliteImageDataUri = await getSatelliteImageForGps(gpsCoordinates);
-
     const doorPhotoDataUri = await fileToDataUri(doorPhoto);
-
-    const input: ValidateDoorPhotoInput = {
-      doorPhotoDataUri,
-      satelliteImageDataUri,
-      gpsCoordinates,
+    
+    // In a real app, you would now save the registration to the database with a 'pending_validation' status.
+    // The data saved would include all form fields and the doorPhotoDataUri.
+    // A new validation request would be created for third-party validators.
+    console.log('Registration submitted for validation:', {
       cryptoAddress,
+      gpsCoordinates,
       countryCode,
       physicalAddress,
       idNumber: idNumber || undefined,
-      // In a real app, you'd collect and pass the phone number.
-      // For now, we'll leave it out as it's not on the form.
-    };
-
-    // The AI validation here is a preliminary check.
-    const preliminaryValidation = await validateDoorPhoto(input);
-
-    if (!preliminaryValidation.isValid) {
-      return {
-        ...preliminaryValidation,
-        error: `Preliminary validation failed: ${preliminaryValidation.validationDetails}`
-      }
-    }
+      doorPhotoDataUri: doorPhotoDataUri.substring(0, 50) + '...' // Log snippet
+    });
     
-    // In a real app, you would now save the registration to the database with a 'pending_validation' status.
-    // A new validation request would be created for third-party validators.
-    console.log('Registration submitted for validation:', input);
-    
-    // For the demo, we'll return a success state indicating it's been submitted.
+    // For the demo, we'll return a success state indicating it's been submitted,
+    // skipping the immediate AI validation.
     return { 
       isValid: true,
       validationDetails: 'Your address has been submitted and is now pending third-party validation. You can track its status on the "My Addresses" page.',
