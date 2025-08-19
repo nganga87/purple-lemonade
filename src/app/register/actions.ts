@@ -41,19 +41,19 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     const idNumber = formData.get('idNumber') as string | null;
 
     if (!doorPhoto || doorPhoto.size === 0) {
-      return { isValid: false, validationDetails: 'Door photo is missing or empty.', error: 'Door photo is missing or empty.' };
+      return { isValid: false, validationDetails: 'Door photo is missing or empty.', error: 'Door photo is missing or empty.', submitted: false };
     }
     if (!gpsCoordinates) {
-      return { isValid: false, validationDetails: 'GPS coordinates are required.', error: 'GPS coordinates are required.' };
+      return { isValid: false, validationDetails: 'GPS coordinates are required.', error: 'GPS coordinates are required.', submitted: false };
     }
     if (!cryptoAddress) {
-        return { isValid: false, validationDetails: 'Crypto wallet address is required.', error: 'Crypto wallet address is required.' };
+        return { isValid: false, validationDetails: 'Crypto wallet address is required.', error: 'Crypto wallet address is required.', submitted: false };
     }
     if (!countryCode) {
-        return { isValid: false, validationDetails: 'Country code is required.', error: 'Country code is required.' };
+        return { isValid: false, validationDetails: 'Country code is required.', error: 'Country code is required.', submitted: false };
     }
     if (!physicalAddress) {
-        return { isValid: false, validationDetails: 'Physical address is required.', error: 'Physical address is required.' };
+        return { isValid: false, validationDetails: 'Physical address is required.', error: 'Physical address is required.', submitted: false };
     }
 
     const doorPhotoDataUri = await fileToDataUri(doorPhoto);
@@ -85,6 +85,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
       isValid: false,
       validationDetails: `Submission failed due to a server error. Please try again.`,
       error: errorMessage,
+      submitted: false,
     };
   }
 }

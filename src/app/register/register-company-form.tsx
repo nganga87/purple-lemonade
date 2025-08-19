@@ -246,7 +246,7 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
 
     try {
       const response = await handleRegistration(formData);
-      if (response.error) {
+      if (response.error && !response.submitted) {
         throw new Error(response.error);
       }
       setResult(response);
