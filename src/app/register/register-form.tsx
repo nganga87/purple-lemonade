@@ -810,20 +810,23 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
               </CardContent>
               {!isFormReadOnly && (
                 <CardFooter className="flex justify-between items-center">
-                   <Button type="button" variant="outline" onClick={handleSave} disabled={isLoading}>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Draft
-                  </Button>
-                  <Button type="submit" disabled={isLoading || !isValid}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      'Submit for Validation'
-                    )}
-                  </Button>
+                   <Button type="button" variant="ghost" onClick={onBack} disabled={isLoading}>Back</Button>
+                   <div className="flex gap-2">
+                        <Button type="button" variant="outline" onClick={handleSave} disabled={isLoading}>
+                            <Save className="mr-2 h-4 w-4" />
+                            Save Draft
+                        </Button>
+                        <Button type="submit" disabled={isLoading || !isValid}>
+                            {isLoading ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Submitting...
+                            </>
+                            ) : (
+                            'Submit for Validation'
+                            )}
+                        </Button>
+                   </div>
                 </CardFooter>
               )}
             </fieldset>
