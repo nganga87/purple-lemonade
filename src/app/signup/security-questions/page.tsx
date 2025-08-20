@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, ShieldCheck } from 'lucide-react';
 import type { AdminUser } from '../../admin/user-management/user-dialog';
 import { individualSecurityQuestions, companySecurityQuestions } from './questions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
@@ -43,7 +44,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function SecurityQuestionsPage() {
+function SecurityQuestionsForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -124,15 +125,7 @@ export default function SecurityQuestionsPage() {
   const selectedQuestions = form.watch('selectedQuestions');
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background font-body p-4">
-       <div className="absolute top-4 left-4">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Logo className="h-6 w-6 text-primary" />
-          <span className="font-headline font-bold">Digital Address</span>
-        </Link>
-      </div>
-
-       <Card className="w-full max-w-2xl shadow-xl">
+    <Card className="w-full max-w-2xl shadow-xl">
         <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <ShieldCheck className="h-8 w-8 text-primary"/>
@@ -207,6 +200,44 @@ export default function SecurityQuestionsPage() {
           </Form>
         </CardContent>
       </Card>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <Card className="w-full max-w-2xl shadow-xl">
+      <CardHeader className="text-center">
+        <Skeleton className="h-12 w-12 rounded-full mx-auto mb-4" />
+        <Skeleton className="h-8 w-3/4 mx-auto" />
+        <Skeleton className="h-5 w-full max-w-md mx-auto mt-2" />
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+           <div key={i} className="space-y-2 rounded-md border p-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-5 w-5" />
+                <Skeleton className="h-5 w-2/3" />
+              </div>
+            </div>
+        ))}
+        <Skeleton className="h-10 w-full mt-4" />
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function SecurityQuestionsPage() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background font-body p-4">
+       <div className="absolute top-4 left-4">
+        <Link href="/" className="mr-6 flex items-center space-x-2">
+          <Logo className="h-6 w-6 text-primary" />
+          <span className="font-headline font-bold">Digital Address</span>
+        </Link>
+      </div>
+      <Suspense fallback={<LoadingFallback />}>
+        <SecurityQuestionsForm />
+      </Suspense>
     </div>
   );
 }
