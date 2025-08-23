@@ -1,6 +1,4 @@
 
-'use client';
-
 import React from 'react';
 import {
   Card,
@@ -22,23 +20,13 @@ import { Button } from '@/components/ui/button';
 import { FileText, Star, TrendingUp, CheckCircle2, History } from 'lucide-react';
 import { AppLayout } from '@/components/layout/app-layout';
 import { initialValidators, initialAppointments } from '../data';
+import { notFound } from 'next/navigation';
 
 export default function ValidatorDetailsPage({ params }: { params: { validatorId: string } }) {
   const validator = initialValidators.find(v => v.id === params.validatorId);
   
   if (!validator) {
-    return (
-      <AppLayout nav="admin">
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Validator Not Found</CardTitle>
-                    <CardDescription>The validator with ID "{params.validatorId}" could not be found.</CardDescription>
-                </CardHeader>
-            </Card>
-        </main>
-      </AppLayout>
-    );
+    notFound();
   }
 
   const assignedAppointments = initialAppointments.filter(a => a.assignedTo === validator?.name);
