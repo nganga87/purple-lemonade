@@ -56,6 +56,19 @@ const placeTypes = [
     },
 ];
 
+const doorValidationConditions = [
+    "Door must be publicly visible",
+    "Photo must be taken from outside in an accessible area",
+    "Door must belong to a recognized place identifier (e.g., shop, school, hospital)",
+    "No obstructions blocking full view of the door",
+    "Door must show signs of active use (e.g., wear, signage, footpath)",
+    "Door must be structurally intact and identifiable",
+    "Photo must be taken during daylight or with sufficient lighting",
+    "No private or restricted access signage visible",
+    "Door must be accessible without trespassing",
+    "Door must be captured from a frontal or angled perspective"
+];
+
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
   state: z.string().optional(),
@@ -65,6 +78,9 @@ const formSchema = z.object({
   idNumber: z.string().optional(),
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
   physicalAddress: z.string().min(1, 'Physical address is required.'),
+  doorConditions: z.boolean().refine(val => val === true, {
+    message: "You must acknowledge the door photo conditions to proceed.",
+  }),
   doorPhoto: z.instanceof(File, { message: 'Door photo is required.' }).refine(file => file.size > 0, 'Door photo is required.'),
   terms: z.boolean().refine(val => val === true, {
     message: "You must accept the terms and conditions to proceed.",
@@ -186,6 +202,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       idNumber: '',
       gpsCoordinates: '',
       physicalAddress: '',
+      doorConditions: false,
       terms: false,
     },
   });
@@ -200,6 +217,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const customAddressName = watchedValues.customAddressName;
   const titleDeedNumber = watchedValues.titleDeedNumber;
   const idNumber = watchedValues.idNumber;
+  const doorConditionsAcknowledged = watchedValues.doorConditions;
 
   const finalAddressName = addressName === 'Other...' ? customAddressName : addressName;
 
@@ -679,7 +697,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                                 <Label htmlFor="id-number-switch">Add ID/Passport Number</Label>
                             </div>
                            <FormField control={form.control} name="idNumber" render={({ field }) => (
-                             <FormItem><FormControl><Input placeholder="Owner's ID" {...field} disabled={!showIdNumber} /></FormControl><FormMessage /></FormItem>
+                             <FormItem><FormControl><Input placeholder="Owner\'s ID" {...field} disabled={!showIdNumber} /></FormControl><FormMessage /></FormItem>
                            )}/>
                          </div>
                       </div>
@@ -723,113 +741,148 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                           </FormItem>
                       )}
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="doorPhoto"
-                    render={() => (
-                      <FormItem>
-                        <FormLabel>7. Door Photo</FormLabel>
-                        <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>
-                          <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
-                            <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
-                          </TabsList>
-                          <TabsContent value="upload">
-                            <div className="space-y-4">
-                              <Alert variant="default" className="border-yellow-500/50 text-yellow-700 dark:border-yellow-500/50 dark:text-yellow-400 [&>svg]:text-yellow-500">
-                                 <AlertTriangle className="h-4 w-4" />
-                                 <AlertTitle>Location Mismatch Warning</AlertTitle>
-                                 <AlertDescription>
-                                   If your photo contains location data (EXIF) that does not match the GPS coordinates provided, validation may fail. For best results, use the "Use Camera" option to take a fresh photo.
-                                 </AlertDescription>
-                               </Alert>
-                              <FormControl>
-                                <label
-                                  onDragOver={onDragOver}
-                                  onDrop={onDrop}
-                                  className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
-                                >
-                                  {doorPhotoPreview ? (
-                                    <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" data-ai-hint="house door"/>
+                  <div className="space-y-4">
+                      <FormField
+                          control={form.control}
+                          name="doorConditions"
+                          render={({ field }) => (
+                              <FormItem className="space-y-3 rounded-lg border p-4">
+                                  <div className="mb-4">
+                                      <FormLabel className="text-base font-semibold">7. Door Photo Conditions</FormLabel>
+                                      <FormDescription>
+                                          Please read and acknowledge the following conditions before taking a photo.
+                                      </FormDescription>
+                                  </div>
+                                  <div className="max-h-48 overflow-y-auto space-y-2 pr-2 text-sm text-muted-foreground">
+                                      <ul className="list-disc pl-5 space-y-1">
+                                          {doorValidationConditions.map((condition, index) => (
+                                              <li key={index}>{condition}</li>
+                                          ))}
+                                      </ul>
+                                  </div>
+                                  <div className="flex items-center space-x-2 pt-2">
+                                      <Checkbox id="door-conditions" checked={field.value} onCheckedChange={field.onChange} />
+                                      <label
+                                          htmlFor="door-conditions"
+                                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                      >
+                                          I have read and agree to these conditions.
+                                      </label>
+                                  </div>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                     <fieldset disabled={!doorConditionsAcknowledged} className="space-y-4">
+                      <FormField
+                          control={form.control}
+                          name="doorPhoto"
+                          render={() => (
+                          <FormItem>
+                              <FormLabel>8. Door Photo</FormLabel>
+                              <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>
+                              <TabsList className="grid w-full grid-cols-2">
+                                  <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                                  <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
+                              </TabsList>
+                              <TabsContent value="upload">
+                                  <div className="space-y-4">
+                                  <Alert variant="default" className="border-yellow-500/50 text-yellow-700 dark:border-yellow-500/50 dark:text-yellow-400 [&>svg]:text-yellow-500">
+                                      <AlertTriangle className="h-4 w-4" />
+                                      <AlertTitle>Location Mismatch Warning</AlertTitle>
+                                      <AlertDescription>
+                                      If your photo contains location data (EXIF) that does not match the GPS coordinates provided, validation may fail. For best results, use the "Use Camera" option to take a fresh photo.
+                                      </AlertDescription>
+                                  </Alert>
+                                  <FormControl>
+                                      <label
+                                      onDragOver={onDragOver}
+                                      onDrop={onDrop}
+                                      className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-secondary hover:bg-muted transition-colors ${doorPhotoPreview ? 'border-primary' : ''}`}
+                                      >
+                                      {doorPhotoPreview ? (
+                                          <Image src={doorPhotoPreview} alt="Preview" layout="fill" objectFit="contain" className="rounded-lg p-2" data-ai-hint="house door"/>
+                                      ) : (
+                                          <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
+                                          <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
+                                          <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
+                                          <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
+                                          </div>
+                                      )}
+                                      <input
+                                          ref={doorPhotoRef}
+                                          type="file"
+                                          className="hidden"
+                                          accept="image/png, image/jpeg, image/webp"
+                                          onChange={handleFileChange}
+                                      />
+                                      </label>
+                                  </FormControl>
+                                  </div>
+                              </TabsContent>
+                              <TabsContent value="camera">
+                                  <div className="relative overflow-hidden rounded-md">
+                                  {capturedImage ? (
+                                      <Image src={capturedImage.src} alt="Captured preview" width={1920} height={1080} className="w-full aspect-video" data-ai-hint="house door"/>
                                   ) : (
-                                    <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center">
-                                      <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
-                                      <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                      <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
-                                    </div>
+                                      <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
                                   )}
-                                  <input
-                                    ref={doorPhotoRef}
-                                    type="file"
-                                    className="hidden"
-                                    accept="image/png, image/jpeg, image/webp"
-                                    onChange={handleFileChange}
-                                  />
-                                </label>
-                              </FormControl>
-                            </div>
-                          </TabsContent>
-                          <TabsContent value="camera">
-                            <div className="relative overflow-hidden rounded-md">
-                              {capturedImage ? (
-                                <Image src={capturedImage.src} alt="Captured preview" width={1920} height={1080} className="w-full aspect-video" data-ai-hint="house door"/>
-                              ) : (
-                                <video ref={videoRef} className="w-full aspect-video bg-black" autoPlay muted playsInline />
-                              )}
-                              <canvas ref={canvasRef} className="hidden"></canvas>
-                              {!capturedImage && (
-                                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                    <div className="w-[calc(100%-4rem)] h-[calc(100%-4rem)] border-4 border-white/50 border-dashed rounded-lg shadow-2xl" />
-                                </div>
-                              )}
-                              {cameraStatus !== 'allowed' && !capturedImage && (
-                                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
-                                   {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
-                                   {cameraStatus === 'denied' && (
-                                     <Alert variant="destructive" className="w-auto">
-                                        <AlertTitle>Camera Access Denied</AlertTitle>
-                                        <AlertDescription>
-                                          Please enable camera permissions to use this feature.
-                                        </AlertDescription>
-                                    </Alert>
-                                   )}
-                                   {cameraStatus === 'notsupported' && (
-                                     <Alert variant="destructive" className="w-auto">
-                                        <AlertTitle>Camera Not Supported</AlertTitle>
-                                        <AlertDescription>
-                                          Your browser does not support camera access.
-                                        </AlertDescription>
-                                    </Alert>
-                                   )}
-                                </div>
-                              )}
-                            </div>
-                            {capturedImage ? (
-                               <div className="flex gap-2 w-full mt-2">
-                                <Button type="button" onClick={handleRetake} variant="outline" className="w-full">
-                                  <RefreshCw className="mr-2" />
-                                  Retake Photo
-                                </Button>
-                                <Button type="button" onClick={handleConfirmCapture} className="w-full">
-                                  <CheckCircle className="mr-2" />
-                                  Confirm & Proceed
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed' || isCapturing} className="w-full mt-2">
-                                {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
-                                {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
-                              </Button>
-                            )}
-                          </TabsContent>
-                        </Tabs>
-                        <FormDescription>
-                          A clear photo of the main entrance, signed with your address details.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                                  <canvas ref={canvasRef} className="hidden"></canvas>
+                                  {!capturedImage && (
+                                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                          <div className="w-[calc(100%-4rem)] h-[calc(100%-4rem)] border-4 border-white/50 border-dashed rounded-lg shadow-2xl" />
+                                      </div>
+                                  )}
+                                  {cameraStatus !== 'allowed' && !capturedImage && (
+                                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+                                      {cameraStatus === 'loading' && <Loader2 className="h-8 w-8 animate-spin text-white" />}
+                                      {cameraStatus === 'denied' && (
+                                          <Alert variant="destructive" className="w-auto">
+                                              <AlertTitle>Camera Access Denied</AlertTitle>
+                                              <AlertDescription>
+                                              Please enable camera permissions to use this feature.
+                                              </AlertDescription>
+                                          </Alert>
+                                      )}
+                                      {cameraStatus === 'notsupported' && (
+                                          <Alert variant="destructive" className="w-auto">
+                                              <AlertTitle>Camera Not Supported</AlertTitle>
+                                              <AlertDescription>
+                                              Your browser does not support camera access.
+                                              </AlertDescription>
+                                          </Alert>
+                                      )}
+                                  </div>
+                                  )}
+                                  </div>
+                                  {capturedImage ? (
+                                  <div className="flex gap-2 w-full mt-2">
+                                      <Button type="button" onClick={handleRetake} variant="outline" className="w-full">
+                                      <RefreshCw className="mr-2" />
+                                      Retake Photo
+                                      </Button>
+                                      <Button type="button" onClick={handleConfirmCapture} className="w-full">
+                                      <CheckCircle className="mr-2" />
+                                      Confirm & Proceed
+                                      </Button>
+                                  </div>
+                                  ) : (
+                                  <Button type="button" onClick={handleCapture} disabled={cameraStatus !== 'allowed' || isCapturing} className="w-full mt-2">
+                                      {isCapturing ? <Loader2 className="animate-spin mr-2" /> : <Camera className="mr-2" />}
+                                      {isCapturing ? 'Processing...' : 'Capture & Sign Photo'}
+                                  </Button>
+                                  )}
+                              </TabsContent>
+                              </Tabs>
+                              <FormDescription>
+                              A clear photo of the main entrance, signed with your address details.
+                              </FormDescription>
+                              <FormMessage />
+                          </FormItem>
+                          )}
+                      />
+                     </fieldset>
+                  </div>
                 </div>
 
                 {(isDataReadyForReview || isFormReadOnly) && (
