@@ -60,7 +60,7 @@ const initialKeys: ApiKey[] = [
   {
     id: 'key_1',
     name: 'Default Production Key',
-    key: 'sk_live_xxxxxxxxxxxxxxxxxxxx1234',
+    key: '',
     status: 'Active',
     createdDate: '2024-05-10',
     lastUsed: '2024-08-19',
@@ -68,7 +68,7 @@ const initialKeys: ApiKey[] = [
   {
     id: 'key_2',
     name: 'Staging Environment Key',
-    key: 'sk_test_xxxxxxxxxxxxxxxxxxxx5678',
+    key: '',
     status: 'Active',
     createdDate: '2024-06-15',
     lastUsed: '2024-08-18',
@@ -76,7 +76,7 @@ const initialKeys: ApiKey[] = [
   {
     id: 'key_3',
     name: 'Old Integration Key',
-    key: 'sk_live_xxxxxxxxxxxxxxxxxxxx9012',
+    key: '',
     status: 'Revoked',
     createdDate: '2023-01-20',
     lastUsed: '2024-05-09',
