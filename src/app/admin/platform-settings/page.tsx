@@ -235,11 +235,11 @@ export default function PlatformSettingsPage() {
                   <h4 className="font-semibold text-muted-foreground">Service Keys</h4>
                   <div className="space-y-2">
                     <Label htmlFor="google-maps-api-key">Google Maps API Key</Label>
-                    <Input id="google-maps-api-key" type="password" defaultValue="AIzaSy_YOUR_TEST_KEY_HERE"/>
+                    <Input id="google-maps-api-key" type="password" defaultValue="AIzaSy_xxxxxxxxxxxxxxxxxxx"/>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="stripe-api-key">Stripe API Key (Test)</Label>
-                    <Input id="stripe-api-key" type="password"/>
+                    <Input id="stripe-api-key" type="password" placeholder="sk_test_..."/>
                   </div>
                </div>
                <div className="space-y-4">
