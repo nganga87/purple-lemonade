@@ -30,6 +30,7 @@ import { countries, type Country } from '@/lib/countries';
 import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
