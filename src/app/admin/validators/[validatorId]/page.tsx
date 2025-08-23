@@ -2,7 +2,6 @@
 'use client';
 
 import React from 'react';
-import { notFound } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -26,11 +25,23 @@ import { initialValidators, initialAppointments } from '../data';
 
 export default function ValidatorDetailsPage({ params }: { params: { validatorId: string } }) {
   const validator = initialValidators.find(v => v.id === params.validatorId);
-  const assignedAppointments = initialAppointments.filter(a => a.assignedTo === validator?.name);
-
+  
   if (!validator) {
-    notFound();
+    return (
+      <AppLayout nav="admin">
+        <main className="flex-1 p-4 md:p-6 lg:p-8">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Validator Not Found</CardTitle>
+                    <CardDescription>The validator with ID "{params.validatorId}" could not be found.</CardDescription>
+                </CardHeader>
+            </Card>
+        </main>
+      </AppLayout>
+    );
   }
+
+  const assignedAppointments = initialAppointments.filter(a => a.assignedTo === validator?.name);
   
   const getStatusBadge = (status: string) => {
     switch (status) {
