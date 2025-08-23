@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Card,
   CardContent,
@@ -28,20 +29,8 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, ShieldAlert, TrendingUp, UserPlus, Users } from 'lucide-react';
 import { AppLayout } from '@/components/layout/app-layout';
 import { useToast } from '@/hooks/use-toast';
+import { initialValidators, initialAppointments } from './data';
 
-const initialValidators = [
-  { id: 'VAL-001', name: 'ValidatorCorp', status: 'Active', rating: 4.9, validations: 1254, successRate: '99.8%' },
-  { id: 'VAL-002', name: 'UKVerify', status: 'Active', rating: 4.8, validations: 890, successRate: '99.5%' },
-  { id: 'VAL-003', name: 'DEPrüfung', status: 'Active', rating: 4.9, validations: 765, successRate: '99.9%' },
-  { id: 'VAL-004', name: 'KenyaCertify', status: 'Pending Review', rating: 0, validations: 0, successRate: 'N/A' },
-  { id: 'VAL-005', name: 'GlobalCheck', status: 'Suspended', rating: 3.2, validations: 2345, successRate: '85.2%' },
-];
-
-const initialAppointments = [
-  { id: 'APT-001', address: '123 Main St, Anytown, US', status: 'Pending Assignment', date: '2024-08-22', assignedTo: 'N/A' },
-  { id: 'APT-002', address: '456 Oak Ave, Springfield, US', status: 'Assigned', date: '2024-08-23', assignedTo: 'ValidatorCorp' },
-  { id: 'APT-003', address: '10 Downing St, London, GB', status: 'Completed', date: '2024-08-20', assignedTo: 'UKVerify' },
-];
 
 export default function ValidatorsPage() {
   const [validators, setValidators] = useState(initialValidators);
@@ -139,7 +128,11 @@ export default function ValidatorsPage() {
               <TableBody>
                 {validators.map((validator) => (
                   <TableRow key={validator.id}>
-                    <TableCell className="font-medium">{validator.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link href={`/admin/validators/${validator.id}`} className="hover:underline text-primary">
+                        {validator.name}
+                      </Link>
+                    </TableCell>
                     <TableCell>{getStatusBadge(validator.status)}</TableCell>
                     <TableCell>{validator.rating}/5.0</TableCell>
                     <TableCell>{validator.validations.toLocaleString()}</TableCell>
