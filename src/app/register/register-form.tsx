@@ -25,7 +25,7 @@ import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { countries, type Country } from '@/lib/countries';
 import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -33,10 +33,34 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import type { Address } from '@/lib/addresses';
 
+const placeTypes = [
+    {
+        label: "Residential",
+        options: ["Home", "Apartment", "Dormitory", "Garage", "Vacation Home", "Farmhouse", "Penthouse"]
+    },
+    {
+        label: "Commercial / Industrial",
+        options: ["Office", "Warehouse", "Factory", "Shop", "Restaurant", "Café", "Bakery", "Pharmacy", "Bank", "Market", "Mall", "Club", "Bar", "Hotel", "Showroom", "Studio"]
+    },
+    {
+        label: "Institutional / Civic",
+        options: ["School", "Hospital", "Clinic", "Laboratory", "Courthouse", "Prison", "Embassy", "Conference Center", "Library", "Museum", "Church", "Mosque", "Temple", "Post Office", "Town Hall"]
+    },
+    {
+        label: "Transit / Infrastructure",
+        options: ["Airport", "Train Station", "Bus Stop", "Port", "Construction Site", "Parking Lot", "Power Plant", "Bridge", "Tunnel"]
+    },
+    {
+        label: "Recreational / Natural",
+        options: ["Park", "Stadium", "Beach", "Forest", "Desert", "Mountain", "Cave", "Island", "Zoo", "Aquarium", "Theater", "Cinema", "Gym", "Golf Course", "Campsite"]
+    },
+];
+
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
   state: z.string().optional(),
-  addressName: z.string().min(1, 'An address name is required (e.g., Home, Office).'),
+  addressName: z.string().min(1, 'An address name is required.'),
+  customAddressName: z.string().optional(),
   titleDeedNumber: z.string().optional(),
   idNumber: z.string().optional(),
   gpsCoordinates: z.string().min(1, 'GPS coordinates are required.'),
@@ -157,6 +181,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
       country: '',
       state: '',
       addressName: '',
+      customAddressName: '',
       titleDeedNumber: '',
       idNumber: '',
       gpsCoordinates: '',
@@ -172,8 +197,12 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
   const physicalAddress = watchedValues.physicalAddress;
   const doorPhoto = watchedValues.doorPhoto;
   const addressName = watchedValues.addressName;
+  const customAddressName = watchedValues.customAddressName;
   const titleDeedNumber = watchedValues.titleDeedNumber;
   const idNumber = watchedValues.idNumber;
+
+  const finalAddressName = addressName === 'Other...' ? customAddressName : addressName;
+
 
   useEffect(() => {
     try {
@@ -364,6 +393,14 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     setResult(null);
     setError(null);
 
+    const finalName = values.addressName === 'Other...' ? values.customAddressName : values.addressName;
+
+    if (!finalName) {
+        toast({variant: 'destructive', title: "Address Name Required", description: "Please enter a custom address name."});
+        setIsLoading(false);
+        return;
+    }
+
     if (!generatedAddress) {
       setError("Could not generate a wallet address. Please check your GPS coordinates.");
       setIsLoading(false);
@@ -376,7 +413,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     formData.append('doorPhoto', values.doorPhoto);
     formData.append('countryCode', values.country);
     formData.append('physicalAddress', values.physicalAddress);
-    formData.append('addressName', values.addressName);
+    formData.append('addressName', finalName);
     
     if (showIdNumber && values.idNumber) {
         formData.append('idNumber', values.idNumber);
@@ -471,7 +508,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     }
   };
 
-  const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto && addressName && countryCode;
+  const isDataReadyForReview = gpsCoordinates && generatedAddress && physicalAddress && doorPhoto && finalAddressName && countryCode;
   const isFormReadOnly = result?.submitted === true;
 
   return (
@@ -493,25 +530,54 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
               <CardContent className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-6">
-                     <FormField
+                    <FormField
                       control={form.control}
                       name="addressName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>1. Address Name</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                              <Input placeholder="e.g., Home, Office, Warehouse" {...field} className="pl-10" />
-                            </div>
-                          </FormControl>
-                          <FormDescription>
-                            A friendly name for this address.
-                          </FormDescription>
+                          <FormLabel>1. Address Type</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a place type..." />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {placeTypes.map(group => (
+                                <SelectGroup key={group.label}>
+                                  <SelectLabel>{group.label}</SelectLabel>
+                                  {group.options.map(option => (
+                                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              ))}
+                              <SelectGroup>
+                                <SelectItem value="Other...">Other...</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+
+                    {addressName === 'Other...' && (
+                         <FormField
+                            control={form.control}
+                            name="customAddressName"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Custom Address Name</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="e.g., My Workshop" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
+
+
                     <div className="grid sm:grid-cols-2 gap-4">
                       <FormField
                           control={form.control}
@@ -772,7 +838,7 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                       <div className="p-4 rounded-lg bg-secondary space-y-3 text-sm">
                           <div>
                               <span className="font-semibold text-muted-foreground">Address Name:</span>
-                              <p>{addressName}</p>
+                              <p>{finalAddressName}</p>
                           </div>
                            <div>
                               <span className="font-semibold text-muted-foreground">Title Deed Number:</span>
