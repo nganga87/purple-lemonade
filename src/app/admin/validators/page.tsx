@@ -25,10 +25,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, UserCheck, CheckCircle, Shield, TrendingUp, Search, PlusCircle, UserPlus, UserX } from 'lucide-react';
+import { MoreHorizontal, ShieldAlert, TrendingUp, UserPlus, Users } from 'lucide-react';
 import { AppLayout } from '@/components/layout/app-layout';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 
 const initialValidators = [
