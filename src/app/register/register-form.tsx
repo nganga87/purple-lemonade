@@ -780,9 +780,9 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
                           render={() => (
                           <FormItem>
                               <FormLabel>8. Door Photo</FormLabel>
-                              <Tabs defaultValue="camera" className="w-full" onValueChange={(value) => value === 'camera' && requestCamera()}>
+                              <Tabs defaultValue="upload" className="w-full">
                               <TabsList className="grid w-full grid-cols-2">
-                                  <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'}><Camera className="mr-2"/>Use Camera</TabsTrigger>
+                                  <TabsTrigger value="camera" disabled={cameraStatus === 'notsupported'} onClick={requestCamera}><Camera className="mr-2"/>Use Camera</TabsTrigger>
                                   <TabsTrigger value="upload"><UploadCloud className="mr-2"/>Upload File</TabsTrigger>
                               </TabsList>
                               <TabsContent value="upload">
