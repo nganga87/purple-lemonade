@@ -21,6 +21,7 @@ import {
   Building,
   Archive,
   CreditCard,
+  UserCheck,
 } from 'lucide-react';
 import type { LucideProps } from 'lucide-react';
 import React from 'react';
@@ -101,6 +102,11 @@ export const adminNav: NavItem[] = [
     title: 'Address Audit',
     href: '/admin/address-audit',
     icon: ShieldCheck,
+  },
+  {
+    title: 'Validators',
+    href: '/admin/validators',
+    icon: UserCheck,
   },
   {
     title: 'User Feedback',
