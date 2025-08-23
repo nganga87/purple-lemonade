@@ -239,7 +239,7 @@ export default function PlatformSettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="stripe-api-key">Stripe API Key (Test)</Label>
-                    <Input id="stripe-api-key" type="password" defaultValue="sk_test_4eC39HqLyjWDarjtT1zdp7dc"/>
+                    <Input id="stripe-api-key" type="password"/>
                   </div>
                </div>
                <div className="space-y-4">
