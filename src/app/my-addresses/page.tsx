@@ -1,7 +1,8 @@
 
+
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -73,9 +74,11 @@ import { Label } from '@/components/ui/label';
 import { addresses as initialAddresses, type Address } from '@/lib/addresses';
 import { AppLayout } from '@/components/layout/app-layout';
 
+const ADDRESS_STORAGE_KEY = 'addressChainUserAddresses';
+
 export default function MyAddressesPage() {
   const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(addresses.find(a => a.isPrimary) || addresses[0] || null);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
   const [actionDialog, setActionDialog] = useState<'archive' | 'incident' | 'headquarters' | null>(null);
@@ -83,6 +86,28 @@ export default function MyAddressesPage() {
 
   const { toast } = useToast();
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
+  
+  useEffect(() => {
+    try {
+      const storedAddressesRaw = localStorage.getItem(ADDRESS_STORAGE_KEY);
+      const storedAddresses: Address[] = storedAddressesRaw ? JSON.parse(storedAddressesRaw) : [];
+      const combinedAddresses = [...initialAddresses];
+
+      storedAddresses.forEach(storedAddr => {
+        if (!combinedAddresses.some(initAddr => initAddr.nftId === storedAddr.nftId)) {
+          combinedAddresses.push(storedAddr);
+        }
+      });
+      
+      setAddresses(combinedAddresses);
+      setSelectedAddress(combinedAddresses.find(a => a.isPrimary) || combinedAddresses[0] || null);
+
+    } catch (e) {
+      console.error("Failed to load addresses from storage:", e);
+      setAddresses(initialAddresses);
+      setSelectedAddress(initialAddresses.find(a => a.isPrimary) || initialAddresses[0] || null);
+    }
+  }, []);
 
   const handleAddressSelect = (addressId: string) => {
     const address = addresses.find(addr => addr.nftId === addressId);

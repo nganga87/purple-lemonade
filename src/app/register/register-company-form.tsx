@@ -30,6 +30,7 @@ import { countries, type Country } from '@/lib/countries';
 import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { AdminUser } from '../admin/user-management/user-dialog';
+import type { Address } from '@/lib/addresses';
 
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
@@ -121,6 +122,7 @@ interface RegisterCompanyFormProps {
 type RegistrationResult = ValidateDoorPhotoOutput & { submitted?: boolean };
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
+const ADDRESS_STORAGE_KEY = 'addressChainUserAddresses';
 
 export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
   const [step, setStep] = useState(1);
@@ -240,6 +242,9 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
     formData.append('countryCode', values.country);
     formData.append('physicalAddress', values.physicalAddress);
     formData.append('idNumber', values.registrationNumber);
+    formData.append('addressName', values.companyName);
+    formData.append('isCompany', 'true');
+    formData.append('isHeadquarters', values.isHeadquarters ? 'true' : 'false');
 
     try {
       const response = await handleRegistration(formData);
@@ -247,7 +252,12 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
         throw new Error(response.error);
       }
       setResult(response);
-      if (response.isValid) {
+      if (response.isValid && response.newAddress) {
+        const existingAddressesRaw = localStorage.getItem(ADDRESS_STORAGE_KEY);
+        const existingAddresses: Address[] = existingAddressesRaw ? JSON.parse(existingAddressesRaw) : [];
+        const newAddresses = [...existingAddresses, response.newAddress];
+        localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(newAddresses));
+
         toast({ title: "Registration Submitted", description: response.validationDetails });
       }
     } catch (err) {
@@ -392,4 +402,3 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
     </div>
   );
 }
-

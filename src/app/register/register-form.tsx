@@ -31,6 +31,7 @@ import Link from 'next/link';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import type { Address } from '@/lib/addresses';
 
 const formSchema = z.object({
   country: z.string().min(1, 'Please select a country.'),
@@ -121,6 +122,7 @@ interface RegisterFormProps {
 type RegistrationResult = ValidateDoorPhotoOutput & { submitted?: boolean };
 
 const LOCAL_STORAGE_KEY = 'addressChainRegistrationForm';
+const ADDRESS_STORAGE_KEY = 'addressChainUserAddresses';
 
 // Helper to convert data URL to File object
 const dataUrlToFile = async (dataUrl: string, filename: string): Promise<File> => {
@@ -374,6 +376,8 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
     formData.append('doorPhoto', values.doorPhoto);
     formData.append('countryCode', values.country);
     formData.append('physicalAddress', values.physicalAddress);
+    formData.append('addressName', values.addressName);
+    
     if (showIdNumber && values.idNumber) {
         formData.append('idNumber', values.idNumber);
     }
@@ -384,11 +388,17 @@ export function RegisterForm({ onBack }: RegisterFormProps) {
         throw new Error(response.error);
       }
       setResult(response);
-      toast({
-        title: response.submitted ? "Registration Submitted" : "Validation Complete",
-        description: response.validationDetails,
-      });
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      
+      if (response.isValid && response.newAddress) {
+        const existingAddressesRaw = localStorage.getItem(ADDRESS_STORAGE_KEY);
+        const existingAddresses: Address[] = existingAddressesRaw ? JSON.parse(existingAddressesRaw) : [];
+        const newAddresses = [...existingAddresses, response.newAddress];
+        localStorage.setItem(ADDRESS_STORAGE_KEY, JSON.stringify(newAddresses));
+        
+        toast({ title: "Registration Submitted", description: response.validationDetails });
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+      }
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
