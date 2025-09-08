@@ -56,7 +56,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Badge } from '@/components/ui/badge';
-import { Logo } from '@/components/icons';
+import { Icons } from '@/components/icons';
 import {
   Table,
   TableBody,

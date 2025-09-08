@@ -3,7 +3,20 @@
 'use server';
 
 import { validateDoorPhoto, type ValidateDoorPhotoInput, type ValidateDoorPhotoOutput } from '@/ai/flows/validate-door-photo';
-import type { Address } from '@/lib/addresses';
+// Use a local, wider type for registration addresses to avoid overly narrow literal unions
+type RegistrationAddress = {
+  name: string;
+  address: string;
+  nftId: string;
+  gps: string;
+  status: string;
+  type: 'Individual' | 'Company';
+  isPrimary: boolean;
+  isHeadquarters: boolean;
+  personalId: string;
+};
+import { ensureSchema, getDb } from '@/lib/db';
+// JWT is handled on the client for this action by passing userId explicitly
 
 // Helper function to convert File to Data URI
 const fileToDataUri = async (file: File): Promise<string> => {
@@ -31,7 +44,7 @@ const getSatelliteImageForGps = async (gpsCoordinates: string): Promise<string> 
 };
 
 
-type ActionResponse = ValidateDoorPhotoOutput & { error?: string, submitted?: boolean, newAddress?: Address };
+type ActionResponse = ValidateDoorPhotoOutput & { error?: string, submitted?: boolean, newAddress?: RegistrationAddress };
 
 export async function handleRegistration(formData: FormData): Promise<ActionResponse> {
   try {
@@ -44,6 +57,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
     const addressName = formData.get('addressName') as string | null;
     const isCompany = formData.get('isCompany') === 'true';
     const isHeadquarters = formData.get('isHeadquarters') === 'true';
+    const userIdFromForm = formData.get('userId') as string | null;
 
     if (!doorPhoto || doorPhoto.size === 0) {
       return { isValid: false, validationDetails: 'Door photo is missing or empty.', error: 'Door photo is missing or empty.', submitted: false };
@@ -67,7 +81,7 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
 
     const doorPhotoDataUri = await fileToDataUri(doorPhoto);
     
-    const newAddress: Address = {
+    const newAddress: RegistrationAddress = {
         name: addressName,
         address: physicalAddress,
         nftId: cryptoAddress,
@@ -79,21 +93,36 @@ export async function handleRegistration(formData: FormData): Promise<ActionResp
         personalId: `did:dap:${[...Array(4)].map(() => Math.floor(Math.random() * 9000) + 1000).join('-')}`
     };
     
-    // The data saved would include all form fields and the doorPhotoDataUri.
-    console.log('Registration submitted for validation:', {
-      cryptoAddress,
-      gpsCoordinates,
-      countryCode,
-      physicalAddress,
-      idNumber: idNumber || undefined,
-      doorPhotoDataUri: doorPhotoDataUri.substring(0, 50) + '...' // Log snippet
-    });
-    
-    // For the demo, we'll return a success state indicating it's been submitted,
-    // skipping the immediate AI validation.
-    return { 
+    // Persist to Postgres
+    await ensureSchema();
+    const client = await getDb().connect();
+    try {
+      const id = `addr_${Date.now()}`;
+      const userId = userIdFromForm || null;
+      await client.query(
+        `INSERT INTO addresses (id, name, address, nft_id, gps, status, type, is_primary, is_headquarters, personal_id, user_id) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+        [
+          id,
+          newAddress.name,
+          newAddress.address,
+          newAddress.nftId,
+          newAddress.gps,
+          newAddress.status,
+          newAddress.type,
+          newAddress.isPrimary,
+          newAddress.isHeadquarters,
+          newAddress.personalId,
+          userId,
+        ]
+      );
+    } finally {
+      client.release();
+    }
+
+    return {
       isValid: true,
-      validationDetails: 'Your address has been submitted and is now pending third-party validation. You can track its status on the "My Addresses" page.',
+      validationDetails:
+        'Your address has been submitted and is now pending third-party validation. You can track its status on the "My Addresses" page.',
       submitted: true,
       newAddress: newAddress,
     };

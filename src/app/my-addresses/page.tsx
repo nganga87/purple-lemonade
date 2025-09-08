@@ -71,14 +71,23 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { addresses as initialAddresses, type Address } from '@/lib/addresses';
+// Local UI type compatible with API payload
+type AddressUI = {
+  isPrimary: boolean;
+  isHeadquarters: boolean;
+  name: string;
+  address: string;
+  nftId: string;
+  personalId: string;
+  gps: string;
+  status: 'Verified' | 'Pending' | 'Compromised' | string;
+  createdAt?: string;
+};
 import { AppLayout } from '@/components/layout/app-layout';
 
-const ADDRESS_STORAGE_KEY = 'addressChainUserAddresses';
-
 export default function MyAddressesPage() {
-  const [addresses, setAddresses] = useState<Address[]>(initialAddresses);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [addresses, setAddresses] = useState<AddressUI[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<AddressUI | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
   const [actionDialog, setActionDialog] = useState<'archive' | 'incident' | 'headquarters' | null>(null);
@@ -88,25 +97,27 @@ export default function MyAddressesPage() {
   const [copiedItem, setCopiedItem] = useState<string | null>(null);
   
   useEffect(() => {
-    try {
-      const storedAddressesRaw = localStorage.getItem(ADDRESS_STORAGE_KEY);
-      const storedAddresses: Address[] = storedAddressesRaw ? JSON.parse(storedAddressesRaw) : [];
-      const combinedAddresses = [...initialAddresses];
-
-      storedAddresses.forEach(storedAddr => {
-        if (!combinedAddresses.some(initAddr => initAddr.nftId === storedAddr.nftId)) {
-          combinedAddresses.push(storedAddr);
+    const load = async () => {
+      try {
+        const res = await fetch('/api/addresses');
+        if (res.status === 401) {
+          setAddresses([]);
+          setSelectedAddress(null);
+          return;
         }
-      });
-      
-      setAddresses(combinedAddresses);
-      setSelectedAddress(combinedAddresses.find(a => a.isPrimary) || combinedAddresses[0] || null);
-
-    } catch (e) {
-      console.error("Failed to load addresses from storage:", e);
-      setAddresses(initialAddresses);
-      setSelectedAddress(initialAddresses.find(a => a.isPrimary) || initialAddresses[0] || null);
-    }
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setAddresses(data as AddressUI[]);
+          const first = (data as AddressUI[]).find(a => a.isPrimary) || (data as AddressUI[])[0] || null;
+          setSelectedAddress(first);
+        }
+      } catch (e) {
+        console.error('Failed to load addresses:', e);
+        setAddresses([]);
+        setSelectedAddress(null);
+      }
+    };
+    load();
   }, []);
 
   const handleAddressSelect = (addressId: string) => {
@@ -114,7 +125,7 @@ export default function MyAddressesPage() {
     setSelectedAddress(address || null);
   };
   
-  const handleAddressUpdate = (updatedAddress: Address) => {
+  const handleAddressUpdate = (updatedAddress: AddressUI) => {
     const newAddresses = addresses.map(addr => addr.nftId === updatedAddress.nftId ? updatedAddress : addr);
     setAddresses(newAddresses);
     setSelectedAddress(updatedAddress);
@@ -219,7 +230,7 @@ export default function MyAddressesPage() {
     }
   };
 
-  const getStatusBadge = (status: Address['status']) => {
+  const getStatusBadge = (status: AddressUI['status']) => {
     switch (status) {
       case 'Verified':
         return <Badge variant="secondary" className="bg-green-100 text-green-800">Verified</Badge>;

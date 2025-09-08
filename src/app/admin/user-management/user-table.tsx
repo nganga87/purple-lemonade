@@ -32,10 +32,8 @@ import { MoreHorizontal, PlusCircle, Edit, Trash2, KeyRound, ShieldQuestion } fr
 import { UserDialog, type AdminUser } from './user-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { roles } from './roles';
-import { initialUsers } from './users';
+// Removed localStorage seeding; now using PostgreSQL-backed API endpoints
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-
-const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
 export function UserTable() {
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -46,41 +44,62 @@ export function UserTable() {
   const { toast } = useToast();
   
   useEffect(() => {
-    try {
-      const savedUsers = localStorage.getItem(USER_STORAGE_KEY);
-      if (savedUsers) {
-        setUsers(JSON.parse(savedUsers));
-      } else {
-        setUsers(initialUsers);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(initialUsers));
+    const load = async () => {
+      try {
+        const res = await fetch('/api/admin/users');
+        const data = await res.json();
+        if (Array.isArray(data)) setUsers(data as AdminUser[]);
+      } catch (e) {
+        console.error('Failed to load users:', e);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not load users from server.' });
       }
-    } catch (e) {
-      console.error("Failed to load users from storage:", e);
-      setUsers(initialUsers);
-    }
+    };
+    load();
   }, []);
 
-  const updateUsers = (newUsers: AdminUser[]) => {
-    setUsers(newUsers);
+  const refreshUsers = async () => {
     try {
-      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUsers));
+      const res = await fetch('/api/admin/users');
+      const data = await res.json();
+      if (Array.isArray(data)) setUsers(data as AdminUser[]);
     } catch (e) {
-      console.error("Failed to save users to storage:", e);
+      console.error('Failed to refresh users:', e);
     }
   };
 
   const handleSaveUser = (user: AdminUser) => {
-    let newUsers;
-    if (editingUser) {
-      newUsers = users.map(u => u.id === user.id ? user : u);
-      toast({ title: 'User Updated', description: `${user.name}'s details have been updated.` });
-    } else {
-      const newUser = { ...user, id: `usr_${Date.now()}` };
-      newUsers = [newUser, ...users];
-      toast({ title: 'User Added', description: `${user.name} has been added to the system.` });
-    }
-    updateUsers(newUsers);
-    setEditingUser(null);
+    const save = async () => {
+      try {
+        if (editingUser && user.id) {
+          const res = await fetch(`/api/admin/users/${user.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user),
+          });
+          if (!res.ok) throw new Error('Failed to update user');
+          toast({ title: 'User Updated', description: `${user.name}'s details have been updated.` });
+        } else {
+          const payload = { ...user };
+          // Ensure required fields for API
+          if (!('password' in payload) || !payload.password) {
+            (payload as any).password = 'Temp#12345'; // placeholder; real app should invite user to set password
+          }
+          const res = await fetch('/api/admin/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error('Failed to add user');
+          toast({ title: 'User Added', description: `${user.name} has been added to the system.` });
+        }
+        await refreshUsers();
+        setEditingUser(null);
+      } catch (e) {
+        console.error(e);
+        toast({ variant: 'destructive', title: 'Save Failed', description: 'Could not save user.' });
+      }
+    };
+    void save();
   };
   
   const handleEdit = (user: AdminUser) => {
@@ -94,17 +113,39 @@ export function UserTable() {
   };
   
   const handleDelete = (userId: string) => {
-      const userName = users.find(u => u.id === userId)?.name;
-      const newUsers = users.filter(u => u.id !== userId);
-      updateUsers(newUsers);
-      toast({ variant: 'destructive', title: `User Deleted`, description: `${userName} has been removed from the system.` });
+      const doDelete = async () => {
+        try {
+          const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('Failed to delete');
+          await refreshUsers();
+          const userName = users.find(u => u.id === userId)?.name;
+          toast({ variant: 'destructive', title: `User Deleted`, description: `${userName} has been removed from the system.` });
+        } catch (e) {
+          console.error(e);
+          toast({ variant: 'destructive', title: 'Delete Failed', description: 'Could not delete user.' });
+        }
+      };
+      void doDelete();
   }
 
   const handleSetStatus = (userId: string, status: AdminUser['status']) => {
-      const newUsers = users.map(u => u.id === userId ? {...u, status} : u);
-      updateUsers(newUsers);
-      const userName = users.find(u => u.id === userId)?.name;
-      toast({ title: `Status Updated`, description: `${userName}'s status has been set to ${status}.` });
+      const doUpdate = async () => {
+        try {
+          const res = await fetch(`/api/admin/users/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status }),
+          });
+          if (!res.ok) throw new Error('Failed to update status');
+          await refreshUsers();
+          const userName = users.find(u => u.id === userId)?.name;
+          toast({ title: `Status Updated`, description: `${userName}'s status has been set to ${status}.` });
+        } catch (e) {
+          console.error(e);
+          toast({ variant: 'destructive', title: 'Update Failed', description: 'Could not update status.' });
+        }
+      };
+      void doUpdate();
   }
 
   const handleViewSecurityQuestions = (user: AdminUser) => {

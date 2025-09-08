@@ -12,8 +12,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from '@/hooks/use-toast';
 import type { AdminUser } from '../admin/user-management/user-dialog';
 
-const USER_STORAGE_KEY = 'addressChainAdminUsers';
-
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -22,44 +20,29 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    setTimeout(() => {
-      try {
-        const storedUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
-        const storedUsers: AdminUser[] = storedUsersRaw ? JSON.parse(storedUsersRaw) : [];
-        
-        const user = storedUsers.find(
-          u => u.email === email && u.password === password
-        );
-
-        if (user) {
-          toast({
-            title: "Login Successful",
-            description: `Welcome back, ${user.name}!`,
-          });
-          localStorage.setItem('loggedInUserName', user.name || 'User');
-          router.push('/dashboard');
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: "Invalid email or password. Please try again.",
-          });
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error("Login error:", error);
-        toast({
-          variant: "destructive",
-          title: "An Error Occurred",
-          description: "Could not process login. Please try again later.",
-        });
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ variant: 'destructive', title: 'Login Failed', description: data.error || 'Invalid email or password.' });
         setIsLoading(false);
+        return;
       }
-    }, 1000);
+      toast({ title: 'Login Successful', description: `Welcome back, ${data.name}!` });
+      localStorage.setItem('loggedInUserName', data.name || 'User');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({ variant: 'destructive', title: 'An Error Occurred', description: 'Could not process login. Please try again later.' });
+      setIsLoading(false);
+    }
   };
 
   return (

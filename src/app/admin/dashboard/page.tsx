@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DollarSign,
   Users,
@@ -34,11 +34,38 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
-import { adminUsers, b2bClients, revenueData } from './data';
 import { AppLayout } from '@/components/layout/app-layout';
 
 
+type RevenuePoint = { name: string; revenue: number };
+type AdminRow = { id?: string; name: string; email: string; role?: string; status: string };
+type ClientRow = { company: string; contact: string; plan: string; since: string };
+
 export default function AdminDashboardPage() {
+  const [revenueData, setRevenueData] = useState<RevenuePoint[]>([]);
+  const [adminUsers, setAdminUsers] = useState<AdminRow[]>([]);
+  const [b2bClients, setB2bClients] = useState<ClientRow[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [revRes, usersRes, clientsRes] = await Promise.all([
+          fetch('/api/admin/dashboard/revenue'),
+          fetch('/api/admin/users'),
+          fetch('/api/admin/dashboard/clients'),
+        ]);
+        const [rev, users, clients] = await Promise.all([
+          revRes.json(), usersRes.json(), clientsRes.json()
+        ]);
+        if (Array.isArray(rev)) setRevenueData(rev);
+        if (Array.isArray(users)) setAdminUsers(users);
+        if (Array.isArray(clients)) setB2bClients(clients);
+      } catch (e) {
+        console.error('Failed to load dashboard data', e);
+      }
+    };
+    load();
+  }, []);
   return (
     <AppLayout nav="admin">
         <main className="flex-1 p-4 md:p-6 lg:p-8 space-y-8">

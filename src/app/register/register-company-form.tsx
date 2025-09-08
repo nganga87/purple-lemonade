@@ -245,6 +245,15 @@ export function RegisterCompanyForm({ onBack }: RegisterCompanyFormProps) {
     formData.append('addressName', values.companyName);
     formData.append('isCompany', 'true');
     formData.append('isHeadquarters', values.isHeadquarters ? 'true' : 'false');
+    try {
+      const meRes = await fetch('/api/auth/me');
+      if (meRes.ok) {
+        const me = await meRes.json();
+        if (me?.user?.sub) {
+          formData.append('userId', me.user.sub);
+        }
+      }
+    } catch {}
 
     try {
       const response = await handleRegistration(formData);

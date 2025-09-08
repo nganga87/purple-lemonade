@@ -16,6 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { inferAccountTypeFromEmail, getDomainFromEmail, isCorporateDomain } from '@/lib/email';
 
 const USER_STORAGE_KEY = 'addressChainAdminUsers';
 
@@ -38,51 +39,49 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [accountType, setAccountType] = useState<'individual' | 'company'>('individual');
+  const [manuallySelectedType, setManuallySelectedType] = useState(false);
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
   });
 
-  const onSubmit = (values: SignupFormValues) => {
+  const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
-
-    setTimeout(() => {
-      try {
-        const existingUsersRaw = localStorage.getItem(USER_STORAGE_KEY);
-        let users: AdminUser[] = existingUsersRaw ? JSON.parse(existingUsersRaw) : [];
-
-        if (users.some(u => u.email === values.email)) {
-          toast({ variant: 'destructive', title: 'Account Exists', description: 'An account with this email already exists. Please log in.'});
-          setIsLoading(false);
-          return;
-        }
-
-        const newUser: AdminUser = {
-          id: `usr_${Date.now()}`,
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: values.name,
           email: values.email,
           password: values.password,
-          role: accountType,
-          status: 'Active',
-        };
+          accountType,
+        }),
+      });
 
-        users.push(newUser);
-        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(users));
-
-        toast({
-          title: "Account Created!",
-          description: "You're all set! Redirecting you to set up security questions.",
-        });
-        
-        router.push(`/signup/security-questions?userId=${newUser.id}&accountType=${accountType}&name=${encodeURIComponent(values.name)}`);
-
-      } catch (error) {
-        console.error("Signup error:", error);
-        toast({ variant: 'destructive', title: 'Error', description: 'Could not create your account.'});
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ variant: 'destructive', title: 'Signup Failed', description: data.error || 'Unknown error' });
         setIsLoading(false);
+        return;
       }
-    }, 1000);
+
+      // Optional compatibility for other parts of the app that read this value.
+      localStorage.setItem('loggedInUserName', values.name || 'User');
+
+      toast({
+        title: 'Account Created!',
+        description: "You're all set! Redirecting you to set up security questions.",
+      });
+
+      router.push(`/signup/security-questions?userId=${data.id}&accountType=${accountType}&name=${encodeURIComponent(values.name)}`);
+    } catch (error) {
+      console.error('Signup error:', error);
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not create your account.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   return (
@@ -102,7 +101,7 @@ export default function SignUpPage() {
         <CardContent>
           <Form {...form}>
             <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-              <Tabs defaultValue="individual" onValueChange={(value) => setAccountType(value as 'individual' | 'company')} className="w-full">
+              <Tabs value={accountType} onValueChange={(value) => { setAccountType(value as 'individual' | 'company'); setManuallySelectedType(true); }} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="individual">
                     <User className="mr-2 h-4 w-4"/> Individual
@@ -138,10 +137,33 @@ export default function SignUpPage() {
                      <FormControl>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                          <Input type="email" placeholder="name@digitaladdress.com" className="pl-10" {...field} />
+                          <Input
+                            type="email"
+                            placeholder="name@digitaladdress.com"
+                            className="pl-10"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              if (!manuallySelectedType) {
+                                const inferred = inferAccountTypeFromEmail(e.target.value);
+                                setAccountType(inferred);
+                              }
+                            }}
+                          />
                         </div>
-                    </FormControl>
-                    <FormMessage />
+                      </FormControl>
+                      {(() => {
+                        const email = form.watch('email');
+                        const domain = getDomainFromEmail(email || '');
+                        if (!domain) return null;
+                        const corporate = isCorporateDomain(domain);
+                        return (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Detected domain: <span className="font-mono">{domain}</span>. Account type set to <span className="font-semibold">{corporate ? 'Company' : 'Individual'}</span>{manuallySelectedType ? ' (overridden manually)' : ''}.
+                          </p>
+                        );
+                      })()}
+                      <FormMessage />
                   </FormItem>
                 )}
               />
