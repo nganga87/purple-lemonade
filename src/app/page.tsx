@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { ArrowRight, KeyRound, Search, Copy } from 'lucide-react';
-import { Icons } from '@/components/icons';
+import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';

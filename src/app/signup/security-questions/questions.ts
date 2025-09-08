@@ -11,3 +11,16 @@ export const individualSecurityQuestions = [
   "What is the name of the street you grew up on?",
   "What was your favorite food as a child?"
 ];
+
+export const companySecurityQuestions = [
+  "What is your company's tax identification number?",
+  "What year was your company founded?",
+  "What is your company's main product or service?",
+  "Who is your company's CEO?",
+  "What is your company's main office location?",
+  "What is your company's primary industry?",
+  "What is your company's main phone number?",
+  "What is your company's website?",
+  "How many employees does your company have?",
+  "What is your company's main business email domain?"
+];

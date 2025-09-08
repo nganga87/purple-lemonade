@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Logo } from '@/components/icons';
 import {
   Bell,
   UserCircle,
